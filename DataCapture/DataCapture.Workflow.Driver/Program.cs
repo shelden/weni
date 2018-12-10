@@ -1,4 +1,6 @@
 ﻿using System;
+using DataCapture.Workflow.Db;
+
 namespace DataCapture.Workflow.Driver
 {
     public class Program
@@ -22,6 +24,9 @@ namespace DataCapture.Workflow.Driver
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
+            var dbConn = ConnectionFactory.Create();
+            var user = User.Select(dbConn, "HfNgoxuuWb");
+            Console.WriteLine(user == null ? "[null]" : user.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 

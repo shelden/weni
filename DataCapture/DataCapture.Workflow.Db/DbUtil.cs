@@ -2,7 +2,7 @@
 using System.Data;
 using System.Text;
 
-namespace VtPurple.Db
+namespace DataCapture.Workflow.Db
 {
     public static class DbUtil
     {
