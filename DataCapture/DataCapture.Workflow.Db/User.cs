@@ -41,17 +41,6 @@ namespace DataCapture.Workflow.Db
         }
         #endregion
 
-        #region ToString()
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.Append(this.Login);
-            sb.Append(", id=");
-            sb.Append(this.Id);
-            return sb.ToString();
-        }
-        #endregion
-
         #region CRUD: Insert
         public static void Insert(IDbConnection dbConn
             , String login
@@ -82,5 +71,17 @@ namespace DataCapture.Workflow.Db
                 );
         }
         #endregion
+
+        #region ToString()
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(this.Login);
+            sb.Append(", id=");
+            sb.Append(this.Id);
+            return sb.ToString();
+        }
+        #endregion
+
     }
 }
