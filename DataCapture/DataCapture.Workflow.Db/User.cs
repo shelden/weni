@@ -25,11 +25,20 @@ namespace DataCapture.Workflow.Db
             ;
         #endregion
 
-        #region properties
+        #region Properties
         public String Login { get; set; }
         public int LoginLimit { get; set; }
         public int Id { get; set; }
         //public enum Status { get; set; }
+        #endregion
+
+        #region Constructors
+        public User(int id, String login, int loginLimit)
+        {
+            Id = id;
+            LoginLimit = loginLimit;
+            Login = login;
+        }
         #endregion
 
         #region ToString()
@@ -40,15 +49,6 @@ namespace DataCapture.Workflow.Db
             sb.Append(", id=");
             sb.Append(this.Id);
             return sb.ToString();
-        }
-        #endregion
-
-        #region constructors
-        public User(int id, String login, int loginLimit)
-        {
-            Id = id;
-            LoginLimit = loginLimit;
-            Login = login;
         }
         #endregion
 
