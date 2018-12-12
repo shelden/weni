@@ -39,6 +39,7 @@
     <Compile Include="DbUtil.cs" />
     <Compile Include="ConnectionFactory.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="Session.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

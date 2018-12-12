@@ -22,6 +22,14 @@ namespace DataCapture.Workflow.Db
             param.Value = value;
             command.Parameters.Add(param);
         }
+        public static void AddParameter(IDbCommand command, String name, DateTime value)
+        {
+            var param = command.CreateParameter();
+            param.DbType = System.Data.DbType.DateTime;
+            param.ParameterName = name;
+            param.Value = value;
+            command.Parameters.Add(param);
+        }
         public static int SelectCount(IDbConnection dbConn, string table)
         {
  
@@ -32,9 +40,21 @@ namespace DataCapture.Workflow.Db
             command.CommandText = sql.ToString();
             var o = command.ExecuteScalar();
 
-            // this is crap XXX RTFM how to get this scalar as int
+            // RTFM how to get this scalar as int more cleanly
             String s = o.ToString();
             return int.Parse(s);
+        }
+        public static void ReallyClose(IDataReader reader)
+        {
+            if (reader == null) return;
+            try
+            {
+                reader.Close();
+            }
+            catch
+            {
+                ; // no code; per contract
+            }
         }
 
     }

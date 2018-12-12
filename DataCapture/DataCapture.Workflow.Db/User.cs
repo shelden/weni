@@ -58,17 +58,24 @@ namespace DataCapture.Workflow.Db
         #region CRUD: Select
         public static User Select(IDbConnection dbConn, String login)
         {
-            IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = SELECT_BY_LOGIN;
-            DbUtil.AddParameter(command, "@login", login);
-            var reader = command.ExecuteReader();
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_LOGIN;
+                DbUtil.AddParameter(command, "@login", login);reader = command.ExecuteReader();
 
-            if (reader == null) return null;
-            if (!reader.Read()) return null;
-            return new User(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                , reader.GetString(1)
-                , reader.GetInt32(2)
-                );
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new User(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
+                    , reader.GetString(1)
+                    , reader.GetInt32(2)
+                    );
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
         }
         #endregion
 
