@@ -17,3 +17,4 @@ namespace VtPurple.Misc.Tests
         }
     }
 }
+

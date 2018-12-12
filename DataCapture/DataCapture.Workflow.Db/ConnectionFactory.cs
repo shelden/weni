@@ -38,3 +38,4 @@ namespace DataCapture.Workflow.Db
         #endregion
     }
 }
+
