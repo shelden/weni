@@ -21,7 +21,7 @@ namespace DataCapture.Workflow.Test
         [Test()]
         // if you don't close your reader correctly, you get an
         // error inserting in this order...
-        public void CanInsertCheckingFirst()
+        public void CanSelectThenInsert()
         {
             String login = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();

@@ -25,17 +25,15 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var user = User.Select(dbConn, "smith");
-            if (user == null)
+            var queue = Queue.Select(dbConn, "stuff");
+            if (queue == null)
             {
-                User.Insert(dbConn, "smith", 99);
-                user = User.Select(dbConn, "smith");
+                Queue.Insert(dbConn, "stuff");
+                queue = Queue.Select(dbConn, "stuff");
             }
 
-            var session = Session.Insert(dbConn, user);
 
-            Console.WriteLine(user == null ? "[null]" : user.ToString());
-            Console.WriteLine(session == null ? "[null]" : session.ToString());
+            Console.WriteLine(queue == null ? "[null]" : queue.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 
