@@ -8,6 +8,3 @@ namespace DataCapture.Workflow
         }
     }
 }
-
-
-#error error to be caught in jenkins

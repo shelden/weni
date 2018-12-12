@@ -38,6 +38,3 @@ namespace DataCapture.Workflow.Db
         #endregion
     }
 }
-
-
-#error error to be caught in jenkins

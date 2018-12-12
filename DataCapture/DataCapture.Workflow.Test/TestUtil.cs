@@ -24,6 +24,3 @@ namespace DataCapture.Workflow.Test
 
     }
 }
-
-
-#error error to be caught in jenkins

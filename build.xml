@@ -1,0 +1,18 @@
+<project name="DataCapture.Workflow"
+	 default="all"
+	 basedir="."
+	 >
+    <target name="all" 
+	    depends="db.init,build,test"
+	    />
+    <!-- ================================================================== -->
+    <target name="db.init" /> 
+    <target name="test" />
+    <!-- ================================================================== -->
+    <target name="build">
+        <exec executable="msbuild">
+	    <arg value="DataCapture/DataCapture.Workflow.sln" />
+	</exec>
+    </target>
+    <!-- ================================================================== -->
+</project>    
