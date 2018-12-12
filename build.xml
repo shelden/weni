@@ -4,6 +4,9 @@
 	 >
     <!-- ================================================================== -->
     <property environment="env" />
+    <property name="msbuild"
+	      value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
+	      />
     <!-- ================================================================== -->
     <target name="all" 
 	    depends="echo,db.init,build,test"
@@ -17,10 +20,7 @@
     </target>
     <!-- ================================================================== -->
     <target name="build">
-        <exec executable="msbuild" failonerror="true">
-	    <env key="PATH"
-		 value="${env.PATH};C:\Windows\Microsoft.NET\Framework64\v4.0.30319"
-		 />
+        <exec executable="${msbuild}" failonerror="true">
 	    <arg value="DataCapture/DataCapture.Workflow.sln" />
 	</exec>
     </target>
