@@ -19,6 +19,26 @@ namespace DataCapture.Workflow.Test
         }
 
         [Test()]
+        // if you don't close your reader correctly, you get an
+        // error inserting this way
+        public void CanInsertCheckingFirst()
+        {
+
+            String login = TestUtil.NextString();
+            var dbConn = ConnectionFactory.Create();
+            var user = User.Select(dbConn, login);
+            Assert.AreEqual(user, null); // because login is a random string
+
+            User.Insert(dbConn, login, 99);
+            user = User.Select(dbConn, login);
+
+            Assert.AreEqual(user.Login, login);
+            Assert.AreEqual(user.LoginLimit, 99);
+            Assert.GreaterOrEqual(user.Id, 1);
+
+        }
+
+        [Test()]
         public void CannotInsertDuplicate()
         {
             String login = TestUtil.NextString();

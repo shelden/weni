@@ -25,7 +25,15 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var user = User.Select(dbConn, "HfNgoxuuWb");
+            var user = User.Select(dbConn, "smith");
+            if (user == null)
+            {
+                User.Insert(dbConn, "smith", 99);
+                user = User.Select(dbConn, "smith");
+            }
+
+            Session.Insert(dbConn, user);
+
             Console.WriteLine(user == null ? "[null]" : user.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
