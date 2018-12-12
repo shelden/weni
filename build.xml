@@ -1,0 +1,28 @@
+<project name="DataCapture.Workflow"
+	 default="all"
+	 basedir="."
+	 >
+    <!-- ================================================================== -->
+    <property environment="env" />
+    <!-- ================================================================== -->
+    <target name="all" 
+	    depends="echo,db.init,build,test"
+	    />
+    <!-- ================================================================== -->
+    <target name="db.init" /> 
+    <target name="test" />
+    <!-- ================================================================== -->
+    <target name="echo">
+        <echo message="${env.PATH}" />
+    </target>
+    <!-- ================================================================== -->
+    <target name="build">
+        <exec executable="msbuild" failonerror="true">
+	    <env key="PATH"
+		 value="${env.PATH};C:\Windows\Microsoft.NET\Framework64\v4.0.30319"
+		 />
+	    <arg value="DataCapture/DataCapture.Workflow.sln" />
+	</exec>
+    </target>
+    <!-- ================================================================== -->
+</project>    
