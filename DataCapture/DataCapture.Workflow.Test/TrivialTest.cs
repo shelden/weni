@@ -18,3 +18,5 @@ namespace VtPurple.Misc.Tests
     }
 }
 
+
+#error error to be caught in jenkins
