@@ -32,9 +32,10 @@ namespace DataCapture.Workflow.Driver
                 user = User.Select(dbConn, "smith");
             }
 
-            Session.Insert(dbConn, user);
+            var session = Session.Insert(dbConn, user);
 
             Console.WriteLine(user == null ? "[null]" : user.ToString());
+            Console.WriteLine(session == null ? "[null]" : session.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 

@@ -42,16 +42,17 @@ namespace DataCapture.Workflow.Db
         #endregion
 
         #region CRUD: Insert
-        public static void Insert(IDbConnection dbConn
+        public static User Insert(IDbConnection dbConn
             , String login
             , int login_limit
             )
         {
             IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = INSERT;
+            command.CommandText = INSERT + ";" + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@login", login);
             DbUtil.AddParameter(command, "@limit", login_limit);
-            command.ExecuteNonQuery();
+            int id = Convert.ToInt32(command.ExecuteScalar());
+            return new User(id, login, login_limit);
         }
         #endregion
 

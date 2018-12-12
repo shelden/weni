@@ -20,10 +20,9 @@ namespace DataCapture.Workflow.Test
 
         [Test()]
         // if you don't close your reader correctly, you get an
-        // error inserting this way
+        // error inserting in this order...
         public void CanInsertCheckingFirst()
         {
-
             String login = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
             var user = User.Select(dbConn, login);
@@ -35,7 +34,31 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(user.Login, login);
             Assert.AreEqual(user.LoginLimit, 99);
             Assert.GreaterOrEqual(user.Id, 1);
+        }
 
+        [Test()]
+        // Now that Insert returns User, not void, let's check some things:
+        public void InsertAndSelectEqual()
+        {
+            String login = TestUtil.NextString();
+            int limit = TestUtil.RANDOM.Next(10, 20);
+            var dbConn = ConnectionFactory.Create();
+            var user = User.Select(dbConn, login);
+            Assert.AreEqual(user, null); // because login is a random string
+
+            var inserted = User.Insert(dbConn, login, limit);
+            Assert.AreNotEqual(inserted, null);
+
+            var selected = User.Select(dbConn, login);
+            Assert.AreNotEqual(selected, inserted);
+
+            // now make sure they have the same attribites.  Prebably
+            // better if we overloaded Equals?
+            Assert.AreEqual(inserted.Id, selected.Id);
+            Assert.AreEqual(inserted.Login, selected.Login);
+            Assert.AreEqual(inserted.LoginLimit, selected.LoginLimit);
+            Assert.AreEqual(selected.Login, login);
+            Assert.AreEqual(selected.LoginLimit, limit);
         }
 
         [Test()]
