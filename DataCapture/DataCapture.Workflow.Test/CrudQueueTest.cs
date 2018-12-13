@@ -82,7 +82,7 @@ namespace DataCapture.Workflow.Test
 
             Assert.AreNotEqual("", msg);
             Console.WriteLine("expected exception: " + msg);
-            int after2 = DbUtil.SelectCount(dbConn, User.TABLE);
+            int after2 = DbUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(after2, before + 1);
         }
 
