@@ -42,6 +42,7 @@
     <Compile Include="Session.cs" />
     <Compile Include="Queue.cs" />
     <Compile Include="AllowedQueue.cs" />
+    <Compile Include="Map.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
