@@ -49,7 +49,6 @@ namespace DataCapture.Workflow.Db
             , Queue queue
             )
         {
-            int type = 1; // XXX should be enum
             IDbCommand command = dbConn.CreateCommand();
             command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@queue_id", queue.Id);

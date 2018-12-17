@@ -41,6 +41,14 @@ namespace DataCapture.Workflow.Db
             param.Value = value;
             command.Parameters.Add(param);
         }
+        public static void AddNullParameter(IDbCommand command, String name)
+        {
+            var param = command.CreateParameter();
+            param.DbType = System.Data.DbType.Int32;
+            param.ParameterName = name;
+            param.Value = null;
+            command.Parameters.Add(param);
+        }
         #endregion
 
         #region SelectCount

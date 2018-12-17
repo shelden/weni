@@ -1,12 +1,12 @@
 ﻿using System;
 using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Test;
 
 namespace DataCapture.Workflow.Driver
 {
     public class Program
     {
         #region Constants
-        public static readonly String SCMID_ = "$Id$";
         #endregion
 
         #region Members
@@ -25,15 +25,21 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var queue = Queue.Select(dbConn, "stuff");
-            if (queue == null)
-            {
-                Queue.Insert(dbConn, "stuff");
-                queue = Queue.Select(dbConn, "stuff");
-            }
+            String step1Name = TestUtil.NextString();
+            String step0Name = TestUtil.NextString();
+            String queueName = TestUtil.NextString();
+            String mapName = TestUtil.NextString();
+            int type = TestUtil.RANDOM.Next(2, 100);
 
+            var queue = Queue.Insert(dbConn, queueName);
+            var map = Map.Insert(dbConn, mapName);
+            var step1 = Step.Insert(dbConn, step1Name, map, queue, type);
+            var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
+            var stepN = Step.Select(dbConn, step0Name);
 
-            Console.WriteLine(queue == null ? "[null]" : queue.ToString());
+            Console.WriteLine(step0 == null ? "[null]" : step0.ToString());
+            Console.WriteLine(step1 == null ? "[null]" : step1.ToString());
+            Console.WriteLine(stepN == null ? "[null]" : stepN.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 

@@ -43,6 +43,7 @@
     <Compile Include="Queue.cs" />
     <Compile Include="AllowedQueue.cs" />
     <Compile Include="Map.cs" />
+    <Compile Include="Step.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
