@@ -144,15 +144,15 @@ CREATE TABLE IF NOT EXISTS work_items
      NAME           VARCHAR(32)     DEFAULT NULL,
      STATE          SMALLINT(5)     NOT NULL DEFAULT 1,
      PRIORITY       INT(10)         NOT NULL DEFAULT 0,
-     CREATED        DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-     ENTERED_STATE  DATETIME        NOT NULL,
-     USER_SESSION   INT(10)         UNSIGNED,
+     CREATED        DATETIME(6)     NOT NULL,
+     ENTERED        DATETIME(6)     NOT NULL,
+     SESSION_ID     INT(10)         UNSIGNED,
 
      PRIMARY KEY (ITEM_ID),
      FOREIGN KEY items_step_fk (STEP_ID)
         REFERENCES steps (STEP_ID)
         ON DELETE RESTRICT,
-     FOREIGN KEY items_session_fk (USER_SESSION)
+     FOREIGN KEY items_session_fk (SESSION_ID)
         REFERENCES sessions (SESSION_ID)
         ON DELETE SET NULL
  );

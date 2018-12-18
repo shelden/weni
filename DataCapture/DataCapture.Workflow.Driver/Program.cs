@@ -25,26 +25,13 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            String step1Name = TestUtil.NextString();
-            String step0Name = TestUtil.NextString();
-            String queueName = TestUtil.NextString();
-            String mapName = TestUtil.NextString();
-            int type = TestUtil.RANDOM.Next(2, 100);
+            var session = TestUtil.makeSession(dbConn);
+            var step = TestUtil.makeStep(dbConn);
+            var item = WorkItem.Insert(dbConn, step, "foo", 0, 0, session);
 
-            var queue = Queue.Insert(dbConn, queueName);
-            var map = Map.Insert(dbConn, mapName);
-            var step1 = Step.Insert(dbConn, step1Name, map, queue, type);
-            var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
-            var stepN = Step.Select(dbConn, step0Name);
+            Console.WriteLine(session);
+            Console.WriteLine(item);
 
-            var rule = Rule.Insert(dbConn, "a", Rule.Compare.LESS, "132", 7, step0, step1);
-            var ruleN = Rule.Select(dbConn, rule.Id);
-            
-            Console.WriteLine(step0 == null ? "[null]" : step0.ToString());
-            Console.WriteLine(step1 == null ? "[null]" : step1.ToString());
-            Console.WriteLine(stepN == null ? "[null]" : stepN.ToString());
-            Console.WriteLine(rule.ToString());
-            Console.WriteLine(ruleN.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 
@@ -61,8 +48,12 @@ namespace DataCapture.Workflow.Driver
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                Console.WriteLine(ex.StackTrace);
+                while (ex != null)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    ex = ex.InnerException;
+                }
             }
             Console.WriteLine("Thank you for playing with "
                 + (p == null ? "this program" : p.GetType().FullName)

@@ -45,6 +45,29 @@ namespace DataCapture.Workflow.Test
             String stepName = TestUtil.NextString();
             return Step.Insert(dbConn, stepName, makeMap(dbConn), makeQueue(dbConn), 29);
         }
+        public static User makeUser(IDbConnection dbConn)
+        {
+            String userName = TestUtil.NextString();
+            return User.Insert(dbConn, userName, 10);
+        }
+        public static Session makeSession(IDbConnection dbConn)
+        {
+            return Session.Insert(dbConn, makeUser(dbConn));
+        }
+        #endregion
+
+        #region Approximately Equal
+        public static void AssertCloseEnough(DateTime a, DateTime b)
+        {
+            String FORMAT = "yyyy-MM-dd HH:mm:ss.fff";
+
+            var astring = a.ToString(FORMAT);
+            var bstring = b.ToString(FORMAT);
+            if (astring != bstring)
+            {
+                throw new Exception(astring + " vs " + bstring);
+            }
+        }
         #endregion
     }
 }

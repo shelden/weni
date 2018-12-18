@@ -45,6 +45,7 @@
     <Compile Include="CrudMapTest.cs" />
     <Compile Include="CrudStepTest.cs" />
     <Compile Include="CrudRuleTest.cs" />
+    <Compile Include="CrudWorkItemTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">

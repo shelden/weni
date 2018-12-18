@@ -9,7 +9,7 @@ namespace DataCapture.Workflow.Db
     {
         #region constants
         // this is the mysql way to get the autoincrement of last insert;
-        // therefore using this is not portable
+        // therefore using this is not portable :-/ XXX
         public static readonly String GET_KEY = "SELECT LAST_INSERT_ID()";
         #endregion
 
@@ -62,6 +62,11 @@ namespace DataCapture.Workflow.Db
             int index = reader.GetOrdinal(name);
             return reader.GetInt32(index);
         }
+        public static DateTime GetDateTime(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetDateTime(index);
+        }
         public static bool IsNull(IDataReader reader, String name)
         {
             int index = reader.GetOrdinal(name);
@@ -72,7 +77,7 @@ namespace DataCapture.Workflow.Db
         #region SelectCount
         // Utility function (mostly for unit tests) to do a select count * from
         // table.  If you're writing a GUI, you should use parameters hanging
-        // off your DataReader.
+        // off your DataReader, as opposed to this method.
         public static int SelectCount(IDbConnection dbConn, string table)
         {
  
@@ -88,7 +93,6 @@ namespace DataCapture.Workflow.Db
         #region Really
         // Less verbose utility methods to really close objects --
         // even if null -- which often happens in catch / finally blocks.
-
         public static void ReallyClose(IDataReader reader)
         {
             if (reader == null) return;

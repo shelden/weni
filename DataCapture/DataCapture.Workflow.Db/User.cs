@@ -84,6 +84,8 @@ namespace DataCapture.Workflow.Db
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.Append(this.GetType().FullName);
+            sb.Append(' ');
             sb.Append(this.Login);
             sb.Append(", id=");
             sb.Append(this.Id);

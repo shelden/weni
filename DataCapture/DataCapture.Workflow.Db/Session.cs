@@ -72,6 +72,8 @@ namespace DataCapture.Workflow.Db
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.Append(this.GetType().FullName);
+            sb.Append(' ');
             sb.Append(this.Id);
             sb.Append(", user_id=");
             sb.Append(this.Id);
@@ -79,6 +81,7 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.Hostname);
             sb.Append(", at ");
             sb.Append(this.StartTime);
+            sb.Append(" UTC");
             return sb.ToString();
         }
         #endregion
