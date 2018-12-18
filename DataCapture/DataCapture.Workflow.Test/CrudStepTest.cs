@@ -7,18 +7,7 @@ namespace DataCapture.Workflow.Test
 {
     public class CrudStepTest
     {
-        #region Util
-        public static Queue makeQueue(IDbConnection dbConn)
-        {
-            String queueName = TestUtil.NextString();
-            return Queue.Insert(dbConn, queueName);
-        }
-        public static Map makeMap(IDbConnection dbConn)
-        {
-            String mapName = TestUtil.NextString();
-            return Map.Insert(dbConn, mapName);
-        }
-        #endregion
+
 
         [Test()]
         public void CanInsertWithoutFollowing()
@@ -29,7 +18,12 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Step.TABLE);
 
-            var step = Step.Insert(dbConn, stepName, makeMap(dbConn), makeQueue(dbConn), type);
+            var step = Step.Insert(dbConn
+                , stepName
+                , TestUtil.makeMap(dbConn)
+                , TestUtil.makeQueue(dbConn)
+                , type
+                );
 
             Assert.AreEqual(step.NextStepId, Step.NO_NEXT_STEP);
 
@@ -45,8 +39,8 @@ namespace DataCapture.Workflow.Test
             int type = TestUtil.RANDOM.Next(2, 100);
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Step.TABLE);
-            var queue = makeQueue(dbConn);
-            var map = makeMap(dbConn);
+            var queue = TestUtil.makeQueue(dbConn);
+            var map = TestUtil.makeMap(dbConn);
 
             var step1 = Step.Insert(dbConn, step1Name, map, queue, type);
             var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
@@ -68,7 +62,12 @@ namespace DataCapture.Workflow.Test
             var step = Step.Select(dbConn, name);
             Assert.AreEqual(step, null); // because name is a random string
 
-            Step.Insert(dbConn, name, makeMap(dbConn), makeQueue(dbConn), 99);
+            Step.Insert(dbConn
+                , name
+                , TestUtil.makeMap(dbConn)
+                , TestUtil.makeQueue(dbConn)
+                , 99)
+                ;
             step = Step.Select(dbConn, name);
 
             Assert.AreEqual(step.Name, name);

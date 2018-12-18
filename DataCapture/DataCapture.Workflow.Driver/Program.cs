@@ -37,9 +37,14 @@ namespace DataCapture.Workflow.Driver
             var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
             var stepN = Step.Select(dbConn, step0Name);
 
+            var rule = Rule.Insert(dbConn, "a", Rule.Compare.LESS, "132", 7, step0, step1);
+            var ruleN = Rule.Select(dbConn, rule.Id);
+            
             Console.WriteLine(step0 == null ? "[null]" : step0.ToString());
             Console.WriteLine(step1 == null ? "[null]" : step1.ToString());
             Console.WriteLine(stepN == null ? "[null]" : stepN.ToString());
+            Console.WriteLine(rule.ToString());
+            Console.WriteLine(ruleN.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 

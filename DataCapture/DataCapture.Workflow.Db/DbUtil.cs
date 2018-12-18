@@ -51,6 +51,19 @@ namespace DataCapture.Workflow.Db
         }
         #endregion
 
+        #region Get Named Parameter
+        public static String GetString(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetString(index);
+        }
+        public static int GetInt(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetInt32(index);
+        }
+        #endregion
+
         #region SelectCount
         // Utility function (mostly for unit tests) to do a select count * from
         // table.  If you're writing a GUI, you should use parameters hanging
