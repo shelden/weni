@@ -74,9 +74,9 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new Queue(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                    , reader.GetString(1)
-                    , reader.GetInt32(2)
+                return new Queue(DbUtil.GetInt(reader, "queue_id")
+                    , DbUtil.GetString(reader, "name")
+                    , DbUtil.GetInt(reader, "type")
                     );
             }
             finally

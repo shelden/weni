@@ -109,16 +109,16 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                var tmp = new Step(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                    , reader.GetString(1)
-                    , reader.GetInt32(2)
-                    , reader.GetInt32(3)
+                var tmp = new Step(DbUtil.GetInt(reader, "step_id")
+                    , DbUtil.GetString(reader, "name")
+                    , DbUtil.GetInt(reader, "map_id")
+                    , DbUtil.GetInt(reader, "queue_id")
                     , NO_NEXT_STEP
-                    , reader.GetInt32(5)
+                    , DbUtil.GetInt(reader, "type")
                     );
-                if (!reader.IsDBNull(4))
+                if (!DbUtil.IsNull(reader, "next_step_id"))
                 {
-                    tmp.NextStepId = reader.GetInt32(4);
+                    tmp.NextStepId = DbUtil.GetInt(reader, "next_step_id");
                 }
                 return tmp;
             }

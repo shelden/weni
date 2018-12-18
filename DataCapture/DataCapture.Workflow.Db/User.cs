@@ -68,9 +68,9 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new User(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                    , reader.GetString(1)
-                    , reader.GetInt32(2)
+                return new User(DbUtil.GetInt(reader, "user_id")
+                    , DbUtil.GetString(reader, "login")
+                    , DbUtil.GetInt(reader, "login_limit")
                     );
             }
             finally

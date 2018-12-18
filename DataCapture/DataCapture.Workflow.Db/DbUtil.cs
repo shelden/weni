@@ -62,12 +62,17 @@ namespace DataCapture.Workflow.Db
             int index = reader.GetOrdinal(name);
             return reader.GetInt32(index);
         }
+        public static bool IsNull(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.IsDBNull(index);
+        }
         #endregion
 
         #region SelectCount
         // Utility function (mostly for unit tests) to do a select count * from
         // table.  If you're writing a GUI, you should use parameters hanging
-        // of your DataReader.
+        // off your DataReader.
         public static int SelectCount(IDbConnection dbConn, string table)
         {
  

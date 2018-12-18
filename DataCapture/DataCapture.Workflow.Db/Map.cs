@@ -75,9 +75,9 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new Map(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                    , reader.GetString(1)
-                    , reader.GetInt32(2)
+                return new Map(DbUtil.GetInt(reader, "map_id")
+                    , DbUtil.GetString(reader, "name")
+                    , DbUtil.GetInt(reader, "version")
                     );
             }
             finally
