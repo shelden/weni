@@ -54,6 +54,15 @@ namespace DataCapture.Workflow.Test
         {
             return Session.Insert(dbConn, makeUser(dbConn));
         }
+        public static WorkItem makeWorkItem(IDbConnection dbConn)
+        {
+            String workItemName = TestUtil.NextString();
+            int priority = TestUtil.RANDOM.Next(1, 100);
+            int state = TestUtil.RANDOM.Next(1, 100);
+            var step = TestUtil.makeStep(dbConn);
+            var session = TestUtil.makeSession(dbConn);
+            return WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
+        }
         #endregion
 
         #region Approximately Equal
@@ -65,7 +74,11 @@ namespace DataCapture.Workflow.Test
             var bstring = b.ToString(FORMAT);
             if (astring != bstring)
             {
-                throw new Exception(astring + " vs " + bstring);
+                throw new Exception("Expected DateTimes to be the same: "
+                    + astring
+                    + " vs "
+                    + bstring
+                );
             }
         }
         #endregion

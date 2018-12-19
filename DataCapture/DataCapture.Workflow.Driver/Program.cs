@@ -29,6 +29,12 @@ namespace DataCapture.Workflow.Driver
             var step = TestUtil.makeStep(dbConn);
             var item = WorkItem.Insert(dbConn, step, "foo", 0, 0, session);
 
+            for (int i = 0; i < 10; i++)
+            {
+                var data = WorkItemData.Insert(dbConn, item, "var" + i, TestUtil.NextString());
+                Console.WriteLine(data);
+            }
+
             Console.WriteLine(session);
             Console.WriteLine(item);
 

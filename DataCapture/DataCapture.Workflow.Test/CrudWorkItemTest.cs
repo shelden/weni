@@ -10,15 +10,15 @@ namespace DataCapture.Workflow.Test
         public void CanInsert()
         {
             String workItemName = TestUtil.NextString();
-            int priority = 11;  //TestUtil.RANDOM.Next(1, 100);
-            int state = 22;  //TestUtil.RANDOM.Next(1, 100);
+            int priority = TestUtil.RANDOM.Next(1, 100);
+            int state = TestUtil.RANDOM.Next(1, 100);
 
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
 
             var step = TestUtil.makeStep(dbConn);
             var session = TestUtil.makeSession(dbConn);
-            WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
+            var item = WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
 
             int after = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
             Assert.AreEqual(before + 1, after);

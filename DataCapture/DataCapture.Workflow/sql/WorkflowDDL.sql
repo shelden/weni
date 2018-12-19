@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS sessions
      SESSION_ID     INT(10)         UNSIGNED NOT NULL AUTO_INCREMENT,
      USER_ID        INT(10)         UNSIGNED NOT NULL,
      HOST_NAME      VARCHAR(32)     NOT NULL,
-     START_TIME     DATETIME        NOT NULL,
+     START_TIME     DATETIME(6)     NOT NULL,
 
      PRIMARY KEY (SESSION_ID),
      FOREIGN KEY sessions_user_fk (USER_ID)
@@ -198,7 +198,7 @@ CREATE TABLE IF NOT EXISTS audit_trail
      ITEM_ID        INT(10)         UNSIGNED NOT NULL,
      USER_ID        INT(10)         UNSIGNED,
      STEP_ID        INT(10)         UNSIGNED NOT NULL,
-     AUDIT_DTIME    DATETIME        NOT NULL,
+     AUDIT_DTIME    DATETIME(6)     NOT NULL,
      EVENT          SMALLINT(5)     NOT NULL,
 
      PRIMARY KEY (AUDIT_ID),

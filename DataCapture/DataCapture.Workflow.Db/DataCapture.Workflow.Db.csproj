@@ -46,6 +46,7 @@
     <Compile Include="Step.cs" />
     <Compile Include="Rule.cs" />
     <Compile Include="WorkItem.cs" />
+    <Compile Include="WorkItemData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
