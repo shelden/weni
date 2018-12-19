@@ -83,9 +83,8 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
 
-            Assert.AreNotEqual("", msg);
             Console.WriteLine("expected exception: " + msg);
-            //Assert.AreNotEqual(msg.IndexOf("duplicate"), -1);
+            Assert.AreNotEqual(msg, "", "expected exception not thrown");
             int after2 = DbUtil.SelectCount(dbConn, User.TABLE);
             Assert.AreEqual(after2, before + 1);
         }

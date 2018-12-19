@@ -41,6 +41,15 @@ namespace DataCapture.Workflow.Db
             param.Value = value;
             command.Parameters.Add(param);
         }
+        public static void AddParameter(IDbCommand command, String name, bool value)
+        {
+            var param = command.CreateParameter();
+            param.DbType = System.Data.DbType.Int16;
+            param.ParameterName = name;
+            param.Value = value ? 1 : 0;
+            command.Parameters.Add(param);
+        }
+
         public static void AddNullParameter(IDbCommand command, String name)
         {
             var param = command.CreateParameter();
@@ -61,6 +70,12 @@ namespace DataCapture.Workflow.Db
         {
             int index = reader.GetOrdinal(name);
             return reader.GetInt32(index);
+        }
+        public static bool GetBool(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            int tmp = reader.GetInt32(index);
+            return (tmp != 0);
         }
         public static DateTime GetDateTime(IDataReader reader, String name)
         {

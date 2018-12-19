@@ -28,6 +28,10 @@ namespace DataCapture.Workflow.Driver
             var session = TestUtil.makeSession(dbConn);
             var step = TestUtil.makeStep(dbConn);
             var item = WorkItem.Insert(dbConn, step, "foo", 0, 0, session);
+            var user = TestUtil.makeUser(dbConn);
+            var access = WorkItemAccess.Insert(dbConn, item, user, false);
+            Console.WriteLine(access);
+
 
             for (int i = 0; i < 10; i++)
             {

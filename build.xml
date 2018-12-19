@@ -23,6 +23,7 @@
     <!-- ================================================================== -->
     <target name="echo">
         <echo message="${env.PATH}" />
+        <echo message="${env.Path}" />
     </target>
     <!-- ================================================================== -->
     <target name="build">
@@ -40,7 +41,6 @@
     </condition>
     <property name="compile.msbuild.prog" value="msbuild" />
     <property name="complie.config" value="Release" />
-
     <macrodef name="msbuild">
         <attribute name="solution" />
         <attribute name="config" default="${complie.config}" />
