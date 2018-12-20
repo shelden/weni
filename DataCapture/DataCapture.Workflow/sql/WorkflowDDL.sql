@@ -1,8 +1,10 @@
 # Commands for creating the Workflow Database Tables in a MySQL database.
-# The order of these statements is important, and takes into consideration the creation of foreign keys.
-# Also, MySQL database table names are case sensitive. For easier typing, we use all lower-case table names.
+# The order of these statements is important, and takes into
+# consideration the creation of foreign keys.
 
-# This is case sensitive.
+# Also, MySQL database table names are case sensitive. For easier typing,
+# we use all lower-case table names.
+
 CREATE DATABASE IF NOT EXISTS workflow;
 USE workflow;
 
@@ -41,7 +43,7 @@ CREATE TABLE IF NOT EXISTS sessions
      SESSION_ID     INT(10)         UNSIGNED NOT NULL AUTO_INCREMENT,
      USER_ID        INT(10)         UNSIGNED NOT NULL,
      HOST_NAME      VARCHAR(32)     NOT NULL,
-     START_TIME     DATETIME        NOT NULL,
+     START_TIME     DATETIME(6)     NOT NULL,
 
      PRIMARY KEY (SESSION_ID),
      FOREIGN KEY sessions_user_fk (USER_ID)
@@ -54,10 +56,11 @@ CREATE TABLE IF NOT EXISTS sessions
 CREATE TABLE IF NOT EXISTS queues
 (
      QUEUE_ID       INT(10)         UNSIGNED NOT NULL AUTO_INCREMENT,
-     TYPE           SMALLINT(5)     UNSIGNED NOT NULL DEFAULT 1,
      NAME           VARCHAR(32)     NOT NULL,
+     TYPE           SMALLINT(5)     UNSIGNED NOT NULL DEFAULT 1,
 
      PRIMARY KEY (QUEUE_ID),
+     UNIQUE KEY (NAME),
      INDEX queue_name_idx (NAME)
 );
 
@@ -86,7 +89,8 @@ CREATE TABLE IF NOT EXISTS maps
      NAME           VARCHAR(32)     NOT NULL,
      VERSION        SMALLINT(5)     UNSIGNED NOT NULL DEFAULT 1,
 
-     PRIMARY KEY (MAP_ID)
+     PRIMARY KEY (MAP_ID),
+     UNIQUE KEY (NAME)
 );
 
 ##################################################################
@@ -142,21 +146,22 @@ CREATE TABLE IF NOT EXISTS work_items
      NAME           VARCHAR(32)     DEFAULT NULL,
      STATE          SMALLINT(5)     NOT NULL DEFAULT 1,
      PRIORITY       INT(10)         NOT NULL DEFAULT 0,
-     CREATED        DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-     ENTERED_STATE  DATETIME        NOT NULL,
-     USER_SESSION   INT(10)         UNSIGNED,
+     CREATED        DATETIME(6)     NOT NULL,
+     ENTERED        DATETIME(6)     NOT NULL,
+     SESSION_ID     INT(10)         UNSIGNED,
 
      PRIMARY KEY (ITEM_ID),
      FOREIGN KEY items_step_fk (STEP_ID)
         REFERENCES steps (STEP_ID)
         ON DELETE RESTRICT,
-     FOREIGN KEY items_session_fk (USER_SESSION)
+     FOREIGN KEY items_session_fk (SESSION_ID)
         REFERENCES sessions (SESSION_ID)
         ON DELETE SET NULL
  );
 
 ##################################################################
-# Create the Work Item Data table, which references the Work Item table.
+# Create the Work Item Data table, which references the Work
+# Item table.
 CREATE TABLE IF NOT EXISTS work_item_data
 (
      DATA_ID        INT(10)         UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -171,13 +176,14 @@ CREATE TABLE IF NOT EXISTS work_item_data
 );
 
 ##################################################################
-# Create the Work Item Access table, which references the Work Item and User tables.
+# Create the Work Item Access table, which references the Work Item
+# and User tables.
 CREATE TABLE IF NOT EXISTS work_item_access
 (
      ACCESS_ID      INT(10)         UNSIGNED NOT NULL AUTO_INCREMENT,
      ITEM_ID        INT(10)         UNSIGNED NOT NULL,
      USER_ID        INT(10)         UNSIGNED NOT NULL,
-     PERMISSION     SMALLINT(5)     NOT NULL,
+     IS_ALLOWED     SMALLINT(5)     NOT NULL,
 
      PRIMARY KEY (ACCESS_ID),
      FOREIGN KEY access_item_fk (ITEM_ID)
@@ -185,18 +191,20 @@ CREATE TABLE IF NOT EXISTS work_item_access
         ON DELETE CASCADE,
      FOREIGN KEY access_user_fk (USER_ID)
         REFERENCES users (USER_ID)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+     UNIQUE KEY (USER_ID, ITEM_ID)
  );
 
 ##################################################################
-# Create the Work Item Access table, which references the Work Item and User tables.
+# Create the Work Item Access table, which references the Work
+# Item and User tables.
 CREATE TABLE IF NOT EXISTS audit_trail
 (
      AUDIT_ID       BIGINT(12)      UNSIGNED NOT NULL AUTO_INCREMENT,
      ITEM_ID        INT(10)         UNSIGNED NOT NULL,
      USER_ID        INT(10)         UNSIGNED,
      STEP_ID        INT(10)         UNSIGNED NOT NULL,
-     AUDIT_DTIME    DATETIME        NOT NULL,
+     AUDIT_TIME     DATETIME(6)     NOT NULL,
      EVENT          SMALLINT(5)     NOT NULL,
 
      PRIMARY KEY (AUDIT_ID),

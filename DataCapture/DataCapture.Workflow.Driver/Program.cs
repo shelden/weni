@@ -1,12 +1,12 @@
 ﻿using System;
 using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Test;
 
 namespace DataCapture.Workflow.Driver
 {
     public class Program
     {
         #region Constants
-        public static readonly String SCMID_ = "$Id$";
         #endregion
 
         #region Members
@@ -25,16 +25,23 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var user = User.Select(dbConn, "smith");
-            if (user == null)
+            var session = TestUtil.makeSession(dbConn);
+            var step = TestUtil.makeStep(dbConn);
+            var item = WorkItem.Insert(dbConn, step, "foo", 0, 0, session);
+            var user = TestUtil.makeUser(dbConn);
+            var access = WorkItemAccess.Insert(dbConn, item, user, false);
+            Console.WriteLine(access);
+
+
+            for (int i = 0; i < 10; i++)
             {
-                User.Insert(dbConn, "smith", 99);
-                user = User.Select(dbConn, "smith");
+                var data = WorkItemData.Insert(dbConn, item, "var" + i, TestUtil.NextString());
+                Console.WriteLine(data);
             }
 
-            Session.Insert(dbConn, user);
+            Console.WriteLine(session);
+            Console.WriteLine(item);
 
-            Console.WriteLine(user == null ? "[null]" : user.ToString());
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
 
@@ -51,8 +58,12 @@ namespace DataCapture.Workflow.Driver
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                Console.WriteLine(ex.StackTrace);
+                while (ex != null)
+                {
+                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(ex.StackTrace);
+                    ex = ex.InnerException;
+                }
             }
             Console.WriteLine("Thank you for playing with "
                 + (p == null ? "this program" : p.GetType().FullName)

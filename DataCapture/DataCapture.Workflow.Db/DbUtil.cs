@@ -5,7 +5,18 @@ using System.Text;
 namespace DataCapture.Workflow.Db
 {
     public static class DbUtil
+
     {
+        #region constants
+        // this is the mysql way to get the autoincrement of last insert;
+        // therefore using this is not portable :-/ XXX
+        public static readonly String GET_KEY = "SELECT LAST_INSERT_ID()";
+        #endregion
+
+        #region AddParameter 
+        // these utility functions allows us to add a named parameter,
+        // generically, to a IDbCommand.  There should be no mysql / oracle
+        // SqlServer code in these functions
         public static void AddParameter(IDbCommand command, String name, String value)
         {
             var param = command.CreateParameter();
@@ -30,6 +41,58 @@ namespace DataCapture.Workflow.Db
             param.Value = value;
             command.Parameters.Add(param);
         }
+        public static void AddParameter(IDbCommand command, String name, bool value)
+        {
+            var param = command.CreateParameter();
+            param.DbType = System.Data.DbType.Int16;
+            param.ParameterName = name;
+            param.Value = value ? 1 : 0;
+            command.Parameters.Add(param);
+        }
+
+        public static void AddNullParameter(IDbCommand command, String name)
+        {
+            var param = command.CreateParameter();
+            param.DbType = System.Data.DbType.Int32;
+            param.ParameterName = name;
+            param.Value = null;
+            command.Parameters.Add(param);
+        }
+        #endregion
+
+        #region Get Named Parameter
+        public static String GetString(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetString(index);
+        }
+        public static int GetInt(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetInt32(index);
+        }
+        public static bool GetBool(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            int tmp = reader.GetInt32(index);
+            return (tmp != 0);
+        }
+        public static DateTime GetDateTime(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.GetDateTime(index);
+        }
+        public static bool IsNull(IDataReader reader, String name)
+        {
+            int index = reader.GetOrdinal(name);
+            return reader.IsDBNull(index);
+        }
+        #endregion
+
+        #region SelectCount
+        // Utility function (mostly for unit tests) to do a select count * from
+        // table.  If you're writing a GUI, you should use parameters hanging
+        // off your DataReader, as opposed to this method.
         public static int SelectCount(IDbConnection dbConn, string table)
         {
  
@@ -38,12 +101,13 @@ namespace DataCapture.Workflow.Db
             sql.Append("SELECT COUNT(1) FROM ");
             sql.Append(table);
             command.CommandText = sql.ToString();
-            var o = command.ExecuteScalar();
-
-            // RTFM how to get this scalar as int more cleanly
-            String s = o.ToString();
-            return int.Parse(s);
+            return Convert.ToInt32(command.ExecuteScalar());
         }
+        #endregion
+
+        #region Really
+        // Less verbose utility methods to really close objects --
+        // even if null -- which often happens in catch / finally blocks.
         public static void ReallyClose(IDataReader reader)
         {
             if (reader == null) return;
@@ -56,6 +120,7 @@ namespace DataCapture.Workflow.Db
                 ; // no code; per contract
             }
         }
+        #endregion
 
     }
 }

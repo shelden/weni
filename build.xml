@@ -9,20 +9,67 @@
 	    depends="echo,db.init,build,test"
 	    />
     <!-- ================================================================== -->
+    <target name="clean">
+        <delete>
+	    <fileset dir="DataCapture" includes="**/DataCapture*.dll" />
+	    <fileset dir="DataCapture" includes="**/DataCapture*.exe" />
+	</delete>
+    </target>
+    <!-- ================================================================== -->
     <target name="db.init" /> 
-    <target name="test" />
+    <target name="test">
+        <nunitconsole dll="DataCapture/DataCapture.Workflow.Test/bin/Release/DataCapture.Workflow.Test.dll" />
+    </target>
     <!-- ================================================================== -->
     <target name="echo">
         <echo message="${env.PATH}" />
+        <echo message="${env.Path}" />
     </target>
     <!-- ================================================================== -->
     <target name="build">
-        <exec executable="msbuild" failonerror="true">
-	    <env key="PATH"
-		 value="${env.PATH};C:\Windows\Microsoft.NET\Framework64\v4.0.30319"
-		 />
-	    <arg value="DataCapture/DataCapture.Workflow.sln" />
-	</exec>
+        <msbuild solution="DataCapture/DataCapture.Workflow.sln" />
     </target>
     <!-- ================================================================== -->
+    <!-- compile section -->
+    <!-- ================================================================== -->
+    <!-- msbuild is not likely in your path on Windows.  Non-windows folks  -->
+    <!-- need to add it to their path.                                      -->
+    <condition property="compile.msbuild.prog"
+	       value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
+	       >
+        <os family="windows" />
+    </condition>
+    <property name="compile.msbuild.prog" value="msbuild" />
+    <property name="complie.config" value="Release" />
+    <macrodef name="msbuild">
+        <attribute name="solution" />
+        <attribute name="config" default="${complie.config}" />
+	<sequential>
+	    <exec executable="${compile.msbuild.prog}"
+		  failonerror="true"
+		  >
+	        <arg value="/p:Configuration=@{config}" />
+		<arg value="/nologo" />
+		<arg value="@{solution}" />
+	      </exec>
+	</sequential>
+    </macrodef>
+
+    <!-- ================================================================== -->
+    <!-- nunit test runner section -->
+    <!-- ================================================================== -->
+    <property name="test.runner.prog"
+	      value="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
+	      />
+    <macrodef name="nunitconsole">
+	<attribute name="dll" />
+        <sequential>
+	    <exec executable="mono"
+		  >
+	        <arg value="${test.runner.prog}" />
+	        <arg value="@{dll}" />
+	    </exec>
+	</sequential>
+    </macrodef>
+    
 </project>    

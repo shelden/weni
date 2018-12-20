@@ -48,17 +48,19 @@ namespace DataCapture.Workflow.Db
         #endregion
 
         #region CRUD: Insert
-        public static void Insert(IDbConnection dbConn
+        public static Session Insert(IDbConnection dbConn
                   , User user
                   )
 
         {
+            DateTime when = DateTime.UtcNow;
             IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = INSERT;
+            command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@user_id", user.Id);
             DbUtil.AddParameter(command, "@host_name", System.Environment.MachineName);
-            DbUtil.AddParameter(command, "@start_time", DateTime.Now);
-            command.ExecuteNonQuery();
+            DbUtil.AddParameter(command, "@start_time", when);
+            int id = Convert.ToInt32(command.ExecuteScalar());
+            return new Session(id, user.Id, System.Environment.MachineName, when);
         }
         #endregion
 
@@ -70,13 +72,16 @@ namespace DataCapture.Workflow.Db
         public override string ToString()
         {
             var sb = new StringBuilder();
+            sb.Append(this.GetType().FullName);
+            sb.Append(' ');
             sb.Append(this.Id);
             sb.Append(", user_id=");
             sb.Append(this.Id);
-	    sb.Append(", from ");
-	    sb.Append(this.Hostname);
-	    sb.Append(", at ");
-	    sb.Append(this.StartTime);
+            sb.Append(", from ");
+            sb.Append(this.Hostname);
+            sb.Append(", at ");
+            sb.Append(this.StartTime);
+            sb.Append(" UTC");
             return sb.ToString();
         }
         #endregion

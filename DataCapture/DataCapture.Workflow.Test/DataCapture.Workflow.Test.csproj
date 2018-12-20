@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>DataCapture.Workflow.Tests</RootNamespace>
-    <AssemblyName>DataCapture.Workflow.Tests</AssemblyName>
+    <RootNamespace>DataCapture.Workflow.Test</RootNamespace>
+    <AssemblyName>DataCapture.Workflow.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -41,6 +41,13 @@
     <Compile Include="TrivialTest.cs" />
     <Compile Include="CrudUserTest.cs" />
     <Compile Include="CrudSessionTest.cs" />
+    <Compile Include="CrudQueueTest.cs" />
+    <Compile Include="CrudMapTest.cs" />
+    <Compile Include="CrudStepTest.cs" />
+    <Compile Include="CrudRuleTest.cs" />
+    <Compile Include="CrudWorkItemTest.cs" />
+    <Compile Include="CrudWorkItemDataTest.cs" />
+    <Compile Include="CrudWorkItemAccessTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">

@@ -40,6 +40,14 @@
     <Compile Include="ConnectionFactory.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Session.cs" />
+    <Compile Include="Queue.cs" />
+    <Compile Include="AllowedQueue.cs" />
+    <Compile Include="Map.cs" />
+    <Compile Include="Step.cs" />
+    <Compile Include="Rule.cs" />
+    <Compile Include="WorkItem.cs" />
+    <Compile Include="WorkItemData.cs" />
+    <Compile Include="WorkItemAccess.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
