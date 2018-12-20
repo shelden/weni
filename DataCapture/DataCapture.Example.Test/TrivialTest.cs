@@ -13,7 +13,7 @@ namespace DataCapture.Example.Test
         [Test()]
         public void SomethingThatFails()
         {
-            //Assert.AreEqual(1, -1);
+            Assert.AreEqual(1, -1);
         }
     }
 }
