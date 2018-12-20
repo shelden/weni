@@ -16,7 +16,16 @@
 	</delete>
     </target>
     <!-- ================================================================== -->
-    <target name="db.init" /> 
+    <target name="db.init">
+        <exec executable="${db.mysql.prog}"
+	      failonerror="true"
+	      input="DataCapture/DataCapture.Workflow.Db/sql/WorkflowDDL.sql"
+	      >
+	    <arg value="-u" />
+	    <arg value="${db.mysql.user}" />
+	</exec>
+    </target>
+    <!-- ================================================================== -->
     <target name="test">
         <nunitconsole dll="DataCapture/DataCapture.Workflow.Test/bin/Release/DataCapture.Workflow.Test.dll" />
     </target>
@@ -71,5 +80,18 @@
 	    </exec>
 	</sequential>
     </macrodef>
+
+    <!-- ================================================================== -->
+    <!-- mysql section                                                      -->
+    <!-- ================================================================== -->
+    <property name="db.mysql.user"     value="workflow" />
+    <property name="db.mysql.password" value="" />
+    <property name="db.mysql.server"   value="localhost:3306" />
+    <condition property="db.mysql.prog"
+	       value="C:\Program Files\MySQL\MySQL Workbench 8.0 CE\mysql.exe"
+	       >
+        <os family="windows" />
+    </condition>
+    <property name="db.mysql.prog"     value="mysql" />
     
 </project>    
