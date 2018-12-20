@@ -16,9 +16,18 @@
 	</delete>
     </target>
     <!-- ================================================================== -->
-    <target name="db.init" /> 
+    <target name="db.init">
+        <exec executable="${db.mysql.prog}"
+	      failonerror="true"
+	      input="DataCapture/DataCapture.Workflow.Db/sql/WorkflowDDL.sql"
+	      >
+	    <arg value="-u" />
+	    <arg value="${db.mysql.user}" />
+	</exec>
+    </target>
+    <!-- ================================================================== -->
     <target name="test">
-        <nunitconsole dll="DataCapture/DataCapture.Workflow.Test/bin/Release/DataCapture.Workflow.Test.dll" />
+        <nunitconsole namespace="DataCapture.Workflow.Test" />
     </target>
     <!-- ================================================================== -->
     <target name="echo">
@@ -40,10 +49,10 @@
         <os family="windows" />
     </condition>
     <property name="compile.msbuild.prog" value="msbuild" />
-    <property name="complie.config" value="Release" />
+    <property name="compile.config" value="Release" />
     <macrodef name="msbuild">
         <attribute name="solution" />
-        <attribute name="config" default="${complie.config}" />
+        <attribute name="config" default="${compile.config}" />
 	<sequential>
 	    <exec executable="${compile.msbuild.prog}"
 		  failonerror="true"
@@ -59,17 +68,32 @@
     <!-- nunit test runner section -->
     <!-- ================================================================== -->
     <property name="test.runner.prog"
-	      value="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
+	      location="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
 	      />
     <macrodef name="nunitconsole">
-	<attribute name="dll" />
+        <attribute name="namespace" />
         <sequential>
-	    <exec executable="mono"
+  	    <exec executable="${test.runner.prog}"
+		  dir="DataCapture/@{namespace}"
 		  >
-	        <arg value="${test.runner.prog}" />
-	        <arg value="@{dll}" />
+	        <arg value="bin/${compile.config}/@{namespace}.dll" />
+		<arg value="--noheader" />
+		<arg value="--nocolor" />
 	    </exec>
 	</sequential>
     </macrodef>
+
+    <!-- ================================================================== -->
+    <!-- mysql section                                                      -->
+    <!-- ================================================================== -->
+    <property name="db.mysql.user"     value="workflow" />
+    <property name="db.mysql.password" value="" />
+    <property name="db.mysql.server"   value="localhost:3306" />
+    <condition property="db.mysql.prog"
+	       value="C:\Program Files\MySQL\MySQL Workbench 8.0 CE\mysql.exe"
+	       >
+        <os family="windows" />
+    </condition>
+    <property name="db.mysql.prog"     value="mysql" />
     
 </project>    
