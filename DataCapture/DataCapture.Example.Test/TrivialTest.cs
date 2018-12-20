@@ -1,17 +1,17 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace VtPurple.Misc.Tests
+namespace DataCapture.Example.Test
 {
     public class TrivialTest
     {
         [Test()]
-        public void TestTwoSquaredIsFour()
+        public void TwoSquaredIsFour()
         {
             Assert.AreEqual(2 * 2, 4);
         }
         [Test()]
-        public void TestThatFails()
+        public void SomethingThatFails()
         {
             //Assert.AreEqual(1, -1);
         }
