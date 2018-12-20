@@ -68,17 +68,17 @@
     <!-- nunit test runner section -->
     <!-- ================================================================== -->
     <property name="test.runner.prog"
-	      value="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
+	      location="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
 	      />
     <macrodef name="nunitconsole">
         <attribute name="namespace" />
         <sequential>
-	    <exec executable="${test.runner.prog}"
+  	    <exec executable="${test.runner.prog}"
+		  dir="DataCapture/@{namespace}"
 		  >
-	        <arg value="DataCapture/@{namespace}/bin/${compile.config}/@{namespace}.dll" />
+	        <arg value="bin/${compile.config}/@{namespace}.dll" />
 		<arg value="--noheader" />
 		<arg value="--nocolor" />
-		<arg value="--out=@{namespace}.testout.xml" />
 	    </exec>
 	</sequential>
     </macrodef>
