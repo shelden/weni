@@ -72,8 +72,23 @@
     <property name="test.runner.prog"
 	      location="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
 	      />
+    <!-- run nunit-console based on some standard naming conventions.       -->
+    <!-- 0. we assume windows here.  It's possible to exec mono             -->
+    <!--    and make the 2nd arg nunit3-console.  But that means we'd be    -->
+    <!--    running mono on win32, which is possible but wierd.             -->
+    <!--    point is, to test elsewhere, put mono in executable and         -->
+    <!--    nunit-console in the 1st arg                                    -->
+    <!-- 1. we assume that the test dll foo lives in                        -->
+    <!--    DataCapture/foo/bin/Release/foo.dll.  A standard but not        -->
+    <!--    required layout                                                 -->
+    <!-- 2. We run nunit console over each DLL in its own directory.        -->
+    <!--    that way, each TestResults.xml is findable by the NUnit         -->
+    <!--    plugin                                                          -->
+    <!-- 3. Lastly test DLLs are not current "found," but listed by hand    -->
+    <!--    in the target test.  Boo.  In the future we could specify       -->
+    <!--    **/*Test?*.dll and then call this macro.                        -->
     <macrodef name="nunitconsole">
-        <attribute name="namespace" />
+      <attribute name="namespace" />
         <sequential>
   	    <exec executable="${test.runner.prog}"
 		  dir="DataCapture/@{namespace}"
