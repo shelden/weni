@@ -13,7 +13,10 @@ namespace DataCapture.Example.Test
         [Test()]
         public void SomethingThatFails()
         {
-            Assert.AreEqual(1, -1);
+	    Console.WriteLine("to make something fail on Jenkins....");
+	    Console.WriteLine("...simply uncomment the next line in ");
+	    Console.WriteLine(this.GetType().FullName);
+            //Assert.AreEqual(1, -1);
         }
     }
 }

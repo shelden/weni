@@ -24,6 +24,7 @@
 	      >
 	    <arg value="-u" />
 	    <arg value="${db.mysql.user}" />
+	    <arg value="--verbose" />
 	</exec>
     </target>
     <!-- ================================================================== -->
