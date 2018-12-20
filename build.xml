@@ -13,6 +13,7 @@
         <delete>
 	    <fileset dir="DataCapture" includes="**/DataCapture*.dll" />
 	    <fileset dir="DataCapture" includes="**/DataCapture*.exe" />
+	    <fileset dir="DataCapture" includes="**/TestResult*.xml" />
 	</delete>
     </target>
     <!-- ================================================================== -->
@@ -27,6 +28,7 @@
     </target>
     <!-- ================================================================== -->
     <target name="test">
+        <nunitconsole namespace="DataCapture.Example.Test" />
         <nunitconsole namespace="DataCapture.Workflow.Test" />
     </target>
     <!-- ================================================================== -->
