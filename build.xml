@@ -1,31 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
 <project name="DataCapture.Workflow"
-	 default="all"
-	 basedir="."
-	 >
+         default="all"
+         basedir="."
+        >
     <!-- ================================================================== -->
     <property environment="env" />
     <!-- ================================================================== -->
-    <target name="all" 
-	    depends="echo,db.init,build,test"
-	    />
+    <target name="all"
+            depends="echo,db.init,build,test"
+            />
     <!-- ================================================================== -->
-    <target name="clean">
+    <target name="clean"
+           >
         <delete>
-	    <fileset dir="DataCapture" includes="**/DataCapture*.dll" />
-	    <fileset dir="DataCapture" includes="**/DataCapture*.exe" />
-	    <fileset dir="DataCapture" includes="**/TestResult*.xml" />
-	</delete>
+            <fileset dir="DataCapture"
+                     includes="**/DataCapture*.dll"
+                     />
+            <fileset dir="DataCapture"
+                     includes="**/DataCapture*.exe"
+                     />
+            <fileset dir="DataCapture"
+                     includes="**/TestResult*.xml"
+                     />
+        </delete>
     </target>
     <!-- ================================================================== -->
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
-	      failonerror="true"
-	      input="DataCapture/DataCapture.Workflow.Db/sql/WorkflowDDL.sql"
-	      >
-	    <arg value="-u" />
-	    <arg value="${db.mysql.user}" />
-	    <arg value="--verbose" />
-	</exec>
+              failonerror="true"
+              input="DataCapture/DataCapture.Workflow.Db/sql/WorkflowDDL.sql"
+              >
+            <arg value="-u" />
+            <arg value="${db.mysql.user}" />
+            <arg value="--verbose" />
+        </exec>
     </target>
     <!-- ================================================================== -->
     <target name="test">
@@ -47,38 +55,43 @@
     <!-- msbuild is not likely in your path on Windows.  Non-windows folks  -->
     <!-- need to add it to their path.                                      -->
     <condition property="compile.msbuild.prog"
-	       value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
-	       >
+               value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
+              >
         <os family="windows" />
     </condition>
     <property name="compile.msbuild.prog" value="msbuild" />
-    <property name="compile.config" value="Release" />
+    <property name="compile.config"       value="Release" />
     <macrodef name="msbuild">
         <attribute name="solution" />
         <attribute name="config" default="${compile.config}" />
-	<sequential>
-	    <exec executable="${compile.msbuild.prog}"
-		  failonerror="true"
-		  >
-	        <arg value="/p:Configuration=@{config}" />
-		<arg value="/nologo" />
-		<arg value="@{solution}" />
-	      </exec>
-	</sequential>
+        <sequential>
+            <exec executable="${compile.msbuild.prog}"
+                  failonerror="true"
+                  >
+                <arg value="/p:Configuration=@{config}" />
+                <arg value="/nologo" />
+                <arg value="@{solution}" />
+            </exec>
+        </sequential>
     </macrodef>
-
     <!-- ================================================================== -->
     <!-- nunit test runner section -->
     <!-- ================================================================== -->
+    <!-- on windows, we run cmd -c "nunit3-console arg arg".  On Unix, we   -->
+    <!-- run sh -c "mono nunit-console arg arg".  It's a hack, but it is    -->
+    <!-- portable.                                                          -->
+    <condition property="test.cmd.prog" value="cmd">
+        <os family="windows" />
+    </condition>
+    <condition property="test.mono.prog" value="">
+        <os family="windows" />
+    </condition>
+    <property name="test.cmd.prog" value="/bin/sh" />
+    <property name="test.mono.prog" value="mono" />
     <property name="test.runner.prog"
-	      location="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
-	      />
-    <!-- run nunit-console based on some standard naming conventions.       -->
-    <!-- 0. we assume windows here.  It's possible to exec mono             -->
-    <!--    and make the 2nd arg nunit3-console.  But that means we'd be    -->
-    <!--    running mono on win32, which is possible but wierd.             -->
-    <!--    point is, to test elsewhere, put mono in executable and         -->
-    <!--    nunit-console in the 1st arg                                    -->
+              location="DataCapture/3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
+              />
+    <!-- run nunit-console based on some standard naming assumptions.       -->
     <!-- 1. we assume that the test dll foo lives in                        -->
     <!--    DataCapture/foo/bin/Release/foo.dll.  A standard but not        -->
     <!--    required layout                                                 -->
@@ -89,29 +102,27 @@
     <!--    in the target test.  Boo.  In the future we could specify       -->
     <!--    **/*Test?*.dll and then call this macro.                        -->
     <macrodef name="nunitconsole">
-      <attribute name="namespace" />
+        <attribute name="namespace" />
         <sequential>
-  	    <exec executable="${test.runner.prog}"
-		  dir="DataCapture/@{namespace}"
-		  >
-	        <arg value="bin/${compile.config}/@{namespace}.dll" />
-		<arg value="--noheader" />
-		<arg value="--nocolor" />
-	    </exec>
-	</sequential>
+            <exec executable="${test.cmd.prog}"
+                  dir="DataCapture/@{namespace}"
+                  >
+	        <arg value="-c" />
+	        <arg value="${test.mono.prog} ${test.runner.prog} bin/${compile.config}/@{namespace}.dll --noheader --nocolor" />
+            </exec>
+        </sequential>
     </macrodef>
-
     <!-- ================================================================== -->
     <!-- mysql section                                                      -->
     <!-- ================================================================== -->
-    <property name="db.mysql.user"     value="workflow" />
-    <property name="db.mysql.password" value="" />
-    <property name="db.mysql.server"   value="localhost:3306" />
+    <property name="db.mysql.user"      value="workflow" />
+    <property name="db.mysql.password"  value="" />
+    <property name="db.mysql.server"    value="localhost:3306" />
     <condition property="db.mysql.prog"
-	       value="C:\Program Files\MySQL\MySQL Workbench 8.0 CE\mysql.exe"
-	       >
+               value="C:\Program Files\MySQL\MySQL Workbench 8.0 CE\mysql.exe"
+              >
         <os family="windows" />
     </condition>
-    <property name="db.mysql.prog"     value="mysql" />
-    
-</project>    
+    <property name="db.mysql.prog"      value="mysql" />
+
+</project>
