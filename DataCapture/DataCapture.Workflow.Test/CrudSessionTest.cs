@@ -14,7 +14,7 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Session.TABLE);
 
-            var user = TestUtil.makeUser(dbConn);
+            var user = TestUtil.MakeUser(dbConn);
             var session = Session.Insert(dbConn, user);
 
             int after = DbUtil.SelectCount(dbConn, Session.TABLE);
@@ -29,7 +29,7 @@ namespace DataCapture.Workflow.Test
         {
             DateTime start = DateTime.UtcNow;
             var dbConn = ConnectionFactory.Create();
-            var user = TestUtil.makeUser(dbConn);
+            var user = TestUtil.MakeUser(dbConn);
 
             // first there should be no sessions for that user:
             var list = Session.SelectAll(dbConn, user);

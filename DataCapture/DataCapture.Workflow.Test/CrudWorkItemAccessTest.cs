@@ -10,9 +10,9 @@ namespace DataCapture.Workflow.Test
         public void CanInsert()
         {
             var dbConn = ConnectionFactory.Create();
-            var item = TestUtil.makeWorkItem(dbConn);
-            var good = TestUtil.makeUser(dbConn);
-            var bad = TestUtil.makeUser(dbConn);
+            var item = TestUtil.MakeWorkItem(dbConn);
+            var good = TestUtil.MakeUser(dbConn);
+            var bad = TestUtil.MakeUser(dbConn);
             int before = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
 
             WorkItemAccess.Insert(dbConn, item, good, true);
@@ -26,8 +26,8 @@ namespace DataCapture.Workflow.Test
         public void CannotInsertDuplicate()
         {
             var dbConn = ConnectionFactory.Create();
-            var item = TestUtil.makeWorkItem(dbConn);
-            var user = TestUtil.makeUser(dbConn);
+            var item = TestUtil.MakeWorkItem(dbConn);
+            var user = TestUtil.MakeUser(dbConn);
             int before = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
 
             var access = WorkItemAccess.Insert(dbConn, item, user, true);
@@ -59,8 +59,8 @@ namespace DataCapture.Workflow.Test
         public void InsertThenSelectMatch()
         {
             var dbConn = ConnectionFactory.Create();
-            var item = TestUtil.makeWorkItem(dbConn);
-            var user = TestUtil.makeUser(dbConn);
+            var item = TestUtil.MakeWorkItem(dbConn);
+            var user = TestUtil.MakeUser(dbConn);
             bool value = false;  //TestUtil.RANDOM.Next(0, 1) == 0;
             Assert.AreNotEqual(item, null);
 

@@ -20,8 +20,8 @@ namespace DataCapture.Workflow.Test
 
             var step = Step.Insert(dbConn
                 , stepName
-                , TestUtil.makeMap(dbConn)
-                , TestUtil.makeQueue(dbConn)
+                , TestUtil.MakeMap(dbConn)
+                , TestUtil.MakeQueue(dbConn)
                 , type
                 );
 
@@ -39,8 +39,8 @@ namespace DataCapture.Workflow.Test
             int type = TestUtil.RANDOM.Next(2, 100);
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Step.TABLE);
-            var queue = TestUtil.makeQueue(dbConn);
-            var map = TestUtil.makeMap(dbConn);
+            var queue = TestUtil.MakeQueue(dbConn);
+            var map = TestUtil.MakeMap(dbConn);
 
             var step1 = Step.Insert(dbConn, step1Name, map, queue, type);
             var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
@@ -64,8 +64,8 @@ namespace DataCapture.Workflow.Test
 
             Step.Insert(dbConn
                 , name
-                , TestUtil.makeMap(dbConn)
-                , TestUtil.makeQueue(dbConn)
+                , TestUtil.MakeMap(dbConn)
+                , TestUtil.MakeQueue(dbConn)
                 , 99)
                 ;
             step = Step.Select(dbConn, name);
