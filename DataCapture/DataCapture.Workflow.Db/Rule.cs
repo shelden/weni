@@ -10,9 +10,9 @@ namespace DataCapture.Workflow.Db
         public enum Compare
         {
             EQUAL = 1
-                , NOT_EQUAL = 2
-                , GREATER = 3
-                , LESS = 4
+            , NOT_EQUAL = 2
+            , GREATER = 3
+            , LESS = 4
         };
         #endregion
 
@@ -65,12 +65,12 @@ namespace DataCapture.Workflow.Db
 
         #region Constructors
         public Rule(int id
-                , int stepId
-                , int ruleOrder
-                , String variableName
-                , String variableValue
-                , Compare comparison
-                , int nextStepId
+            , int stepId
+            , String variableName
+            , Compare comparison
+            , String variableValue
+            , int ruleOrder
+            , int nextStepId
             )
         {
             Id = id;
@@ -81,17 +81,27 @@ namespace DataCapture.Workflow.Db
             Comparison = comparison;
             NextStepId = nextStepId;
         }
+        public Rule(IDataReader reader)
+            : this(DbUtil.GetInt(reader, "rule_id")
+                  , DbUtil.GetInt(reader, "step_id")
+                  , DbUtil.GetString(reader, "variable_name")
+                  , (Rule.Compare)DbUtil.GetInt(reader, "comparison")
+                  , DbUtil.GetString(reader, "variable_value")
+                  , DbUtil.GetInt(reader, "rule_order")
+                  , DbUtil.GetInt(reader, "next_step_id")
+                  )
+        { /* no code */ }
         #endregion
 
         #region CRUD: Insert
         public static Rule Insert(IDbConnection dbConn
-                                 , String variableName
-                                 , Rule.Compare compare
-                                 , String variableValue
-                                 , int ruleOrder
-                                 , Step step
+            , String variableName
+            , Rule.Compare compare
+            , String variableValue
+            , int ruleOrder
+            , Step step
             , Step nextStep
-                             )
+            )
 
         {
             IDbCommand command = dbConn.CreateCommand();
@@ -107,10 +117,12 @@ namespace DataCapture.Workflow.Db
             int id = Convert.ToInt32(command.ExecuteScalar());
             return new Rule(id
                 , step.Id
-                , ruleOrder
                 , variableName
+                                , compare
+
                 , variableValue
-                , compare
+                                , ruleOrder
+
                 , nextStep.Id
                 );
         }
@@ -130,14 +142,7 @@ namespace DataCapture.Workflow.Db
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
 
-                return new Rule(DbUtil.GetInt(reader, "rule_id")
-                    , DbUtil.GetInt(reader, "step_id")
-                    , DbUtil.GetInt(reader, "rule_order")
-                    , DbUtil.GetString(reader, "variable_name")
-                    , DbUtil.GetString(reader, "variable_value")
-                    , (Rule.Compare)(DbUtil.GetInt(reader, "comparison"))
-                    , DbUtil.GetInt(reader, "next_step_id")
-                    );
+                return new Rule(reader); 
             }
             finally
             {
