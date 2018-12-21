@@ -33,7 +33,7 @@ namespace DataCapture.Workflow.Test
         public static Queue makeQueue(IDbConnection dbConn)
         {
             String queueName = TestUtil.NextString();
-            return Queue.Insert(dbConn, queueName);
+            return Queue.Insert(dbConn, queueName, (TestUtil.RANDOM.Next() % 2 == 0));
         }
         public static Map makeMap(IDbConnection dbConn)
         {

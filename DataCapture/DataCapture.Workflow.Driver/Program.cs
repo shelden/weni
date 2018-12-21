@@ -25,22 +25,16 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var session = TestUtil.makeSession(dbConn);
-            var step = TestUtil.makeStep(dbConn);
-            var item = WorkItem.Insert(dbConn, step, "foo", 0, 0, session);
-            var user = TestUtil.makeUser(dbConn);
-            var access = WorkItemAccess.Insert(dbConn, item, user, false);
-            Console.WriteLine(access);
+            var name = TestUtil.NextString();
+            var queue0 = Queue.Insert(dbConn, TestUtil.NextString(), true);
+            var queue1 = Queue.Insert(dbConn, TestUtil.NextString(), false);
+            var queue2 = Queue.Insert(dbConn, TestUtil.NextString());
+            var queueN = Queue.Select(dbConn, queue1.Name);
 
-
-            for (int i = 0; i < 10; i++)
-            {
-                var data = WorkItemData.Insert(dbConn, item, "var" + i, TestUtil.NextString());
-                Console.WriteLine(data);
-            }
-
-            Console.WriteLine(session);
-            Console.WriteLine(item);
+            Console.WriteLine(queue0);
+            Console.WriteLine(queue1);
+            Console.WriteLine(queue2);
+            Console.WriteLine(queueN);
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }

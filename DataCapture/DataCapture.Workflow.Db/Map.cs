@@ -42,13 +42,19 @@ namespace DataCapture.Workflow.Db
             Name = name;
             Version = version;
         }
+        public Map(IDataReader reader)
+        {
+            Id = DbUtil.GetInt(reader, "map_id");
+            Name = DbUtil.GetString(reader, "name");
+            Version = DbUtil.GetInt(reader, "version");
+        }
         #endregion
 
         #region CRUD: Insert
         public static Map Insert(IDbConnection dbConn
-                  , String name
+            , String name
             , int version = 1
-                  )
+            )
 
         {
             IDbCommand command = dbConn.CreateCommand();
@@ -75,10 +81,7 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new Map(DbUtil.GetInt(reader, "map_id")
-                    , DbUtil.GetString(reader, "name")
-                    , DbUtil.GetInt(reader, "version")
-                    );
+                return new Map(reader);
             }
             finally
             {
