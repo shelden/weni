@@ -43,12 +43,32 @@ namespace DataCapture.Workflow.Test
         public static Step MakeStep(IDbConnection dbConn)
         {
             String stepName = TestUtil.NextString();
-            return Step.Insert(dbConn, stepName, MakeMap(dbConn), MakeQueue(dbConn), 29);
+            Step.StepType type = Step.StepType.Terminating;
+            switch(RANDOM.Next(0, 4))
+            {
+                case 0:
+                    type = Step.StepType.Failure;
+                    break;
+                case 1:
+                    type = Step.StepType.Failure;
+                    break;
+                case 2:
+                    type = Step.StepType.Start;
+                    break;
+                default:
+                    break;
+            }
+            return Step.Insert(dbConn
+                , stepName
+                , MakeMap(dbConn)
+                , MakeQueue(dbConn)
+                , type
+                );
         }
         public static User MakeUser(IDbConnection dbConn)
         {
             String userName = TestUtil.NextString();
-            return User.Insert(dbConn, userName, 10);
+            return User.Insert(dbConn, userName, RANDOM.Next(10, 20));
         }
         public static Session MakeSession(IDbConnection dbConn)
         {

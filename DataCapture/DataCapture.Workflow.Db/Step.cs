@@ -6,14 +6,35 @@ namespace DataCapture.Workflow.Db
 {
     public class Step
     {
+        #region enums
+        public enum StepType
+        {
+            Standard = 1
+            , Start = 2
+            , Terminating = 4
+            , Failure = 8
+        }
+        #endregion
+
         #region Constants
         public static readonly String TABLE = "workflow.steps";
-        public static readonly int NO_NEXT_STEP = 0;
+        public static readonly int NO_NEXT_STEP = -1;
         public static readonly String INSERT = ""
-                + "insert into "
-                + TABLE
-                + " (map_id, queue_id, name, next_step_id, type) "
-                + "values (@map_id, @queue_id, @name, @next_step_id, @type) "
+            + "INSERT INTO "
+            + TABLE
+            + " ("
+            + "   map_id "
+            + "   , queue_id "
+            + "   , name "
+            + "   , next_step_id "
+            + "   , type "
+            + ") VALUES ("
+            + "    @map_id "
+            + "    , @queue_id "
+            + "    , @name "
+            + "    , @next_step_id "
+            + "    , @type "
+            + ") "
             ;
         public static readonly String SELECT_BY_NAME = ""
                 + "select step_id "
@@ -22,7 +43,7 @@ namespace DataCapture.Workflow.Db
                 + "       , queue_id "
                 + "       , next_step_id "
                 + "       , type "
-                + " from "
+                + "FROM "
                 + TABLE + " "
                 + "WHERE 0 = 0 "
                 + "AND   name = @name "
@@ -35,7 +56,7 @@ namespace DataCapture.Workflow.Db
         public int MapId { get; set; }
         public int QueueId { get; set; }
         public int NextStepId { get; set; }
-        public int Type { get; set; } // XXX: Int16?
+        public StepType Type { get; set; }
         #endregion
 
         #region Constructors
@@ -44,7 +65,7 @@ namespace DataCapture.Workflow.Db
                 , int mapId
                 , int queueId
                 , int nextStepId
-                , int type
+                , StepType type
             )
         {
             Id = id;
@@ -54,6 +75,21 @@ namespace DataCapture.Workflow.Db
             NextStepId = nextStepId;
             Type = type;
         }
+        public Step(IDataReader reader)
+            : this(DbUtil.GetInt(reader, "step_id")
+                  , DbUtil.GetString(reader, "name")
+                  , DbUtil.GetInt(reader, "map_id")
+                  , DbUtil.GetInt(reader, "queue_id")
+                  , NO_NEXT_STEP
+                  , (Step.StepType)(DbUtil.GetInt(reader, "type"))
+                  )
+        {
+            if (!DbUtil.IsNull(reader, "next_step_id"))
+            {
+                this.NextStepId = DbUtil.GetInt(reader, "next_step_id");
+            }
+        }
+
         #endregion
 
         #region CRUD: Insert
@@ -61,7 +97,7 @@ namespace DataCapture.Workflow.Db
                                   , String name
                                   , Map map
                                   , Queue queue
-                                  , int type
+                                  , StepType type
                                   )
 
         {
@@ -73,7 +109,7 @@ namespace DataCapture.Workflow.Db
                              , Map map
                              , Queue queue
                              , Step nextStep
-                             , int type
+                             , StepType type
                              )
 
         {
@@ -86,10 +122,11 @@ namespace DataCapture.Workflow.Db
             {
                 DbUtil.AddNullParameter(command, "@next_step_id");
             }
-            else{
+            else
+            {
                 DbUtil.AddParameter(command, "@next_step_id", nextStep.Id);
             }
-            DbUtil.AddParameter(command, "@type", type);
+            DbUtil.AddParameter(command, "@type", (int)type);
             int id = Convert.ToInt32(command.ExecuteScalar());
             Step tmp = new Step(id, name, map.Id, queue.Id, nextStep == null ? NO_NEXT_STEP : nextStep.Id, type);
             return tmp;
@@ -109,18 +146,7 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                var tmp = new Step(DbUtil.GetInt(reader, "step_id")
-                    , DbUtil.GetString(reader, "name")
-                    , DbUtil.GetInt(reader, "map_id")
-                    , DbUtil.GetInt(reader, "queue_id")
-                    , NO_NEXT_STEP
-                    , DbUtil.GetInt(reader, "type")
-                    );
-                if (!DbUtil.IsNull(reader, "next_step_id"))
-                {
-                    tmp.NextStepId = DbUtil.GetInt(reader, "next_step_id");
-                }
-                return tmp;
+                return new Step(reader);
             }
             finally
             {
@@ -140,6 +166,9 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.Name);
             sb.Append(", next=");
             sb.Append(this.NextStepId);
+            sb.Append(", state=");
+            sb.Append(this.Type);
+
             return sb.ToString();
         }
         #endregion
