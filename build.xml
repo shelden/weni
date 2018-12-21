@@ -108,7 +108,7 @@
                   dir="DataCapture/@{namespace}"
                   >
 	        <arg value="-c" />
-	        <arg value="${test.mono.prog} ${test.runner.prog} bin/${compile.config}/@{namespace}.dll --noheader --nocolor" />
+	        <arg value="${test.mono.prog} ${test.runner.prog} bin\${compile.config}\@{namespace}.dll --noheader --nocolor" />
             </exec>
         </sequential>
     </macrodef>
