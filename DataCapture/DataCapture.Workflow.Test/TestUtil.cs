@@ -74,11 +74,13 @@ namespace DataCapture.Workflow.Test
             var bstring = b.ToString(FORMAT);
             if (astring != bstring)
             {
-                throw new Exception("Expected DateTimes to be the same: "
+                String msg = "Expected DateTimes to be the same: "
                     + astring
                     + " vs "
                     + bstring
-                );
+                    ;
+                Console.WriteLine(msg);
+                throw new Exception(msg);
             }
         }
         #endregion

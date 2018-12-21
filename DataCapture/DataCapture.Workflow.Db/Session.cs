@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Text;
+using System.Collections.Generic;
 
 namespace DataCapture.Workflow.Db
 {
@@ -14,7 +15,7 @@ namespace DataCapture.Workflow.Db
             + " (user_id, host_name, start_time) "
             + "values (@user_id, @host_name, @start_time) "
             ;
-        public static readonly String SELECT_BY_ID = ""
+        public static readonly String SELECT_BY_USER_ID = ""
             + "select session_id "
             + "   , user_id "
             + "   , start_time "
@@ -22,7 +23,7 @@ namespace DataCapture.Workflow.Db
             + " from "
             + TABLE + " "
             + "WHERE 0 = 0 "
-            + "AND   session_id = @session_id "
+            + "AND   user_id = @user_id "
             ;
         #endregion
 
@@ -45,6 +46,13 @@ namespace DataCapture.Workflow.Db
             Hostname = hostname;
             StartTime = startTime;
         }
+        public Session(IDataReader reader)
+            : this(DbUtil.GetInt(reader, "session_id")
+                  , DbUtil.GetInt(reader, "user_id")
+                  , DbUtil.GetString(reader, "host_name")
+                  , DbUtil.GetDateTime(reader, "start_time")
+                  )
+        { /* no code */ }
         #endregion
 
         #region CRUD: Insert
@@ -54,18 +62,43 @@ namespace DataCapture.Workflow.Db
 
         {
             DateTime when = DateTime.UtcNow;
+            String hostname = System.Environment.MachineName.ToLower(); // and maybe strip domains etc?
             IDbCommand command = dbConn.CreateCommand();
             command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@user_id", user.Id);
-            DbUtil.AddParameter(command, "@host_name", System.Environment.MachineName);
+            DbUtil.AddParameter(command, "@host_name", hostname);
             DbUtil.AddParameter(command, "@start_time", when);
             int id = Convert.ToInt32(command.ExecuteScalar());
-            return new Session(id, user.Id, System.Environment.MachineName, when);
+            return new Session(id, user.Id, hostname, when);
         }
         #endregion
 
         #region CRUD: Select
+        public static IList<Session> SelectAll(IDbConnection dbConn
+            , User user
+            )
+        {
+            IDataReader reader = null;
+            IList<Session> tmp = new List<Session>();
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_USER_ID;
+                DbUtil.AddParameter(command, "@user_id", user.Id);
+                reader = command.ExecuteReader();
 
+                if (reader == null) return null;
+                while(reader.Read())
+                {
+                    tmp.Add(new Session(reader));
+                }
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+            return tmp;
+        }
         #endregion
 
         #region ToString()
@@ -80,7 +113,7 @@ namespace DataCapture.Workflow.Db
             sb.Append(", from ");
             sb.Append(this.Hostname);
             sb.Append(", at ");
-            sb.Append(this.StartTime);
+            sb.Append(this.StartTime.ToString(DbUtil.FORMAT));
             sb.Append(" UTC");
             return sb.ToString();
         }
