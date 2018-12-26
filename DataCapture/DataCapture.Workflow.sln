@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Db", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Test", "DataCapture.Workflow.Test\DataCapture.Workflow.Test.csproj", "{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Example.Test", "DataCapture.Example.Test\DataCapture.Example.Test.csproj", "{59d41aca-2299-6e6e-40ae-a966531967e5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Example.Test", "DataCapture.Example.Test\DataCapture.Example.Test.csproj", "{59D41ACA-2299-6E6E-40AE-A966531967E5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Build.AssemblyVersionSetter", "DataCapture.Build.AssemblyVersionSetter\DataCapture.Build.AssemblyVersionSetter.csproj", "{5A93F5E9-6B69-8B1B-551B-4402169CA283|"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,9 +39,13 @@ Global
 		{DED7DCA5-C2FB-426B-9A39-A01402E2C54C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DED7DCA5-C2FB-426B-9A39-A01402E2C54C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DED7DCA5-C2FB-426B-9A39-A01402E2C54C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59d41aca-2299-6e6e-40ae-a966531967e5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59d41aca-2299-6e6e-40ae-a966531967e5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59d41aca-2299-6e6e-40ae-a966531967e5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59d41aca-2299-6e6e-40ae-a966531967e5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A93F5E9-6B69-8B1B-551B-4402169CA283|.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A93F5E9-6B69-8B1B-551B-4402169CA283|.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A93F5E9-6B69-8B1B-551B-4402169CA283|.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A93F5E9-6B69-8B1B-551B-4402169CA283|.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
