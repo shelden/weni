@@ -1,39 +1,42 @@
-<?xml version="1.0" encoding="utf-8"?> 
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"> 
-  <PropertyGroup> 
-    <Configuration Condition=" '20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Configuration)' == '' ">Debug</Configuration> 
-    <Platform Condition=" '20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Platform)' == '' ">AnyCPU</Platform> 
-    <ProjectGuid>{9fda7f45-078f-9bc7-8552-88380fe38277}</ProjectGuid> 
-    <OutputType>Exe</OutputType> 
-    <RootNamespace>DataCapture.Build.AssemblyVersionSetter</RootNamespace> 
-    <AssemblyName>DataCapture.Build.AssemblyVersionSetter</AssemblyName> 
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion> 
-  </PropertyGroup> 
-  <PropertyGroup Condition=" '20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Configuration)|20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Platform)' == 'Debug|AnyCPU' "> 
-    <DebugSymbols>true</DebugSymbols> 
-    <DebugType>full</DebugType> 
-    <Optimize>false</Optimize> 
-    <OutputPath>binDebug</OutputPath> 
-    <DefineConstants>DEBUG;</DefineConstants> 
-    <ErrorReport>prompt</ErrorReport> 
-    <WarningLevel>4</WarningLevel> 
-    <ConsolePause>false</ConsolePause> 
-  </PropertyGroup> 
-  <PropertyGroup Condition=" '20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Configuration)|20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701Platform)' == 'Release|AnyCPU' "> 
-    <Optimize>true</Optimize> 
-    <OutputPath>binRelease</OutputPath> 
-    <ErrorReport>prompt</ErrorReport> 
-    <WarningLevel>4</WarningLevel> 
-    <ConsolePause>false</ConsolePause> 
-  </PropertyGroup> 
-  <ItemGroup> 
-    <Reference Include="System" /> 
-    <Reference Include="System.Xml" /> 
-    <Reference Include="System.Data" /> 
-  </ItemGroup> 
-  <ItemGroup> 
-    <Compile Include="Program.cs" /> 
-    <Compile Include="Properties\AssemblyInfo.cs" /> 
-  </ItemGroup> 
-  <Import Project="20 20 12 61 79 80 81 98 33 100 204 250 395 398 399 701MSBuildBinPath)Microsoft.CSharp.targets" /> 
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5a93f5e9-6b69-8b1b-551b-4402169ca283}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>DataCapture.Build.AssemblyVersionSetter</RootNamespace>
+    <AssemblyName>DataCapture.Build.AssemblyVersionSetter</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="FileFinder.cs" />
+    <Compile Include="TempFile.cs" />
+    <Compile Include="VersionSetter.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
