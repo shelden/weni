@@ -30,37 +30,57 @@ namespace DataCapture.Workflow.Test
         // some utility methods to insert random things like
         // queues, steps, etc.  Sometimes you can't insert, for example,
         // a rule without creating a Step.  These make that easier.
-        public static Queue makeQueue(IDbConnection dbConn)
+        public static Queue MakeQueue(IDbConnection dbConn)
         {
             String queueName = TestUtil.NextString();
-            return Queue.Insert(dbConn, queueName);
+            return Queue.Insert(dbConn, queueName, (TestUtil.RANDOM.Next() % 2 == 0));
         }
-        public static Map makeMap(IDbConnection dbConn)
+        public static Map MakeMap(IDbConnection dbConn)
         {
             String mapName = TestUtil.NextString();
             return Map.Insert(dbConn, mapName);
         }
-        public static Step makeStep(IDbConnection dbConn)
+        public static Step MakeStep(IDbConnection dbConn)
         {
             String stepName = TestUtil.NextString();
-            return Step.Insert(dbConn, stepName, makeMap(dbConn), makeQueue(dbConn), 29);
+            Step.StepType type = Step.StepType.Terminating;
+            switch(RANDOM.Next(0, 4))
+            {
+                case 0:
+                    type = Step.StepType.Failure;
+                    break;
+                case 1:
+                    type = Step.StepType.Failure;
+                    break;
+                case 2:
+                    type = Step.StepType.Start;
+                    break;
+                default:
+                    break;
+            }
+            return Step.Insert(dbConn
+                , stepName
+                , MakeMap(dbConn)
+                , MakeQueue(dbConn)
+                , type
+                );
         }
-        public static User makeUser(IDbConnection dbConn)
+        public static User MakeUser(IDbConnection dbConn)
         {
             String userName = TestUtil.NextString();
-            return User.Insert(dbConn, userName, 10);
+            return User.Insert(dbConn, userName, RANDOM.Next(10, 20));
         }
-        public static Session makeSession(IDbConnection dbConn)
+        public static Session MakeSession(IDbConnection dbConn)
         {
-            return Session.Insert(dbConn, makeUser(dbConn));
+            return Session.Insert(dbConn, MakeUser(dbConn));
         }
-        public static WorkItem makeWorkItem(IDbConnection dbConn)
+        public static WorkItem MakeWorkItem(IDbConnection dbConn)
         {
             String workItemName = TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(1, 100);
             int state = TestUtil.RANDOM.Next(1, 100);
-            var step = TestUtil.makeStep(dbConn);
-            var session = TestUtil.makeSession(dbConn);
+            var step = TestUtil.MakeStep(dbConn);
+            var session = TestUtil.MakeSession(dbConn);
             return WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
         }
         #endregion
@@ -74,11 +94,13 @@ namespace DataCapture.Workflow.Test
             var bstring = b.ToString(FORMAT);
             if (astring != bstring)
             {
-                throw new Exception("Expected DateTimes to be the same: "
+                String msg = "Expected DateTimes to be the same: "
                     + astring
                     + " vs "
                     + bstring
-                );
+                    ;
+                Console.WriteLine(msg);
+                throw new Exception(msg);
             }
         }
         #endregion

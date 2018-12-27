@@ -11,6 +11,7 @@ namespace DataCapture.Workflow.Db
         // this is the mysql way to get the autoincrement of last insert;
         // therefore using this is not portable :-/ XXX
         public static readonly String GET_KEY = "SELECT LAST_INSERT_ID()";
+        public static readonly String FORMAT = "yyyy-MM-dd HH:mm:ss.fff";
         #endregion
 
         #region AddParameter 

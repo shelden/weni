@@ -16,8 +16,8 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
 
-            var step = TestUtil.makeStep(dbConn);
-            var session = TestUtil.makeSession(dbConn);
+            var step = TestUtil.MakeStep(dbConn);
+            var session = TestUtil.MakeSession(dbConn);
             var item = WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
 
             int after = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
@@ -37,8 +37,8 @@ namespace DataCapture.Workflow.Test
             var item = WorkItem.Select(dbConn, name);
             Assert.AreEqual(item, null);
 
-            var step = TestUtil.makeStep(dbConn);
-            var session = TestUtil.makeSession(dbConn);
+            var step = TestUtil.MakeStep(dbConn);
+            var session = TestUtil.MakeSession(dbConn);
             var inserted = WorkItem.Insert(dbConn, step, name, state, priority, session);
             var selected = WorkItem.Select(dbConn, name);
             

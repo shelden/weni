@@ -11,13 +11,13 @@ namespace DataCapture.Workflow.Db
         public static readonly String INSERT = ""
             + "insert into "
             + TABLE
-            + " (name, type) "
-            + "values (@name, type) "
+            + " (name, is_fail) "
+            + "values (@name, @is_fail) "
             ;
         public static readonly String SELECT_BY_NAME = ""
             + "select queue_id "
             + "   , name "
-            + "   , type "
+            + "   , is_fail "
             + " from "
             + TABLE + " "
             + "WHERE 0 = 0 "
@@ -27,36 +27,52 @@ namespace DataCapture.Workflow.Db
 
         #region Properties
         public int Id { get; set; }
-        public int Type { get; set; } // XXX these are supposed to be enums
         public String Name { get; set; }
+        /// <summary>
+        /// Is this a normal queue?  Or a fail queue?
+        /// </summary>
+        public bool IsNormal { get; set; }
+        /// <summary>
+        /// Is this a fail queue?  Or a normal queue?
+        /// </summary>
+        public bool IsFail
+        {
+            get { return !IsNormal; }
+        }
         #endregion
 
         #region Constructors
         public Queue (int id
             , String name
-            , int type = 1
+            , bool isFail = false
             )
         {
             Id = id;
             Name = name;
-            Type = type;
+            IsNormal = !isFail;
+        }
+        public Queue(IDataReader reader)
+        {
+            Id = DbUtil.GetInt(reader, "queue_id");
+            Name = DbUtil.GetString(reader, "name");
+            IsNormal = !DbUtil.GetBool(reader, "is_fail");
         }
         #endregion
 
         #region CRUD: Insert
         public static Queue Insert(IDbConnection dbConn
                   , String name
+                , bool isFail = false
                   )
 
         {
-            int type = 1; // XXX should be enum
             IDbCommand command = dbConn.CreateCommand();
             command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@name", name);
-            DbUtil.AddParameter(command, "@type", type);
+            DbUtil.AddParameter(command, "@is_fail", isFail);
 
             int id = Convert.ToInt32(command.ExecuteScalar());
-            Queue tmp = new Queue(id, name, type);
+            Queue tmp = new Queue(id, name, isFail);
             return tmp;
         }
         #endregion
@@ -74,10 +90,7 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new Queue(DbUtil.GetInt(reader, "queue_id")
-                    , DbUtil.GetString(reader, "name")
-                    , DbUtil.GetInt(reader, "type")
-                    );
+                return new Queue(reader);
             }
             finally
             {
@@ -95,6 +108,10 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.Id);
             sb.Append(", name=");
             sb.Append(this.Name);
+            if (IsFail)
+            {
+                sb.Append(" fail");
+            }
             return sb.ToString();
         }
         #endregion

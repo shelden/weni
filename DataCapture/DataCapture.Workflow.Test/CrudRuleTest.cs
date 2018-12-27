@@ -37,8 +37,8 @@ namespace DataCapture.Workflow.Test
                 , nextCompare()
                 , value
                 , order
-                , TestUtil.makeStep(dbConn)
-                , TestUtil.makeStep(dbConn)
+                , TestUtil.MakeStep(dbConn)
+                , TestUtil.MakeStep(dbConn)
                 );
             int after = DbUtil.SelectCount(dbConn, Rule.TABLE);
             Assert.AreEqual(before + 1, after);
@@ -53,8 +53,8 @@ namespace DataCapture.Workflow.Test
             var rule = Rule.Select(dbConn, -1); 
             Assert.AreEqual(rule, null);
 
-            var step0 = TestUtil.makeStep(dbConn);
-            var step1 = TestUtil.makeStep(dbConn);
+            var step0 = TestUtil.MakeStep(dbConn);
+            var step1 = TestUtil.MakeStep(dbConn);
 
             var inserted = Rule.Insert(dbConn
                 , key

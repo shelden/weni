@@ -7,21 +7,19 @@ namespace DataCapture.Workflow.Test
 {
     public class CrudStepTest
     {
-
-
         [Test()]
         public void CanInsertWithoutFollowing()
         {
             String stepName = TestUtil.NextString();
 
-            int type = TestUtil.RANDOM.Next(2, 100);
+            Step.StepType type = Step.StepType.Standard;
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Step.TABLE);
 
             var step = Step.Insert(dbConn
                 , stepName
-                , TestUtil.makeMap(dbConn)
-                , TestUtil.makeQueue(dbConn)
+                , TestUtil.MakeMap(dbConn)
+                , TestUtil.MakeQueue(dbConn)
                 , type
                 );
 
@@ -39,11 +37,11 @@ namespace DataCapture.Workflow.Test
             int type = TestUtil.RANDOM.Next(2, 100);
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Step.TABLE);
-            var queue = TestUtil.makeQueue(dbConn);
-            var map = TestUtil.makeMap(dbConn);
+            var queue = TestUtil.MakeQueue(dbConn);
+            var map = TestUtil.MakeMap(dbConn);
 
-            var step1 = Step.Insert(dbConn, step1Name, map, queue, type);
-            var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, type);
+            var step1 = Step.Insert(dbConn, step1Name, map, queue, Step.StepType.Terminating);
+            var step0 = Step.Insert(dbConn, step0Name, map, queue, step1, Step.StepType.Start);
 
             Assert.AreEqual(step1.NextStepId, Step.NO_NEXT_STEP);
             Assert.AreEqual(step0.NextStepId, step1.Id);
@@ -64,14 +62,14 @@ namespace DataCapture.Workflow.Test
 
             Step.Insert(dbConn
                 , name
-                , TestUtil.makeMap(dbConn)
-                , TestUtil.makeQueue(dbConn)
-                , 99)
+                , TestUtil.MakeMap(dbConn)
+                , TestUtil.MakeQueue(dbConn)
+                , Step.StepType.Start)
                 ;
             step = Step.Select(dbConn, name);
 
             Assert.AreEqual(step.Name, name);
-            Assert.AreEqual(step.Type, 99);
+            Assert.AreEqual(step.Type, Step.StepType.Start);
             Assert.AreEqual(step.NextStepId, Step.NO_NEXT_STEP);
             Assert.GreaterOrEqual(step.Id, 1);
         }

@@ -10,7 +10,7 @@ namespace DataCapture.Workflow.Test
         public void CanInsert()
         {
             var dbConn = ConnectionFactory.Create();
-            var item = TestUtil.makeWorkItem(dbConn);
+            var item = TestUtil.MakeWorkItem(dbConn);
             int before = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             WorkItemData.Insert(dbConn, item, "variable0", TestUtil.NextString());
@@ -26,7 +26,7 @@ namespace DataCapture.Workflow.Test
             String value = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
 
-            var item = TestUtil.makeWorkItem(dbConn);
+            var item = TestUtil.MakeWorkItem(dbConn);
             Assert.AreNotEqual(item, null);
 
             // there should be no data (aka key value pairs) now:
