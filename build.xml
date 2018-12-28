@@ -6,7 +6,7 @@
     <property environment="env" />
     <!-- ================================================================== -->
     <target name="all" 
-            depends="echo,version,db.init,build,test"
+            depends="echo,version,build,db.init,test"
             />
     <!-- ================================================================== -->
     <target name="clean">
