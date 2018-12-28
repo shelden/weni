@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5a93f5e9-6b69-8b1b-551b-4402169ca283}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DataCapture.Build.AssemblyVersionSetter</RootNamespace>
-    <AssemblyName>DataCapture.Build.AssemblyVersionSetter</AssemblyName>
+    <RootNamespace>DataCapture.Build.VersionSetter</RootNamespace>
+    <AssemblyName>DataCapture.Build.VersionSetter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
