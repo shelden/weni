@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.Build.VersionSetter
 {
     /// <summary>
     /// XXX add code to remove the file on destruction / GC

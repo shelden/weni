@@ -43,8 +43,11 @@
     </target>
     <!-- ================================================================== -->
     <target name="version">
+        <property name="version.number"
+		  value="0.10.*"
+		  />
         <property name="version.namespace"
-                  value="DataCapture.Build.AssemblyVersionSetter"
+                  value="DataCapture.Build.VersionSetter"
                   />
         <property name="version.project"
                   location="DataCapture/${version.namespace}/${version.namespace}.csproj" />
@@ -52,11 +55,11 @@
                   location="DataCapture/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
                   />
         <msbuild solution="${version.project}" />
-        <exec executable="${version.prog}"
-              failonerror="true"
-              >
+        <exec    executable="${version.prog}"
+		 failonerror="true"
+		 >
             <arg value="--version" />
-            <arg value="0.10.*" />
+            <arg value="${version.number}" />
         </exec>
     </target>
     <!-- ================================================================== -->

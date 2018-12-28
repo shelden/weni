@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.Build.VersionSetter
 {
     public class FileFinder
     {

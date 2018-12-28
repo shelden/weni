@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.IO;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.Build.VersionSetter
 {
     public class Program
     {
