@@ -44,6 +44,10 @@
       <Project>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</Project>
       <Name>DataCapture.Workflow.Test</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataCapture.Workflow\DataCapture.Workflow.csproj">
+      <Project>{DB68AA81-C4E9-4350-9153-9821DADA7420}</Project>
+      <Name>DataCapture.Workflow</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

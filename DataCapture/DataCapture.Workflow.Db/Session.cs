@@ -25,6 +25,12 @@ namespace DataCapture.Workflow.Db
             + "WHERE 0 = 0 "
             + "AND   user_id = @user_id "
             ;
+        public static readonly String DELETE_BY_ID = ""
+            + "delete from "
+            + TABLE
+            + " WHERE 0 = 0"
+            + " AND session_id = @session_id"
+            ;
         #endregion
 
         #region Properties
@@ -98,6 +104,16 @@ namespace DataCapture.Workflow.Db
                 DbUtil.ReallyClose(reader);
             }
             return tmp;
+        }
+        #endregion
+
+        #region CRUD: Delete
+        public void Delete(IDbConnection dbConn)
+        {
+            IDbCommand command = dbConn.CreateCommand();
+            command.CommandText = DELETE_BY_ID;
+            DbUtil.AddParameter(command, "@session_id", this.Id);
+            command.ExecuteNonQuery();
         }
         #endregion
 

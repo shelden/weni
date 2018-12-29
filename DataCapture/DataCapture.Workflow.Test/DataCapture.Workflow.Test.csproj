@@ -47,6 +47,7 @@
     <Compile Include="CrudWorkItemTest.cs" />
     <Compile Include="CrudWorkItemDataTest.cs" />
     <Compile Include="CrudWorkItemAccessTest.cs" />
+    <Compile Include="ApiConnectionTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">

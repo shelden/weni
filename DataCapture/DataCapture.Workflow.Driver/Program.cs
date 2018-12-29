@@ -1,6 +1,7 @@
 ﻿using System;
 using DataCapture.Workflow.Db;
 using DataCapture.Workflow.Test;
+using DataCapture.Workflow;
 
 namespace DataCapture.Workflow.Driver
 {
@@ -24,17 +25,15 @@ namespace DataCapture.Workflow.Driver
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
-            var dbConn = ConnectionFactory.Create();
-            var name = TestUtil.NextString();
-            var queue0 = Queue.Insert(dbConn, TestUtil.NextString(), true);
-            var queue1 = Queue.Insert(dbConn, TestUtil.NextString(), false);
-            var queue2 = Queue.Insert(dbConn, TestUtil.NextString());
-            var queueN = Queue.Select(dbConn, queue1.Name);
+            var wfConn = new DataCapture.Workflow.Connection();
+            Console.WriteLine(wfConn);
+            wfConn.Connect();
+            Console.WriteLine(wfConn);
 
-            Console.WriteLine(queue0);
-            Console.WriteLine(queue1);
-            Console.WriteLine(queue2);
-            Console.WriteLine(queueN);
+            wfConn.Disconnect();
+            Console.WriteLine(wfConn);
+
+
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
