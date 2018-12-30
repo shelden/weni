@@ -25,14 +25,13 @@ namespace DataCapture.Workflow.Driver
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
-            var wfConn = new DataCapture.Workflow.Connection();
-            Console.WriteLine(wfConn);
-            wfConn.Connect();
-            Console.WriteLine(wfConn);
-
-            wfConn.Disconnect();
-            Console.WriteLine(wfConn);
-
+            var user = TestUtil.MakeUser(ConnectionFactory.Create());
+            for (int i = 0; i < user.LoginLimit + 1; i++)
+            {
+                var conn0 = new DataCapture.Workflow.Connection();
+                conn0.Connect(user.Login);
+                Console.WriteLine(i + ") " + conn0);
+            }
 
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
