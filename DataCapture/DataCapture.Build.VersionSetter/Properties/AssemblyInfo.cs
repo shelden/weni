@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vermont Purple, LLC")]
 [assembly: AssemblyProduct("DataCapture.Build.VersionSetter")]
-[assembly: AssemblyCopyright("Copyright (C) 2018 Vermont Purple, LLC")]
+[assembly: AssemblyCopyright("Copyright (C) 2018 - 2019 Vermont Purple, LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
