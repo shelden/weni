@@ -1,0 +1,7 @@
+<project name="DataCapture.Workflow"
+         default="all"
+         basedir="DataCapture"
+         >
+    <!-- ================================================================== -->
+    <import file="DataCapture/build.xml" />
+</project>    
