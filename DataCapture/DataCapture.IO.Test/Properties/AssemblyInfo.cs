@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DataCapture.Build.VersionSetter")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("DataCapture.IO.Test")]
+[assembly: AssemblyDescription("$Id$")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vermont Purple, LLC")]
-[assembly: AssemblyProduct("DataCapture.Build.VersionSetter")]
-[assembly: AssemblyCopyright("Copyright (C) 2018 - 2019 Vermont Purple, LLC")]
+[assembly: AssemblyProduct("DataCapture.IO.Test")]
+[assembly: AssemblyCopyright("Copyright (C) 2019 Vermont Purple, LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed toCOM
-[assembly: Guid("5a93f5e9-6b69-8b1b-551b-4402169ca283")]
+[assembly: Guid("23b81c4c-02c9-72d6-4bd7-f391b8c12959")]
 
 // Version information for an assembly consists of the following four values:
 //
