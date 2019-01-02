@@ -1,6 +1,6 @@
 using System;
-using System.Text;
 using System.IO;
+using DataCapture.IO;
 
 namespace DataCapture.Build.VersionSetter
 {

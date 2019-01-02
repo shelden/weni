@@ -30,6 +30,7 @@
     <!-- ================================================================== -->
     <target name="test">
         <nunitconsole namespace="DataCapture.Example.Test" />
+        <nunitconsole namespace="DataCapture.IO.Test" />
         <nunitconsole namespace="DataCapture.Workflow.Test" />
     </target>
     <!-- ================================================================== -->
