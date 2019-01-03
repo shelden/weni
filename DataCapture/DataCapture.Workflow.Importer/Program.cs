@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using System.IO;
 using System.Collections.Generic;
+using DataCapture.Workflow.Db;
 
 namespace DataCapture.Workflow.Importer
 {
@@ -22,6 +23,7 @@ namespace DataCapture.Workflow.Importer
                 var f = new FileInfo(s);
                 files_.Add(f);
             }
+            files_.Add(new FileInfo("/tmp/foo.xml"));
         }
         #endregion
 
@@ -29,9 +31,13 @@ namespace DataCapture.Workflow.Importer
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Importer()");
+            var dbConn = ConnectionFactory.Create();
+            XmlImporter importer = new XmlImporter();
             foreach(var f in files_)
             {
-                Console.WriteLine(f.FullName);
+                var xaction = dbConn.BeginTransaction();
+                importer.Import(dbConn, f);
+                xaction.Commit();
             }
             Console.WriteLine("<-- DataCapture.Workflow.Importer()");
         }
@@ -49,7 +55,7 @@ namespace DataCapture.Workflow.Importer
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
             Console.WriteLine("Thank you for playing with "

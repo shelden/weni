@@ -59,6 +59,10 @@
       <Project>{DB68AA81-C4E9-4350-9153-9821DADA7420}</Project>
       <Name>DataCapture.Workflow</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataCapture.IO\DataCapture.IO.csproj">
+      <Project>{5AFC4BB5-843C-C180-AE73-47F5A1978B22}</Project>
+      <Name>DataCapture.IO</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
