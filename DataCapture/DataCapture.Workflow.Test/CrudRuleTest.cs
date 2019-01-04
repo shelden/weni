@@ -12,13 +12,13 @@ namespace DataCapture.Workflow.Test
             switch(TestUtil.RANDOM.Next(0, 4))
             {
                 case 0:
-                    return Rule.Compare.EQUAL;
+                    return Rule.Compare.Equal;
                 case 1:
-                    return Rule.Compare.NOT_EQUAL;
+                    return Rule.Compare.NotEqual;
                 case 2:
-                    return Rule.Compare.LESS;
+                    return Rule.Compare.Less;
                 case 3:
-                    return Rule.Compare.GREATER;
+                    return Rule.Compare.Greater;
             }
             return (Rule.Compare)(999999);
         }

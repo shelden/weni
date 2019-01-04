@@ -76,6 +76,35 @@ namespace DataCapture.Workflow
             return defaultValue;
         }
         /// <summary>
+        /// safely extracts a string attribute from an XmlElement.
+        /// If it doesn't exist or problems occur, it reutrns
+        /// the specified default
+        /// </summary>
+        /// <returns>The attribute.</returns>
+        /// <param name="element">Xml Element</param>
+        /// <param name="name">Name of the element</param>
+        /// <param name="defaultValue">Default value</param>
+        static private int GetAttribute(XmlElement element
+            , String name
+            , int defaultValue
+            )
+        {
+            if (element == null) return defaultValue;
+            XmlAttribute attribute = element.Attributes[name];
+            if (attribute == null) return defaultValue;
+            if (String.IsNullOrEmpty(attribute.Value)) return defaultValue;
+            try
+            {
+                return int.Parse(attribute.Value);
+
+            }
+            catch
+            {
+                ;  // no code
+            }
+            return defaultValue;
+        }
+        /// <summary>
         /// Like GetAtrribute(), but throws if the element doesn't exist
         /// </summary>
         /// <returns>The required attribute.</returns>
@@ -116,6 +145,37 @@ namespace DataCapture.Workflow
         {
             return (T)Enum.Parse(typeof(T), value, true);
         }
+        public static DataCapture.Workflow.Db.Rule.Compare ParseCompare(String value)
+        {
+            switch (value.ToLower())
+            {
+                case "greater":
+                case "greaterthan":
+                case "gt":
+                case ">":
+                    return DataCapture.Workflow.Db.Rule.Compare.Greater;
+                case "less":
+                case "lessthan":
+                case "lt":
+                case "<":
+                    return DataCapture.Workflow.Db.Rule.Compare.Less;
+                case "equal":
+                case "equals":
+                case "eq":
+                case "==":
+                case "=":
+                    return DataCapture.Workflow.Db.Rule.Compare.Equal;
+                case "notequal":
+                case "notequals":
+                case "ne":
+                case "<>":
+                case "!=":
+                    return DataCapture.Workflow.Db.Rule.Compare.NotEqual;
+                default:
+                    break;
+            }
+            return DataCapture.Workflow.Db.Rule.Compare.Equal;
+        }
         #endregion
 
         #region Behavior
@@ -152,7 +212,7 @@ namespace DataCapture.Workflow
                     }
                 case "step":
                     {
-                        String nextStepName = GetAttribute(element, "nextStep", "");
+                        String nextStepName = GetAttribute(element, "next", "");
                         Step nextStep = null;
                         if (!String.IsNullOrEmpty(nextStepName) && steps.ContainsKey(nextStepName))
                         {
@@ -167,6 +227,20 @@ namespace DataCapture.Workflow
                             , ParseEnum<Step.StepType>(GetAttribute(element, "type", "Standard"))
                             );
                         steps.Add(step.Name, step);
+                        break;
+                    }
+                case "rule":
+                    {
+                        var step = steps[GetRequiredAttribute(element, "step")];
+                        var next = steps[GetRequiredAttribute(element, "next")];
+                        var rule = DataCapture.Workflow.Db.Rule.Insert(dbConn
+                            , GetRequiredAttribute(element, "variable")
+                            , ParseCompare(GetAttribute(element, "compare", "Equals"))
+                            , GetRequiredAttribute(element, "value")
+                            , GetAttribute(element, "order", int.MaxValue)
+                            , step
+                            , next
+                            );
                         break;
                     }
                 default:

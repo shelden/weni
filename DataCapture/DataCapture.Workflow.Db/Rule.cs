@@ -9,10 +9,10 @@ namespace DataCapture.Workflow.Db
         #region Enums
         public enum Compare
         {
-            EQUAL = 1
-            , NOT_EQUAL = 2
-            , GREATER = 3
-            , LESS = 4
+            Equal = 1
+            , NotEqual = 2
+            , Greater = 3
+            , Less = 4
         };
         #endregion
 
@@ -162,16 +162,16 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.VariableName);
             switch(this.Comparison)
             {
-                case Rule.Compare.EQUAL:
+                case Rule.Compare.Equal:
                     sb.Append("==");
                     break;
-                case Rule.Compare.NOT_EQUAL:
+                case Rule.Compare.NotEqual:
                     sb.Append("!=");
                     break;
-                case Rule.Compare.GREATER:
+                case Rule.Compare.Greater:
                     sb.Append(">");
                     break;
-                case Rule.Compare.LESS:
+                case Rule.Compare.Less:
                     sb.Append("<");
                     break;
                 default:
