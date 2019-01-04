@@ -23,19 +23,20 @@ namespace DataCapture.Workflow.Db
             + TABLE + " "
             + "WHERE 0 = 0 "
             + "AND   name = @name "
+            + "ORDER BY version DESC "
             ;
         #endregion
 
         #region Properties
         public int Id { get; set; }
         public String Name { get; set; }
-        public int Version { get; set; } // XXX: Int16?
+        public int Version { get; set; } 
         #endregion
 
         #region Constructors
         public Map (int id
             , String name
-            , int version = 1
+            , int version
             )
         {
             Id = id;
@@ -51,9 +52,19 @@ namespace DataCapture.Workflow.Db
         #endregion
 
         #region CRUD: Insert
+        /// <summary>
+        /// Insert the specified dbConn, name and version.
+        /// Version doesn't default.  If you want to insert
+        /// while creating a new version if it already exists,
+        /// ise InsertWithMaxVersion()
+        /// </summary>
+        /// <returns>The insert.</returns>
+        /// <param name="dbConn">Db conn.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="version">Version.</param>
         public static Map Insert(IDbConnection dbConn
             , String name
-            , int version = 1
+            , int version
             )
 
         {
@@ -65,6 +76,21 @@ namespace DataCapture.Workflow.Db
             int id = Convert.ToInt32(command.ExecuteScalar());
             Map tmp = new Map(id, name, version);
             return tmp;
+        }
+        /// <summary>
+        /// inserts a new map.  Increments version if there is already
+        /// a map with that name.
+        /// </summary>
+        /// <returns>The resultantly added map</returns>
+        /// <param name="dbConn">Db conn.</param>
+        /// <param name="name">Name.</param>
+        public static Map InsertWithMaxVersion(IDbConnection dbConn
+            , String name
+            )
+        {
+            var max = Map.Select(dbConn, name);
+            int nextVersion = max == null ? Map.VERSION : max.Version + 1;
+            return Map.Insert(dbConn, name, nextVersion);
         }
         #endregion
 
@@ -82,6 +108,9 @@ namespace DataCapture.Workflow.Db
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
                 return new Map(reader);
+                // Note: this assumes that we only every want the one with the
+                // max version.  If that stops being true, we will need an
+                // overload that specifies the version.
             }
             finally
             {

@@ -19,6 +19,10 @@ namespace DataCapture.Workflow
         }
         #endregion
 
+        #region Members
+        private Map map_ = null;
+        #endregion
+
         #region Xml 
         /// <summary>
         /// safely extracts a string attribute from an XmlElement.
@@ -39,6 +43,37 @@ namespace DataCapture.Workflow
             if (attribute == null) return defaultValue;
             if (String.IsNullOrEmpty(attribute.Value)) return defaultValue;
             return attribute.Value;
+        }
+        /// <summary>
+        /// safely extracts a string attribute from an XmlElement.
+        /// If it doesn't exist or problems occur, it reutrns
+        /// the specified default
+        /// </summary>
+        /// <returns>The attribute.</returns>
+        /// <param name="element">Xml Element</param>
+        /// <param name="name">Name of the element</param>
+        /// <param name="defaultValue">Default value</param>
+        static private bool GetAttribute(XmlElement element
+            , String name
+            , bool defaultValue
+            )
+        {
+            if (element == null) return defaultValue;
+            XmlAttribute attribute = element.Attributes[name];
+            if (attribute == null) return defaultValue;
+            if (String.IsNullOrEmpty(attribute.Value)) return defaultValue;
+            switch(attribute.Value.ToLower())
+            {
+                case "true":
+                case "yes":
+                    return true;
+                case "false":
+                case "no":
+                    return false;
+                default:
+                    break;
+            }
+            return defaultValue;
         }
         /// <summary>
         /// Like GetAtrribute(), but throws if the element doesn't exist
@@ -84,63 +119,81 @@ namespace DataCapture.Workflow
         #endregion
 
         #region Behavior
+        private void Import(IDbConnection dbConn
+                , XmlElement element
+                , ref Dictionary<String, Step> steps
+                , ref Dictionary<String, Queue> queues
+            )
+        {
+            if (element == null) return;
+
+            switch (element.LocalName.ToLower())
+            {
+                case "map":
+                    {
+                        map_ = Map.InsertWithMaxVersion(dbConn
+                            , GetRequiredAttribute(element, "name")
+                            );
+                        break;
+                    }
+                case "queue":
+                    {
+                        String queueName = GetRequiredAttribute(element, "name");
+                        var queue = Queue.Select(dbConn, queueName);
+                        if (queue == null)
+                        {
+                            queue = Queue.Insert(dbConn
+                                , GetRequiredAttribute(element, "name")
+                                , GetAttribute(element, "isfail", false)
+                                );
+                        }
+                        queues.Add(queue.Name, queue);
+                        break;
+                    }
+                case "step":
+                    {
+                        String nextStepName = GetAttribute(element, "nextStep", "");
+                        Step nextStep = null;
+                        if (!String.IsNullOrEmpty(nextStepName) && steps.ContainsKey(nextStepName))
+                        {
+                            nextStep = steps[nextStepName];
+                        }
+                        var queue = queues[GetRequiredAttribute(element, "queue")];
+                        var step = Step.Insert(dbConn
+                            , GetRequiredAttribute(element, "name")
+                            , map_
+                            , queue
+                            , nextStep
+                            , ParseEnum<Step.StepType>(GetAttribute(element, "type", "Standard"))
+                            );
+                        steps.Add(step.Name, step);
+                        break;
+                    }
+                default:
+                    Console.WriteLine("Warning: unknown element [" + element.Name + "]");
+                    break;
+            }
+
+            foreach(var subnode in element.ChildNodes)
+            {
+                var subelement = (XmlElement)(subnode);
+                this.Import(dbConn, subelement, ref steps, ref queues);
+            }
+
+        }
         public void Import(IDbConnection dbConn, FileInfo file)
         {
-            int found = 0;
             XmlDocument doc = new XmlDocument();
             doc.Load(file.FullName);
-
-            // document element should be "map":
-            var map = Map.Insert(dbConn
-                , GetRequiredAttribute(doc.DocumentElement, "name")
-                );
-            Console.WriteLine(map);
                 
-
             var steps = new Dictionary<String, Step>();
-            foreach(XmlNode node in doc.DocumentElement.ChildNodes)
-            {  
-                System.Xml.XmlElement element = (XmlElement)node;
-
-                // assumes we want one queue per step:
-                String stepName = GetRequiredAttribute(element, "name");
-                String queueName = map.Name + "." + stepName;
-                var queue = Queue.Select(dbConn, queueName);
-                if (queue == null)
-                {
-                    queue = Queue.Insert(dbConn, queueName);
-                }
-
-                // assume each element here is a step:
-                String nextStepName = GetAttribute(element, "next", "blahblahblah");
-                var nextStep = steps.ContainsKey(nextStepName)
-                    ? steps[nextStepName]
-                    : null
-                    ;
-
-
-                // assumes child elements are steps:
-                var step = Step.Insert(dbConn
-                    , stepName
-                    , map
-                    , queue
-                    , nextStep
-                    , ParseEnum<Step.StepType>(GetRequiredAttribute(element, "type"))
-                );
-
-                Console.WriteLine(queue);
-                Console.WriteLine(step);
-                steps.Add(step.Name, step);
-                found++;
-            }
-
-            if (found <= 0)
+            var queues = new Dictionary<String, Queue>();
+            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
             {
-                throw new Exception("no start element found in ["
-                    + file.FullName
-                    + "]"
-                    );
+                var element = (XmlElement)node;
+                Import(dbConn, element, ref steps, ref queues);
             }
+            map_ = null;
         }
         #endregion
 

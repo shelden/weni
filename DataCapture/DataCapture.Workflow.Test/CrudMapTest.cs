@@ -27,7 +27,7 @@ namespace DataCapture.Workflow.Test
             var map = Map.Select(dbConn, name);
             Assert.AreEqual(map, null); // because login is a random string
 
-            Map.Insert(dbConn, name);
+            Map.Insert(dbConn, name, Map.VERSION);
             map = Map.Select(dbConn, name);
 
             Assert.AreEqual(map.Name, name);
@@ -59,52 +59,41 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(selected.Version, version);
         }
 
-
         [Test()]
-        public void CannotInsertDuplicate()
+        public void InsertingDuplicateIncreasesVersion()
         {
             String name = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
             int before = DbUtil.SelectCount(dbConn, Map.TABLE);
-            Map.Insert(dbConn, name, 1);
-            int after0 = DbUtil.SelectCount(dbConn, Map.TABLE);
-            Assert.AreEqual(before + 1, after0);
+            var insertedv1 = Map.InsertWithMaxVersion(dbConn, name);
+            int afterv1 = DbUtil.SelectCount(dbConn, Map.TABLE);
+            Assert.AreEqual(before + 1, afterv1);
+            Assert.AreEqual(insertedv1.Version, Map.VERSION);
 
-            // now try and insert again, it should fail:
-            string msg = "";
-            try
-            {
-                Map.Insert(dbConn, name, 1);
-                int after1 = DbUtil.SelectCount(dbConn, Map.TABLE);
-            }
-            catch (Exception ex)
-            {
-                msg = ex.Message;
-            }
+            // now try and insert again.  When doing so, the version
+            // should increase.
+            var insertedv2 = Map.InsertWithMaxVersion(dbConn, name);
+            int afterv2 = DbUtil.SelectCount(dbConn, Map.TABLE);
 
-            Assert.AreNotEqual("", msg);
-            Console.WriteLine("expected exception: " + msg);
-            int after2 = DbUtil.SelectCount(dbConn, Map.TABLE);
-            Assert.AreEqual(after2, before + 1);
+
+            Assert.AreEqual(afterv2, before + 2);
+            Assert.AreEqual(insertedv2.Version, insertedv1.Version + 1);
         }
 
         [Test()]
         public void CanSelect()
         {
-            String login = TestUtil.NextString();
-            int limit = TestUtil.RANDOM.Next(2, 100);
-
+            String name = TestUtil.NextString();
 
             var dbConn = ConnectionFactory.Create();
-            User.Insert(dbConn, login, limit);
+            var inserted = Map.Insert(dbConn, name, Map.VERSION);
 
-
-            User found = User.Select(dbConn, login);
+            var found = Map.Select(dbConn, name);
 
             Assert.AreNotEqual(found, null);
-            Assert.AreEqual(found.Login, login);
-            Assert.AreEqual(found.LoginLimit, limit);
-            Assert.AreNotEqual(found.Id, 0);
+            //Assert.AreEqual(found.
+            //Assert.AreEqual(found.LoginLimit, limit);
+            //Assert.AreNotEqual(found.Id, 0);
         }
 
         
