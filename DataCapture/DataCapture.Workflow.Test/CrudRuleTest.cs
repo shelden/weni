@@ -82,6 +82,5 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(inserted.StepId, step0.Id);
             Assert.AreEqual(inserted.NextStepId, step1.Id);
         }
-        
     }
 }

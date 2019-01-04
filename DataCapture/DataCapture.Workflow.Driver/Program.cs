@@ -25,14 +25,13 @@ namespace DataCapture.Workflow.Driver
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
-            var user = TestUtil.MakeUser(ConnectionFactory.Create());
-            for (int i = 0; i < user.LoginLimit + 1; i++)
-            {
-                var conn0 = new DataCapture.Workflow.Connection();
-                conn0.Connect(user.Login);
-                Console.WriteLine(i + ") " + conn0);
-            }
-
+            var dbConn = ConnectionFactory.Create();
+            var map1 = TestUtil.MakeMap(dbConn);
+            Console.WriteLine(map1);
+            var map2 = Map.Insert(dbConn, map1.Name, 2);
+            Console.WriteLine(map2);
+            var map3 = Map.InsertWithMaxVersion(dbConn, map1.Name);
+            Console.WriteLine(map3);
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
