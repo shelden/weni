@@ -55,7 +55,6 @@ namespace DataCapture.Workflow.Test
         [Test()]
         public void CanImport()
         {
-
             var dbConn = ConnectionFactory.Create();
             int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
             int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
@@ -72,6 +71,7 @@ namespace DataCapture.Workflow.Test
                 importer.Import(dbConn, tmp.Value);
             }
             map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
             int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
             int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
             int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
@@ -84,5 +84,78 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(beforeMapVersion + 1, map.Version);
         }
 
+        public void CanImportWithLeadingComments()
+        {
+            var dbConn = ConnectionFactory.Create();
+            int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int beforeRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            var map = Map.Select(dbConn, MAP_NAME);
+            int beforeMapVersion = map == null ? Map.VERSION - 1 : map.Version;
+
+            using (var tmp = new TempFile(".xml"))
+            {
+                using (var writer = new System.IO.StreamWriter(tmp.FullName))
+                {
+                    writer.WriteLine("<!-- leading XML commentary--> ");
+                    writer.WriteLine(EXAMPLE_XML);
+                }
+                var importer = new XmlImporter();
+                importer.Import(dbConn, tmp.Value);
+            }
+            map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            // don't check queues, because it's ok if they already exist
+            // by name...making this quick & dirty technique not quite 
+            // right
+            Assert.AreEqual(beforeMaps + 1, afterMaps); // example has 1 map
+            Assert.AreEqual(beforeSteps + 4, afterSteps); // example has 4 steps
+            Assert.AreEqual(beforeRules + 2, afterRules); // example has 2 rules
+            Assert.AreEqual(beforeMapVersion + 1, map.Version);
+        }
+
+        public void CanImportWithInlineComments()
+        {
+            var dbConn = ConnectionFactory.Create();
+            int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int beforeRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            var map = Map.Select(dbConn, MAP_NAME);
+            int beforeMapVersion = map == null ? Map.VERSION - 1 : map.Version;
+
+            using (var tmp = new TempFile(".xml"))
+            {
+                using (var writer = new System.IO.StreamWriter(tmp.FullName))
+                {
+                    string[] lines = EXAMPLE_XML.Split(
+                        new[] { "\r\n", "\r", "\n" },
+                        StringSplitOptions.None
+                    );
+                    for(int i = 0; i < lines.Length; i++)
+                    {
+                        writer.WriteLine(lines[i]);
+                        writer.WriteLine("<!-- xml comments are fun" + i + " -->");
+                    }
+                    writer.WriteLine(EXAMPLE_XML);
+                }
+                var importer = new XmlImporter();
+                importer.Import(dbConn, tmp.Value);
+            }
+            map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            // don't check queues, because it's ok if they already exist
+            // by name...making this quick & dirty technique not quite 
+            // right
+            Assert.AreEqual(beforeMaps + 1, afterMaps); // example has 1 map
+            Assert.AreEqual(beforeSteps + 4, afterSteps); // example has 4 steps
+            Assert.AreEqual(beforeRules + 2, afterRules); // example has 2 rules
+            Assert.AreEqual(beforeMapVersion + 1, map.Version);
+        }
     }
 }
