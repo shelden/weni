@@ -96,7 +96,6 @@ namespace DataCapture.Workflow
             try
             {
                 return int.Parse(attribute.Value);
-
             }
             catch
             {
@@ -218,6 +217,17 @@ namespace DataCapture.Workflow
                         {
                             nextStep = steps[nextStepName];
                         }
+                        String queueName = GetRequiredAttribute(element, "queue");
+                        if (!queues.ContainsKey(queueName))
+                        {
+                            var msg = new StringBuilder();
+                            msg.Append("unknown queue [");
+                            msg.Append(queueName);
+                            msg.Append("] specified in step [");
+                            msg.Append(GetAttribute(element, "name", "unknown"));
+                            msg.Append("]");
+                            throw new Exception(msg.ToString());
+                        }
                         var queue = queues[GetRequiredAttribute(element, "queue")];
                         var step = Step.Insert(dbConn
                             , GetRequiredAttribute(element, "name")
@@ -257,30 +267,44 @@ namespace DataCapture.Workflow
         }
         public void Import(IDbConnection dbConn, FileInfo file)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(file.FullName);
-                
-            var steps = new Dictionary<String, Step>();
-            var queues = new Dictionary<String, Queue>();
-            foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+            var transaction = dbConn.BeginTransaction();
+            try
             {
-                if (node.NodeType == XmlNodeType.Element)
+
+                XmlDocument doc = new XmlDocument();
+                doc.Load(file.FullName);
+
+                var steps = new Dictionary<String, Step>();
+                var queues = new Dictionary<String, Queue>();
+                foreach (XmlNode node in doc.DocumentElement.ChildNodes)
                 {
-                    var element = (XmlElement)node;
-                    Import(dbConn, element, ref steps, ref queues);
+                    if (node.NodeType == XmlNodeType.Element)
+                    {
+                        var element = (XmlElement)node;
+                        Import(dbConn, element, ref steps, ref queues);
+                    }
+                    else
+                    {
+                        var sb = new StringBuilder();
+                        sb.Append("only XML elements are supported.  Your XML contains ");
+                        sb.Append(node.NodeType);
+                        sb.Append(" [");
+                        sb.Append(node.InnerText);
+                        sb.Append("]");
+                        throw new Exception(sb.ToString());
+                    }
                 }
-                else
+                transaction.Commit();
+                transaction = null;
+            }
+            finally
+            {
+                map_ = null;
+                if (transaction != null)
                 {
-                    var sb = new StringBuilder();
-                    sb.Append("only XML elements are supported.  Your XML contains ");
-                    sb.Append(node.NodeType);
-                    sb.Append(" [");
-                    sb.Append(node.InnerText);
-                    sb.Append("]");
-                    throw new Exception(sb.ToString());
+                    transaction.Rollback();
                 }
             }
-            map_ = null;
         }
         #endregion
 

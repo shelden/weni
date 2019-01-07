@@ -75,8 +75,6 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
             Assert.That(!String.IsNullOrEmpty(msg), "we expected an exception but it wasn't thrown");
-            Console.WriteLine(msg);
-            Console.WriteLine("checking if msg contains [" + containing + "]?");
             Assert.That(msg.Contains(containing)
                 , "Expected exception containing ["
                 + containing
@@ -178,7 +176,7 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             var before = BuildCounts(dbConn);
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             string[] lines = EXAMPLE_XML.Split(
                 new[] { "\r\n", "\r", "\n" },
                 StringSplitOptions.None
@@ -196,6 +194,66 @@ namespace DataCapture.Workflow.Test
             AssertIncreases(before, after);
         }
 
+
+        /// XXX: these tests -- to shuffle the casedness of the elements -- should 
+        /// be made more common
+        [Test()]
+        public void QueueElementCanBeMixedCase()
+        {
+
+            String mixed = EXAMPLE_XML.Replace("<queue", "<qUeUe");
+            var dbConn = ConnectionFactory.Create();
+
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, mixed);
+            var map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
+        }
+
+        [Test()]
+        public void StepElementCanBeMixedCase()
+        {
+
+            String mixed = EXAMPLE_XML.Replace("<step", "<STEP");
+            var dbConn = ConnectionFactory.Create();
+
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, mixed);
+            var map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
+        }
+
+        public void MapElementCanBeMixedCase()
+        {
+
+            String mixed = EXAMPLE_XML.Replace("<map", "<Map");
+            var dbConn = ConnectionFactory.Create();
+
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, mixed);
+            var map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
+        }
+
+        public void RuleElementCanBeMixedCase()
+        {
+            String mixed = EXAMPLE_XML.Replace("<rule", "<RuLE");
+            var dbConn = ConnectionFactory.Create();
+
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, mixed);
+            var map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
+        }
+
         [Test()]
         public void BadXmlThrows()
         {
@@ -205,19 +263,42 @@ namespace DataCapture.Workflow.Test
             RunImporterFailingly(dbConn, "<root>then crap</root>", "crap");
             // we could test bad XML some more, purely, but that's really
             // testing the XML parser, not our code.
-
-            // The other ways in which the XML could be bad include:
-            // steps that reference missing queues
-            // rules that refererence missing steps
-            // step type enums that don't parse
-            // queue isfail that doesn't parse?  (This might be reasonable to default to false?)
-            // step next for a missing step
-            // step without next for a non-terminating step
-            // rule comparison that doesn't parse
-            // rule with missing value, variable, comparison, next
-            // rule, step outside map
-            // queue inside map
         }
+
+        [Test()]
+        public void MissingQueueThrows()
+        {
+            var dbConn = ConnectionFactory.Create();
+
+            StringBuilder sb = new StringBuilder();
+            string[] lines = EXAMPLE_XML.Split(
+                new[] { "\r\n", "\r", "\n" },
+                StringSplitOptions.None
+            );
+
+            // now strip out the queues:
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (!lines[i].Contains("<queue"))
+                {
+                    sb.AppendLine(lines[i]);
+                }
+            }
+            RunImporterFailingly(dbConn, sb.ToString(), "unknown queue");
+        }
+
+
+        // The other ways in which the XML could be bad include:
+        // steps that reference missing queues
+        // rules that refererence missing steps
+        // step type enums that don't parse
+        // queue isfail that doesn't parse?  (This might be reasonable to default to false?)
+        // step next for a missing step
+        // step without next for a non-terminating step
+        // rule comparison that doesn't parse
+        // rule with missing value, variable, comparison, next
+        // rule, step outside map
+        // queue inside map
 
     }
 }
