@@ -35,9 +35,7 @@ namespace DataCapture.Workflow.Importer
             XmlImporter importer = new XmlImporter();
             foreach(var f in files_)
             {
-                var xaction = dbConn.BeginTransaction();
                 importer.Import(dbConn, f);
-                xaction.Commit();
             }
             Console.WriteLine("<-- DataCapture.Workflow.Importer()");
         }

@@ -1,5 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Text;
+using System.Collections.Generic;
 using DataCapture.Workflow.Db;
 using DataCapture.IO;
 using NUnit.Framework;
@@ -8,6 +9,87 @@ namespace DataCapture.Workflow.Test
 {
     public class XmlImportTest
     {
+        #region common / utility
+        /// <summary>
+        /// Write XML string to a temporary file and import it.  This
+        /// process may throw; if so the exception bubbles out for
+        /// assertion that that was expected downstream
+        /// </summary>
+        /// <param name="xml">Xml.</param>
+        public void RunImporter(System.Data.IDbConnection dbConn, String xml)
+        {
+            using (var tmp = new TempFile(".xml"))
+            {
+                using (var writer = new System.IO.StreamWriter(tmp.FullName))
+                {
+                    writer.WriteLine(xml);
+                }
+                var importer = new XmlImporter();
+                importer.Import(dbConn, tmp.Value);
+            }
+        }
+        public IDictionary<String, int> BuildCounts(System.Data.IDbConnection dbConn)
+        {
+            var tmp = new Dictionary<String, int>();
+            tmp["steps"] = DbUtil.SelectCount(dbConn, Step.TABLE);
+            tmp["rules"] = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            tmp["maps"] = DbUtil.SelectCount(dbConn, Map.TABLE);
+            var map = Map.Select(dbConn, MAP_NAME);
+            tmp["mapVersion"] = map == null ? Map.VERSION - 1 : map.Version;
+            return tmp;
+        }
+        public void AssertIncreases(IDictionary<String, int> before, IDictionary<String, int> after)
+        {
+            Assert.AreEqual(before["maps"] + 1, after["maps"]); // example has 1 map
+            Assert.AreEqual(before["steps"] + 4, after["steps"]); // example has 4 steps
+            Assert.AreEqual(before["rules"] + 2, after["rules"]); // example has 2 rules
+            Assert.AreEqual(before["mapVersion"] + 1, after["mapVersion"]);
+        }
+        public void AssertUnchanged(IDictionary<String, int> before, IDictionary<String, int> after)
+        {
+            Assert.AreEqual(before["maps"], after["maps"]); 
+            Assert.AreEqual(before["steps"], after["steps"]); 
+            Assert.AreEqual(before["rules"], after["rules"]); 
+            Assert.AreEqual(before["mapVersion"], after["mapVersion"]);
+        }
+
+        /// <summary>
+        /// Runs the importer with an exception expected
+        /// </summary>
+        /// <param name="dbConn">Db conn.</param>
+        /// <param name="xml">Xml.</param>
+        /// <param name="containing">a string expected in the bad XML's thrown eception</param>
+        public void RunImporterFailingly(System.Data.IDbConnection dbConn
+            , String xml
+            , String containing
+            )
+        {
+            var before = BuildCounts(dbConn);
+            String msg = "";
+            try
+            {
+                RunImporter(dbConn, xml);
+            }
+            catch(Exception ex)
+            {
+                msg = ex.Message;
+            }
+            Assert.That(!String.IsNullOrEmpty(msg), "we expected an exception but it wasn't thrown");
+            Console.WriteLine(msg);
+            Console.WriteLine("checking if msg contains [" + containing + "]?");
+            Assert.That(msg.Contains(containing)
+                , "Expected exception containing ["
+                + containing
+                + "], was not found in message ["
+                + msg
+                + "]"
+                );
+            var after = BuildCounts(dbConn);
+            AssertUnchanged(before, after);
+        }
+
+        #endregion
+
         #region xml
         public static readonly String NL = Environment.NewLine;
         public static readonly String MAP_NAME = "m.unit";
@@ -56,106 +138,86 @@ namespace DataCapture.Workflow.Test
         public void CanImport()
         {
             var dbConn = ConnectionFactory.Create();
-            int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int beforeRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, EXAMPLE_XML);
             var map = Map.Select(dbConn, MAP_NAME);
-            int beforeMapVersion = map == null ? Map.VERSION - 1 : map.Version;
-            using (var tmp = new TempFile(".xml"))
-            {
-                using (var writer = new System.IO.StreamWriter(tmp.FullName))
-                {
-                    writer.WriteLine(EXAMPLE_XML);
-                }
-                var importer = new XmlImporter();
-                importer.Import(dbConn, tmp.Value);
-            }
-            map = Map.Select(dbConn, MAP_NAME);
             Assert.IsNotNull(map);
-            int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
-            // don't check queues, because it's ok if they already exist
-            // by name...making this quick & dirty technique not quite 
-            // right
-            Assert.AreEqual(beforeMaps + 1, afterMaps); // example has 1 map
-            Assert.AreEqual(beforeSteps + 4, afterSteps); // example has 4 steps
-            Assert.AreEqual(beforeRules + 2, afterRules); // example has 2 rules
-            Assert.AreEqual(beforeMapVersion + 1, map.Version);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
+        }
+
+        [Test()]
+        public void AnyRootElementWorks()
+        {
+            var dbConn = ConnectionFactory.Create();
+            var before = BuildCounts(dbConn);
+            String root = TestUtil.NextString();
+            String xml = EXAMPLE_XML.Replace("anything", root);
+            Assert.That(xml.Contains(root));
+            Assert.That(!xml.Contains("anything"));
+            RunImporter(dbConn, xml);
+            var map = Map.Select(dbConn, MAP_NAME);
+            Assert.IsNotNull(map);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
         }
 
         public void CanImportWithLeadingComments()
         {
             var dbConn = ConnectionFactory.Create();
-            int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int beforeRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            var before = BuildCounts(dbConn);
+            RunImporter(dbConn, "<!-- leading XML comment --> " + EXAMPLE_XML);
             var map = Map.Select(dbConn, MAP_NAME);
-            int beforeMapVersion = map == null ? Map.VERSION - 1 : map.Version;
-
-            using (var tmp = new TempFile(".xml"))
-            {
-                using (var writer = new System.IO.StreamWriter(tmp.FullName))
-                {
-                    writer.WriteLine("<!-- leading XML commentary--> ");
-                    writer.WriteLine(EXAMPLE_XML);
-                }
-                var importer = new XmlImporter();
-                importer.Import(dbConn, tmp.Value);
-            }
-            map = Map.Select(dbConn, MAP_NAME);
             Assert.IsNotNull(map);
-            int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
-            // don't check queues, because it's ok if they already exist
-            // by name...making this quick & dirty technique not quite 
-            // right
-            Assert.AreEqual(beforeMaps + 1, afterMaps); // example has 1 map
-            Assert.AreEqual(beforeSteps + 4, afterSteps); // example has 4 steps
-            Assert.AreEqual(beforeRules + 2, afterRules); // example has 2 rules
-            Assert.AreEqual(beforeMapVersion + 1, map.Version);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
         }
 
         public void CanImportWithInlineComments()
         {
             var dbConn = ConnectionFactory.Create();
-            int beforeMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int beforeSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int beforeRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
-            var map = Map.Select(dbConn, MAP_NAME);
-            int beforeMapVersion = map == null ? Map.VERSION - 1 : map.Version;
+            var before = BuildCounts(dbConn);
 
-            using (var tmp = new TempFile(".xml"))
+            StringBuilder sb = new StringBuilder();
+            string[] lines = EXAMPLE_XML.Split(
+                new[] { "\r\n", "\r", "\n" },
+                StringSplitOptions.None
+            );
+            for (int i = 0; i < lines.Length; i++)
             {
-                using (var writer = new System.IO.StreamWriter(tmp.FullName))
-                {
-                    string[] lines = EXAMPLE_XML.Split(
-                        new[] { "\r\n", "\r", "\n" },
-                        StringSplitOptions.None
-                    );
-                    for(int i = 0; i < lines.Length; i++)
-                    {
-                        writer.WriteLine(lines[i]);
-                        writer.WriteLine("<!-- xml comments are fun" + i + " -->");
-                    }
-                    writer.WriteLine(EXAMPLE_XML);
-                }
-                var importer = new XmlImporter();
-                importer.Import(dbConn, tmp.Value);
+                sb.AppendLine(lines[0]);
+                sb.AppendLine("<!-- xml comments are fun " + i + " -->");
             }
-            map = Map.Select(dbConn, MAP_NAME);
+            RunImporter(dbConn, sb.ToString());
+
+            var map = Map.Select(dbConn, MAP_NAME);
             Assert.IsNotNull(map);
-            int afterMaps = DbUtil.SelectCount(dbConn, Map.TABLE);
-            int afterSteps = DbUtil.SelectCount(dbConn, Step.TABLE);
-            int afterRules = DbUtil.SelectCount(dbConn, Rule.TABLE);
-            // don't check queues, because it's ok if they already exist
-            // by name...making this quick & dirty technique not quite 
-            // right
-            Assert.AreEqual(beforeMaps + 1, afterMaps); // example has 1 map
-            Assert.AreEqual(beforeSteps + 4, afterSteps); // example has 4 steps
-            Assert.AreEqual(beforeRules + 2, afterRules); // example has 2 rules
-            Assert.AreEqual(beforeMapVersion + 1, map.Version);
+            var after = BuildCounts(dbConn);
+            AssertIncreases(before, after);
         }
+
+        [Test()]
+        public void BadXmlThrows()
+        {
+            var dbConn = ConnectionFactory.Create();
+            RunImporterFailingly(dbConn, "bogus", "root level is invalid");
+            RunImporterFailingly(dbConn, "<unclosed>", "are not closed");
+            RunImporterFailingly(dbConn, "<root>then crap</root>", "crap");
+            // we could test bad XML some more, purely, but that's really
+            // testing the XML parser, not our code.
+
+            // The other ways in which the XML could be bad include:
+            // steps that reference missing queues
+            // rules that refererence missing steps
+            // step type enums that don't parse
+            // queue isfail that doesn't parse?  (This might be reasonable to default to false?)
+            // step next for a missing step
+            // step without next for a non-terminating step
+            // rule comparison that doesn't parse
+            // rule with missing value, variable, comparison, next
+            // rule, step outside map
+            // queue inside map
+        }
+
     }
 }

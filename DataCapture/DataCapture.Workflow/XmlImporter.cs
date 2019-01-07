@@ -264,8 +264,21 @@ namespace DataCapture.Workflow
             var queues = new Dictionary<String, Queue>();
             foreach (XmlNode node in doc.DocumentElement.ChildNodes)
             {
-                var element = (XmlElement)node;
-                Import(dbConn, element, ref steps, ref queues);
+                if (node.NodeType == XmlNodeType.Element)
+                {
+                    var element = (XmlElement)node;
+                    Import(dbConn, element, ref steps, ref queues);
+                }
+                else
+                {
+                    var sb = new StringBuilder();
+                    sb.Append("only XML elements are supported.  Your XML contains ");
+                    sb.Append(node.NodeType);
+                    sb.Append(" [");
+                    sb.Append(node.InnerText);
+                    sb.Append("]");
+                    throw new Exception(sb.ToString());
+                }
             }
             map_ = null;
         }
