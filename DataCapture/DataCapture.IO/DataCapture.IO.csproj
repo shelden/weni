@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5afc4bb5-843c-c180-ae73-47f5a1978b22}</ProjectGuid>
+    <ProjectGuid>{C7508BD7-082D-49E1-9FA2-AF22231F82C8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>DataCapture.IO</RootNamespace>
     <AssemblyName>DataCapture.IO</AssemblyName>
