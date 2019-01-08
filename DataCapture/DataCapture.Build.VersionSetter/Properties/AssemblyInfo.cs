@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DataCapture.Build.VersionSetter")]
+[assembly: AssemblyTitle("DataCapture.Build.AssemblyVersionSetter")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vermont Purple, LLC")]
-[assembly: AssemblyProduct("DataCapture.Build.VersionSetter")]
+[assembly: AssemblyProduct("DataCapture.Build.AssemblyVersionSetter")]
 [assembly: AssemblyCopyright("Copyright (C) 2018 - 2019 Vermont Purple, LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
