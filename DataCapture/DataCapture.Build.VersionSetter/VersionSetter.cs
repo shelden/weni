@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using DataCapture.IO;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.Build.VersionSetter
 {
     public class VersionSetter
     {
@@ -102,7 +103,7 @@ namespace DataCapture.Build.AssemblyVersionSetter
 
             // ...and yyyy starts with 20xx:
             if (value[twoIndex + 1] != '0') return THIS_YEAR;
-
+            
             // should check IsDigit on the last two digits but meh?  Or maybe
             // just parse the thing?
             return 2000

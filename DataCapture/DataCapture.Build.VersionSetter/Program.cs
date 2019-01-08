@@ -1,8 +1,8 @@
 using System;
-using System.Text;
 using System.IO;
+using DataCapture.IO;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.Build.VersionSetter
 {
     public class Program
     {
@@ -34,10 +34,11 @@ namespace DataCapture.Build.AssemblyVersionSetter
                 }
                 else
                 {
-                    throw new Exception("Usage: AssemblyVersionSetter "
-                        + "[--version version] "
-                        + "[--dir topDirectory] "
-                        + "[--company company] "
+                    throw new Exception("Usage: "
+                        + this.GetType().FullName
+                        + " [--version version]"
+                        + " [--dir topDirectory]"
+                        + " [--company company]"
                         );
                 }
             }
@@ -48,14 +49,12 @@ namespace DataCapture.Build.AssemblyVersionSetter
         public void Go()
         {
             var setter = new VersionSetter(this.version_, this.company_);
-            Console.WriteLine("--> DataCapture.Build.AssemblyVersionSetter()");
             Console.WriteLine(setter);
             var ff = new FileFinder(this.top_);
             foreach (var file in ff.Search("AssemblyInfo.cs"))
             { 
                 setter.EditInPlace(file);
             }
-            Console.WriteLine("<-- DataCapture.Build.AssemblyVersionSetter()");
         }
         #endregion
 

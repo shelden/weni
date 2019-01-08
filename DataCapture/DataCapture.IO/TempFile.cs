@@ -1,14 +1,12 @@
-﻿
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.IO
 {
     /// <summary>
-    /// XXX add code to remove the file on destruction / GC
     /// </summary>
-    public class TempFile
+    public class TempFile : IDisposable
     {
         #region members
         private FileInfo file_;
@@ -18,14 +16,13 @@ namespace DataCapture.Build.AssemblyVersionSetter
         #region static initialzer
         static TempFile()
         {
-            if (System.IO.Directory.Exists("/tmp"))
-            {
-                dir_ = new DirectoryInfo("/tmp");
-            }
-            else if (System.IO.Directory.Exists("c:\\temp"))
+            if (System.IO.Directory.Exists("c:\\temp"))
             {
                 dir_ = new DirectoryInfo("c:\\temp");
-                return;
+            }
+            else if (System.IO.Directory.Exists("/tmp"))
+            {
+                dir_ = new DirectoryInfo("/tmp");
             }
             else
             {
@@ -56,6 +53,44 @@ namespace DataCapture.Build.AssemblyVersionSetter
                 sb.Append(suffix);
             }
             file_ = new FileInfo(sb.ToString());
+            this.Touch();
+        }
+        #endregion
+
+        #region Disposable
+        public void ReallyDelete()
+        {
+            if (file_ == null) return;
+            if (!System.IO.File.Exists(file_.FullName)) return;
+            try
+            {
+                System.IO.File.Delete(file_.FullName);
+            }
+            catch
+            {
+                /* no code; deliberately suppress error per contract */
+            }
+            file_ = null;
+        }
+        public void Dispose()
+        {
+            this.ReallyDelete();
+        }
+
+        #endregion
+
+        #region behavior
+        private void Touch()
+        {
+             using (var fs = File.Open(file_.FullName
+                , FileMode.OpenOrCreate
+                , FileAccess.Write
+                , FileShare.ReadWrite
+                )
+                )
+            {
+                fs.Close();
+            }
         }
         #endregion
     }

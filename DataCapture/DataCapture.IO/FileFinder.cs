@@ -2,8 +2,12 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace DataCapture.Build.AssemblyVersionSetter
+namespace DataCapture.IO
 {
+    /// <summary>
+    /// This class will recursively find files -- as FileInfos -- starting
+    /// at an existing Directory
+    /// </summary>
     public class FileFinder
     {
         #region members
@@ -39,8 +43,8 @@ namespace DataCapture.Build.AssemblyVersionSetter
             {
                 Search(dest, new DirectoryInfo(s), pattern);
             }
-
         }
         #endregion
     }
 }
+

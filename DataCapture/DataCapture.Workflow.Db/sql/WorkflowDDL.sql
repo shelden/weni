@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS maps
      VERSION        SMALLINT(5)     UNSIGNED NOT NULL DEFAULT 1,
 
      PRIMARY KEY (MAP_ID),
-     UNIQUE KEY (NAME)
+     UNIQUE KEY (NAME, VERSION)
 );
 
 ##################################################################

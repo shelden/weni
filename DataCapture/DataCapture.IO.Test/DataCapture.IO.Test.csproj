@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DED7DCA5-C2FB-426B-9A39-A01402E2C54C}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>DataCapture.Workflow.Driver</RootNamespace>
-    <AssemblyName>DataCapture.Workflow.Driver</AssemblyName>
+    <ProjectGuid>{5AFC4BB5-843C-C180-AE73-47F5A1978B22}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DataCapture.IO.Test</RootNamespace>
+    <AssemblyName>DataCapture.IO.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -18,39 +18,34 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ExternalConsole>true</ExternalConsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ExternalConsole>true</ExternalConsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\3rdParty\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TempFileTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">
-      <Project>{A8420AAC-FEBC-4B6E-90E0-35977C7266A0}</Project>
-      <Name>DataCapture.Workflow.Db</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataCapture.Workflow.Test\DataCapture.Workflow.Test.csproj">
-      <Project>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</Project>
-      <Name>DataCapture.Workflow.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DataCapture.Workflow\DataCapture.Workflow.csproj">
+    <ProjectReference Include="..\DataCapture.IO\DataCapture.IO.csproj">
       <Project>{DB68AA81-C4E9-4350-9153-9821DADA7420}</Project>
       <Name>DataCapture.Workflow</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

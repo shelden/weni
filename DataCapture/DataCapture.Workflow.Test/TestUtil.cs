@@ -32,17 +32,17 @@ namespace DataCapture.Workflow.Test
         // a rule without creating a Step.  These make that easier.
         public static Queue MakeQueue(IDbConnection dbConn)
         {
-            String queueName = TestUtil.NextString();
+            String queueName = "Queue" + TestUtil.NextString();
             return Queue.Insert(dbConn, queueName, (TestUtil.RANDOM.Next() % 2 == 0));
         }
         public static Map MakeMap(IDbConnection dbConn)
         {
-            String mapName = TestUtil.NextString();
-            return Map.Insert(dbConn, mapName);
+            String mapName = "Map" + TestUtil.NextString();
+            return Map.InsertWithMaxVersion(dbConn, mapName);
         }
         public static Step MakeStep(IDbConnection dbConn)
         {
-            String stepName = TestUtil.NextString();
+            String stepName = "Step" + TestUtil.NextString();
             Step.StepType type = Step.StepType.Terminating;
             switch(RANDOM.Next(0, 4))
             {
@@ -67,7 +67,7 @@ namespace DataCapture.Workflow.Test
         }
         public static User MakeUser(IDbConnection dbConn)
         {
-            String userName = TestUtil.NextString();
+            String userName = "User" + TestUtil.NextString();
             return User.Insert(dbConn, userName, RANDOM.Next(10, 20));
         }
         public static Session MakeSession(IDbConnection dbConn)
@@ -76,7 +76,7 @@ namespace DataCapture.Workflow.Test
         }
         public static WorkItem MakeWorkItem(IDbConnection dbConn)
         {
-            String workItemName = TestUtil.NextString();
+            String workItemName = "Item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(1, 100);
             int state = TestUtil.RANDOM.Next(1, 100);
             var step = TestUtil.MakeStep(dbConn);
@@ -104,5 +104,6 @@ namespace DataCapture.Workflow.Test
             }
         }
         #endregion
+
     }
 }

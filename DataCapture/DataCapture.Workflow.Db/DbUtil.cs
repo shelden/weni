@@ -121,6 +121,18 @@ namespace DataCapture.Workflow.Db
                 ; // no code; per contract
             }
         }
+        public static void ReallyClose(IDbConnection dbConn)
+        {
+            if (dbConn == null) return;
+            try
+            {
+                dbConn.Close();
+            }
+            catch
+            {
+                ; // no code; per contract
+            }
+        }
         #endregion
 
     }

@@ -1,9 +1,10 @@
-﻿using System;
+using System;
+using System.Text;
+using System.IO;
+using System.Collections.Generic;
 using DataCapture.Workflow.Db;
-using DataCapture.Workflow.Test;
-using DataCapture.Workflow;
 
-namespace DataCapture.Workflow.Driver
+namespace DataCapture.Workflow.Importer
 {
     public class Program
     {
@@ -11,29 +12,32 @@ namespace DataCapture.Workflow.Driver
         #endregion
 
         #region Members
-        String[] argv_;
+        IList<FileInfo> files_ = new List<FileInfo>();
         #endregion
 
         #region Constructor
         public Program(String[] argv)
         {
-            argv_ = argv;
+            foreach (var s in argv)
+            {
+                var f = new FileInfo(s);
+                files_.Add(f);
+            }
+            files_.Add(new FileInfo("/tmp/foo.xml"));
         }
         #endregion
 
         #region Go
         public void Go()
         {
-            Console.WriteLine("--> DataCapture.Workflow.Driver()");
+            Console.WriteLine("--> DataCapture.Workflow.Importer()");
             var dbConn = ConnectionFactory.Create();
-            var map1 = TestUtil.MakeMap(dbConn);
-            Console.WriteLine(map1);
-            var map2 = Map.Insert(dbConn, map1.Name, 2);
-            Console.WriteLine(map2);
-            var map3 = Map.InsertWithMaxVersion(dbConn, map1.Name);
-            Console.WriteLine(map3);
-
-            Console.WriteLine("<-- DataCapture.Workflow.Driver()");
+            XmlImporter importer = new XmlImporter();
+            foreach(var f in files_)
+            {
+                importer.Import(dbConn, f);
+            }
+            Console.WriteLine("<-- DataCapture.Workflow.Importer()");
         }
 
         #endregion
@@ -49,12 +53,8 @@ namespace DataCapture.Workflow.Driver
             }
             catch (Exception ex)
             {
-                while (ex != null)
-                {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine(ex.StackTrace);
-                    ex = ex.InnerException;
-                }
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
             }
             Console.WriteLine("Thank you for playing with "
                 + (p == null ? "this program" : p.GetType().FullName)
