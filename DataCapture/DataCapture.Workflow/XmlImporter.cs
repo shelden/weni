@@ -241,8 +241,27 @@ namespace DataCapture.Workflow
                     }
                 case "rule":
                     {
-                        var step = steps[GetRequiredAttribute(element, "step")];
-                        var next = steps[GetRequiredAttribute(element, "next")];
+                        String stepName = GetRequiredAttribute(element, "step");
+                        if (!steps.ContainsKey(stepName))
+                        {
+                            var msg = new StringBuilder();
+                            msg.Append("unknown step [");
+                            msg.Append(stepName);
+                            msg.Append("] specified in rule");
+                            throw new Exception(msg.ToString());
+                        }
+                        String nextStepName = GetRequiredAttribute(element, "next");
+                        if (!steps.ContainsKey(nextStepName))
+                        {
+                            var msg = new StringBuilder();
+                            msg.Append("unknown next step [");
+                            msg.Append(nextStepName);
+                            msg.Append("] specified in rule");
+                            throw new Exception(msg.ToString());
+                        }
+
+                        var step = steps[stepName];
+                        var next = steps[nextStepName];
                         var rule = DataCapture.Workflow.Db.Rule.Insert(dbConn
                             , GetRequiredAttribute(element, "variable")
                             , ParseCompare(GetAttribute(element, "compare", "Equals"))

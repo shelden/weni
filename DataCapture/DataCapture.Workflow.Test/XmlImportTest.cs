@@ -75,6 +75,7 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
             Assert.That(!String.IsNullOrEmpty(msg), "we expected an exception but it wasn't thrown");
+            Console.WriteLine(msg);
             Assert.That(msg.Contains(containing)
                 , "Expected exception containing ["
                 + containing
@@ -285,6 +286,17 @@ namespace DataCapture.Workflow.Test
                 }
             }
             RunImporterFailingly(dbConn, sb.ToString(), "unknown queue");
+        }
+
+        [Test()]
+        public void MissingStepThrows()
+        {
+            String badStep = TestUtil.NextString();
+            var dbConn = ConnectionFactory.Create();
+            String xml = EXAMPLE_XML.Replace("<rule step='s.unit.start'"
+                , "<rule step='" + badStep + "'"
+                );
+            RunImporterFailingly(dbConn, xml, "unknown step [" + badStep + "]");
         }
 
 
