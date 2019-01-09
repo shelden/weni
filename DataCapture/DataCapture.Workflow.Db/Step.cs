@@ -48,6 +48,16 @@ namespace DataCapture.Workflow.Db
                 + "WHERE 0 = 0 "
                 + "AND   name = @name "
                 ;
+        public static readonly String UPDATE = ""
+                + "UPDATE " + TABLE + " set "
+                + "    map_id = @map_id "
+                + "    queue_id = @queue_id "
+                + "    next_step_id = @next_step_id "
+                + "    type = @type "
+                + "    name = @name "
+                + " "
+                + "WHERE step_id = @step_id"
+                ;
         #endregion
 
         #region Properties
@@ -113,6 +123,7 @@ namespace DataCapture.Workflow.Db
                              )
 
         {
+
             IDbCommand command = dbConn.CreateCommand();
             command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
             DbUtil.AddParameter(command, "@name", name);
@@ -128,8 +139,27 @@ namespace DataCapture.Workflow.Db
             }
             DbUtil.AddParameter(command, "@type", (int)type);
             int id = Convert.ToInt32(command.ExecuteScalar());
-            Step tmp = new Step(id, name, map.Id, queue.Id, nextStep == null ? NO_NEXT_STEP : nextStep.Id, type);
+            Step tmp = new Step(id
+                    , name
+                    , map.Id
+                    , queue.Id
+                    , nextStep == null ? NO_NEXT_STEP : nextStep.Id
+                    , type
+                    );
             return tmp;
+        }
+
+        public void Update(IDbConnection dbConn)
+        {
+            IDbCommand command = dbConn.CreateCommand();
+            command.CommandText = UPDATE;
+            DbUtil.AddParameter(command, "@name", this.Name);
+            DbUtil.AddParameter(command, "@map_id", this.MapId);
+            DbUtil.AddParameter(command, "@queue_id", this.QueueId);
+            DbUtil.AddParameter(command, "@type", (int)this.Type);
+            DbUtil.AddParameter(command, "@step_id", this.Id);
+            DbUtil.AddParameter(command, "@next_step_id", this.NextStepId);
+            command.ExecuteNonQuery();
         }
         #endregion
 
@@ -166,7 +196,7 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.Name);
             sb.Append(", next=");
             sb.Append(this.NextStepId);
-            sb.Append(", state=");
+            sb.Append(", type=");
             sb.Append(this.Type);
 
             return sb.ToString();

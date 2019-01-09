@@ -39,7 +39,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.IO\DataCapture.IO.csproj">
       <Project>{5AFC4BB5-843C-C180-AE73-47F5A1978B22}</Project>
-      <Name>DataCapture.IO</Name>
+      <Name>DataCapture.IO.Test</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
