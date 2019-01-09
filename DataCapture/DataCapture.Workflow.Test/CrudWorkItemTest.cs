@@ -18,7 +18,7 @@ namespace DataCapture.Workflow.Test
 
             var step = TestUtil.MakeStep(dbConn);
             var session = TestUtil.MakeSession(dbConn);
-            var item = WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
+            var item = WorkItem.Insert(dbConn, step, workItemName, priority, session);
 
             int after = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
             Assert.AreEqual(before + 1, after);
@@ -32,14 +32,13 @@ namespace DataCapture.Workflow.Test
             DateTime startup = DateTime.UtcNow;
             String name = TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(1, 100);
-            int state = TestUtil.RANDOM.Next(1, 100);
             var dbConn = ConnectionFactory.Create();
             var item = WorkItem.Select(dbConn, name);
             Assert.AreEqual(item, null);
-
+             
             var step = TestUtil.MakeStep(dbConn);
             var session = TestUtil.MakeSession(dbConn);
-            var inserted = WorkItem.Insert(dbConn, step, name, state, priority, session);
+            var inserted = WorkItem.Insert(dbConn, step, name, priority, session);
             var selected = WorkItem.Select(dbConn, name);
             
             // first, is inserted rational:
@@ -48,7 +47,7 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(inserted.StepId, step.Id);
             Assert.AreEqual(inserted.SessionId, session.Id);
             Assert.AreEqual(inserted.Priority, priority);
-            Assert.AreEqual(inserted.State, state);
+            Assert.AreEqual(inserted.ItemState, WorkItem.State.Available);
             Assert.GreaterOrEqual(inserted.Created, startup);
             Assert.GreaterOrEqual(inserted.Entered, startup);
             Assert.AreEqual(inserted.Entered, inserted.Created);
@@ -59,7 +58,7 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(inserted.StepId, selected.StepId);
             Assert.AreEqual(inserted.SessionId, selected.SessionId);
             Assert.AreEqual(inserted.Priority, selected.Priority);
-            Assert.AreEqual(inserted.State, selected.State);
+            Assert.AreEqual(inserted.ItemState, selected.ItemState);
 
             TestUtil.AssertCloseEnough(inserted.Created, selected.Created);
             TestUtil.AssertCloseEnough(inserted.Entered, selected.Entered);

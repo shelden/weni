@@ -169,7 +169,12 @@ namespace DataCapture.Workflow
             }
 
             // XXX state should be enum
-            var item = WorkItem.Insert(dbConn_, step, itemName, -29, priority, session_);
+            var item = WorkItem.Insert(dbConn_
+                , step
+                , itemName
+                , priority
+                , session_
+                );
             if (data == null) return;
             foreach(String key in data.Keys)
             {

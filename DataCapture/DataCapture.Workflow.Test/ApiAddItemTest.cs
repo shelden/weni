@@ -89,6 +89,8 @@ namespace DataCapture.Workflow.Test
             var item = WorkItem.Select(dbConn, itemName);
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
+            Assert.AreEqual(item.Name, itemName);
+            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
             Assert.Greater(item.Id, 0);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
@@ -135,6 +137,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.Greater(item.Id, 0);
+            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
             Assert.IsNotNull(selectedPairs);
@@ -172,6 +175,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.Greater(item.Id, 0);
+            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
             Assert.IsNotNull(selectedPairs);
@@ -276,7 +280,6 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
             Assert.That(!String.IsNullOrEmpty(msg));
-            Console.WriteLine("missing map? " + msg);
             Assert.That(msg.Contains("No such map"));
             Assert.That(msg.Contains("[" + bogus + "]"));
 
