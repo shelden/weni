@@ -23,11 +23,7 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
 
             var map = TestUtil.MakeMap(dbConn);
-            Console.WriteLine(map);
-
             var queue = TestUtil.MakeQueue(dbConn);
-            Console.WriteLine(queue);
-
             var end = Step.Insert(dbConn
                 , "End" + TestUtil.NextString()
                 , map
@@ -42,10 +38,6 @@ namespace DataCapture.Workflow.Test
                 , end
                 , Step.StepType.Start
                 );
-
-            Console.WriteLine(start);
-            Console.WriteLine(end);
-
 
             return new Dictionary<String, String>() {
                 {  "queue", queue.Name }
@@ -184,6 +176,115 @@ namespace DataCapture.Workflow.Test
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
             Assert.IsNotNull(selectedPairs);
             Assert.AreEqual(selectedPairs.Count, 0);
+        }
+
+        [Test()]
+        public void ItemInMissingStepThrows()
+        {
+            String itemName = "Item" + TestUtil.NextString();
+            var dbConn = ConnectionFactory.Create();
+            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            var where = CreateBasicMap();
+            var wfConn = CreateConnected();
+
+            String bogus = "Bogus." + TestUtil.NextString();
+            String msg = "";
+            try
+            {
+                wfConn.CreateItem(where["map"]
+                    , itemName
+                    , bogus
+                    , CreatePairs()
+                    );
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            Assert.That(!String.IsNullOrEmpty(msg));
+            Assert.That(msg.Contains("step [" + bogus + "]"));
+
+            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            Assert.AreEqual(beforeItems, afterItems);
+            Assert.AreEqual(beforeNvps, afterNvps);
+
+        }
+
+        [Test()]
+        public void ItemInEndStepThrows()
+        {
+            String itemName = "Item" + TestUtil.NextString();
+            var dbConn = ConnectionFactory.Create();
+            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            var where = CreateBasicMap();
+            var wfConn = CreateConnected();
+
+            String msg = "";
+            try
+            {
+                wfConn.CreateItem(where["map"]
+                    , itemName
+                    , where["endStep"]
+                    , CreatePairs()
+                    );
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            Console.WriteLine(msg);
+            Assert.That(!String.IsNullOrEmpty(msg));
+            Assert.That(msg.Contains("on start steps"));
+            Assert.That(msg.Contains("[" + where["endStep"] + "]"));
+
+            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            Assert.AreEqual(beforeItems, afterItems);
+            Assert.AreEqual(beforeNvps, afterNvps);
+        }
+
+        [Test()]
+        public void ItemInMissingMapThrows()
+        {
+            String itemName = "Item" + TestUtil.NextString();
+            var dbConn = ConnectionFactory.Create();
+            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            var where = CreateBasicMap();
+            var wfConn = CreateConnected();
+            String bogus = "Bogus" + TestUtil.NextString();
+
+            String msg = "";
+            try
+            {
+                wfConn.CreateItem(bogus
+                    , itemName
+                    , where["startStep"]
+                    , CreatePairs()
+                    );
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            Assert.That(!String.IsNullOrEmpty(msg));
+            Console.WriteLine("missing map? " + msg);
+            Assert.That(msg.Contains("No such map"));
+            Assert.That(msg.Contains("[" + bogus + "]"));
+
+            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+
+            Assert.AreEqual(beforeItems, afterItems);
+            Assert.AreEqual(beforeNvps, afterNvps);
         }
     }
 }
