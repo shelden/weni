@@ -48,15 +48,15 @@ namespace DataCapture.Workflow.Test
             };
         }
 
-        static NameValueCollection CreatePairs()
+        static Dictionary<String, String> CreatePairs()
         {
-            NameValueCollection nvc = new NameValueCollection();
+            Dictionary<String, String> tmp = new Dictionary<String, String>();
             int count = TestUtil.RANDOM.Next(1, 5);
             for (int i = 0; i < count; i++)
             {
-                nvc.Add("key" + i + "of" + count, TestUtil.NextString());
+                tmp.Add("key" + i + "of" + count, TestUtil.NextString());
             }
-            return nvc;
+            return tmp;
         }
         #endregion
 
@@ -73,11 +73,11 @@ namespace DataCapture.Workflow.Test
             var wfConn = new Connection();
             wfConn.Connect(user.Login);
             var where = CreateBasicMap();
-            var pairs = CreatePairs();
+            var inboundPairs = CreatePairs();
             wfConn.CreateItem(where["map"]
                 , itemName
                 , where["startStep"]
-                , pairs
+                , inboundPairs
                 , priority
                 );
 
@@ -85,23 +85,25 @@ namespace DataCapture.Workflow.Test
             int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             Assert.AreEqual(beforeItems + 1, afterItems);
-            Assert.Greater(pairs.Count, 0);
-            Assert.AreEqual(beforeNvps + pairs.Count, afterNvps);
+            Assert.Greater(inboundPairs.Count, 0);
+            Assert.AreEqual(beforeNvps + inboundPairs.Count, afterNvps);
 
             var item = WorkItem.Select(dbConn, itemName);
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.Greater(item.Id, 0);
 
-            var data = WorkItemData.SelectAll(dbConn, item.Id);
-            Assert.IsNotNull(data);
-            Assert.GreaterOrEqual(data.Count, 1);
-            Assert.AreEqual(data.Count, pairs.Count);
-            for(int i = 0; i < pairs.Count; i++)
+            var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
+            Assert.IsNotNull(selectedPairs);
+            Assert.GreaterOrEqual(selectedPairs.Count, 1);
+            Assert.AreEqual(selectedPairs.Count, inboundPairs.Count);
+            foreach(var row in selectedPairs)
             {
-                /// XXX add asserts for key / value pairs
+                String key = row.VariableName;
+                String value = row.VariableValue;
+                Console.WriteLine(key + ") " + inboundPairs[key] + " vs " + value);
+                Assert.AreEqual(inboundPairs[key], value);
             }
-
         }
     }
 }

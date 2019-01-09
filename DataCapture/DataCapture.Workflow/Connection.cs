@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Text;
-using System.Collections.Specialized;
+using System.Collections.Generic;
 using DataCapture.Workflow.Db;
 
 namespace DataCapture.Workflow
 {
+    using KeyValuePairs = Dictionary<String, String>;
     public class Connection : IDisposable
     {
         #region constants
@@ -119,7 +120,7 @@ namespace DataCapture.Workflow
         public void CreateItem(String mapName
             , String itemName
             , String stepName
-            , NameValueCollection data
+            , KeyValuePairs data
             , int priority = 0
             )
         {
@@ -147,12 +148,9 @@ namespace DataCapture.Workflow
 
             // XXX state should be enum
             var item = WorkItem.Insert(dbConn_, step, itemName, -29, priority, session_);
-            for (int i = 0; data != null && i < data.Count; i++)
+            foreach(String key in data.Keys)
             {
-                String key = data[i];
-                String value = data[i];
-                var kvp = WorkItemData.Insert(dbConn_, item, key, value);
-                Console.WriteLine(kvp);
+                var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
             }
         }
         #endregion
