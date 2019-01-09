@@ -137,7 +137,7 @@ namespace DataCapture.Workflow
             if (step.Type != Step.StepType.Start)
             {
                 var msg = new StringBuilder();
-                msg.Append("One may only Create Items in start steps.  ");
+                msg.Append("One may only CreateItem() on start steps.  ");
                 msg.Append("[");
                 msg.Append(step.Name);
                 msg.Append("] is type [");
@@ -146,8 +146,36 @@ namespace DataCapture.Workflow
                 throw new Exception(msg.ToString());
             }
 
+            var map = Map.Select(dbConn_, mapName);
+            if (map == null)
+            {
+                var msg = new StringBuilder();
+                msg.Append("No such map [");
+                msg.Append(mapName);
+                msg.Append("]");
+                throw new Exception(msg.ToString());
+            }
+
+            if (map.Id != step.MapId)
+            {
+                var msg = new StringBuilder();
+                msg.Append("Step [");
+                msg.Append(stepName);
+                msg.Append("] is in map #");
+                msg.Append(step.MapId);
+                msg.Append(", not #");
+                msg.Append(map.Id); // TODO: look up correct map and report here
+                throw new Exception(msg.ToString());
+            }
+
             // XXX state should be enum
-            var item = WorkItem.Insert(dbConn_, step, itemName, -29, priority, session_);
+            var item = WorkItem.Insert(dbConn_
+                , step
+                , itemName
+                , priority
+                , session_
+                );
+            if (data == null) return;
             foreach(String key in data.Keys)
             {
                 var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);

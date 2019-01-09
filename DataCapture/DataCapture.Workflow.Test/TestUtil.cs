@@ -77,11 +77,10 @@ namespace DataCapture.Workflow.Test
         public static WorkItem MakeWorkItem(IDbConnection dbConn)
         {
             String workItemName = "Item" + TestUtil.NextString();
-            int priority = TestUtil.RANDOM.Next(1, 100);
-            int state = TestUtil.RANDOM.Next(1, 100);
+            int priority = TestUtil.RANDOM.Next(-100, 100);
             var step = TestUtil.MakeStep(dbConn);
             var session = TestUtil.MakeSession(dbConn);
-            return WorkItem.Insert(dbConn, step, workItemName, state, priority, session);
+            return WorkItem.Insert(dbConn, step, workItemName, priority, session);
         }
         #endregion
 
