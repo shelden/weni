@@ -14,11 +14,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Example.Test", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Build.VersionSetter", "DataCapture.Build.VersionSetter\DataCapture.Build.VersionSetter.csproj", "{5A93F5E9-6B69-8B1B-551B-4402169CA283}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Importer", "DataCapture.Workflow.Importer\DataCapture.Workflow.Importer.csproj", "{0D35E20E-01F1-0FA5-3662-B74C460E541F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.IO", "DataCapture.IO\DataCapture.IO.csproj", "{C7508BD7-082D-49E1-9FA2-AF22231F82C8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.IO.Test", "DataCapture.IO.Test\DataCapture.IO.Test.csproj", "{5AFC4BB5-843C-C180-AE73-47F5A1978B22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Importer", "DataCapture.Workflow.Importer\DataCapture.Workflow.Importer.csproj", "{0D35E20E-01F1-0FA5-3662-B74C460E541F|"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,10 +50,6 @@ Global
 		{5A93F5E9-6B69-8B1B-551B-4402169CA283}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A93F5E9-6B69-8B1B-551B-4402169CA283}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A93F5E9-6B69-8B1B-551B-4402169CA283}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0D35E20E-01F1-0FA5-3662-B74C460E541F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0D35E20E-01F1-0FA5-3662-B74C460E541F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0D35E20E-01F1-0FA5-3662-B74C460E541F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0D35E20E-01F1-0FA5-3662-B74C460E541F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C7508BD7-082D-49E1-9FA2-AF22231F82C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C7508BD7-082D-49E1-9FA2-AF22231F82C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7508BD7-082D-49E1-9FA2-AF22231F82C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -62,6 +58,10 @@ Global
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D35E20E-01F1-0FA5-3662-B74C460E541F|.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D35E20E-01F1-0FA5-3662-B74C460E541F|.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D35E20E-01F1-0FA5-3662-B74C460E541F|.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D35E20E-01F1-0FA5-3662-B74C460E541F|.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

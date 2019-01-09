@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Data;
 using System.Text;
+using System.Collections.Generic;
 using DataCapture.Workflow.Db;
 
 namespace DataCapture.Workflow
 {
+    using KeyValuePairs = Dictionary<String, String>;
     public class Connection : IDisposable
     {
         #region constants
@@ -13,7 +15,7 @@ namespace DataCapture.Workflow
         #region members
         private User user_ = null;
         private Session session_ = null;
-        private IDbConnection dbConn_ = null; // XXX destructor should close
+        private IDbConnection dbConn_ = null; 
         #endregion
 
         #region properties
@@ -111,6 +113,45 @@ namespace DataCapture.Workflow
         public void Dispose()
         {
             this.Disconnect();
+        }
+        #endregion
+
+        #region Create Items
+        public void CreateItem(String mapName
+            , String itemName
+            , String stepName
+            , KeyValuePairs data
+            , int priority = 0
+            )
+        {
+            // XXX start transaction
+            var step = Step.Select(dbConn_, stepName);
+            if (step == null)
+            {
+                var msg = new StringBuilder();
+                msg.Append("No such step [");
+                msg.Append(stepName);
+                msg.Append("]");
+                throw new Exception(msg.ToString());
+            }
+            if (step.Type != Step.StepType.Start)
+            {
+                var msg = new StringBuilder();
+                msg.Append("One may only Create Items in start steps.  ");
+                msg.Append("[");
+                msg.Append(step.Name);
+                msg.Append("] is type [");
+                msg.Append(step.Type);
+                msg.Append("]");
+                throw new Exception(msg.ToString());
+            }
+
+            // XXX state should be enum
+            var item = WorkItem.Insert(dbConn_, step, itemName, -29, priority, session_);
+            foreach(String key in data.Keys)
+            {
+                var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
+            }
         }
         #endregion
 

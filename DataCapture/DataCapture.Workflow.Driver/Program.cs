@@ -26,12 +26,24 @@ namespace DataCapture.Workflow.Driver
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
             var dbConn = ConnectionFactory.Create();
-            var map1 = TestUtil.MakeMap(dbConn);
-            Console.WriteLine(map1);
-            var map2 = Map.Insert(dbConn, map1.Name, 2);
-            Console.WriteLine(map2);
-            var map3 = Map.InsertWithMaxVersion(dbConn, map1.Name);
-            Console.WriteLine(map3);
+            var user = TestUtil.MakeUser(dbConn);
+            Console.WriteLine(user);
+
+            var map = TestUtil.MakeMap(dbConn);
+            Console.WriteLine(map);
+
+            var queue = TestUtil.MakeQueue(dbConn);
+            Console.WriteLine(queue);
+
+            var step0 = TestUtil.MakeStep(dbConn);
+            Console.WriteLine(step0);
+
+            var wfConn = new Connection();
+            wfConn.Connect(user.Login);
+
+            Console.WriteLine(wfConn);
+
+            wfConn.CreateItem(map.Name, "foo", step0.Name, null);
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }

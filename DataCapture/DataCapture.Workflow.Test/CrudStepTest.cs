@@ -45,6 +45,8 @@ namespace DataCapture.Workflow.Test
 
             Assert.AreEqual(step1.NextStepId, Step.NO_NEXT_STEP);
             Assert.AreEqual(step0.NextStepId, step1.Id);
+            ///Assert.AreEqual(step1.Type, Step.StepType.Terminating);
+            //Assert.AreEqual(step0.Type, Step.StepType.Start);
 
             int after = DbUtil.SelectCount(dbConn, Step.TABLE);
             Assert.AreEqual(before + 2, after);

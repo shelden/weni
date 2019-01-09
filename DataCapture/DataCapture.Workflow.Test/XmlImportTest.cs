@@ -16,7 +16,7 @@ namespace DataCapture.Workflow.Test
         /// assertion that that was expected downstream
         /// </summary>
         /// <param name="xml">Xml.</param>
-        public void RunImporter(System.Data.IDbConnection dbConn, String xml)
+        public static void RunImporter(System.Data.IDbConnection dbConn, String xml)
         {
             using (var tmp = new TempFile(".xml"))
             {
@@ -75,7 +75,7 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
             Assert.That(!String.IsNullOrEmpty(msg), "we expected an exception but it wasn't thrown");
-            Console.WriteLine(msg);
+            //Console.WriteLine(msg);
             Assert.That(msg.Contains(containing)
                 , "Expected exception containing ["
                 + containing
