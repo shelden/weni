@@ -208,18 +208,19 @@ namespace DataCapture.Workflow
             {
                 transaction = dbConn_.BeginTransaction();
 
+                // first get the queue object, so we can query things in
+                // all steps hanging off that queue:
+
                 var queue = Queue.Select(dbConn_, queueName);
                 if (queue == null) throw new Exception("unknown queue [" + queueName + "]");
 
-                //TODO check queue perms here:
+                // TODO check queue perms here: 
                 //var allowed = AllowedQueue.Select(dbConn_, this.user_, queue);
 
                 var items = WorkItem.SelectByPriority(dbConn_, queue);
                 if (items == null || items.Count == 0) return null;
 
-
-
-                int x = 0;
+               int x = 0;
                 foreach (var i in items)
                 {
                     Console.WriteLine(x + ") " + i);
@@ -229,19 +230,22 @@ namespace DataCapture.Workflow
                     x++;
                 }
 
+                // WorkItemInfos have information about the item's
+                // step, and map; and the queue under which we queried
+                // for it.  Therefore we need all 4 things to build
+                // WorkItemInfo:  
+
                 var item = items[0];
                 var step = Step.Select(dbConn_, item.StepId);
                 var map = Map.Select(dbConn_, step.MapId);
 
+                // Now update the work item, otherwise it will always be the
+                // one returned:
+                item.ItemState = WorkItem.State.InProgress;
+                item.Entered = DateTime.UtcNow;
+                item.SessionId = session_.Id;
+                item.Update(dbConn_);
 
-
-
-                
-
-
-
-
-                // stuff
                 transaction.Commit();
                 transaction = null;
                 return new WorkItemInfo(item
@@ -253,7 +257,7 @@ namespace DataCapture.Workflow
             }
             finally
             {
-                DbUtil.ReallyClose(transaction);
+                DbUtil.ReallyBackout(transaction);
             }
         }
         #endregion

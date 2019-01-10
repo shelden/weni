@@ -20,7 +20,7 @@ namespace DataCapture.Workflow.Db
 
         #region Constants
         public static readonly String TABLE = "workflow.work_items";
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
                 + "insert into "
                 + TABLE
                 + " ( "
@@ -43,7 +43,7 @@ namespace DataCapture.Workflow.Db
                 + ") "
             ;
                 
-        public static readonly String SELECT_BY_NAME = ""
+        private static readonly String SELECT_BY_NAME = ""
                 + "select "
                 + "     item_id "
                 + "     , step_id "
@@ -59,7 +59,7 @@ namespace DataCapture.Workflow.Db
                 + "AND   name = @name "
                 ;
 
-        public static readonly String SELECT_BY_QUEUE_PRIORITY = ""
+        private static readonly String SELECT_BY_QUEUE_PRIORITY = ""
                 + "select "
                 + "     w.item_id "
                 + "     , w.step_id "
@@ -77,23 +77,36 @@ namespace DataCapture.Workflow.Db
                 + "AND s.step_id = w.step_id " // XXX: use 21st century join syntax :-)
                 + "AND s.queue_id = q.queue_id "
                 + "AND q.queue_id = @queue_id "
-                + "AND w.state = " + (int)WorkItem.State.Available  // XXX that's a hack; use property
-                + " ORDER BY w.priority "
+                + "AND w.state = @available " 
+                + "ORDER BY w.priority "
                 + "         , w.created "
             ;
+        private static readonly String UPDATE = ""
+            + "UPDATE " + TABLE + " set "
+            + "    step_id = @step_id "
+            + "    , name = @name "
+            + "    , state = @state "
+            + "    , priority = @priority "
+            + "    , created = @created "
+            + "    , entered = @entered "
+            + "    , session_id = @session_id "
+            + "WHERE 0 = 0 "
+            + "AND   item_id = @item_id "
+            ;
+                
 
 
 
         #endregion
-                    
+
         #region Properties
-        public int Id { get; set; }
-        public int StepId { get; set; }
+        public int Id { get; private set; }
+        public int StepId { get; private set; }
         public int SessionId { get; set; }
         public int Priority { get; set; }
         public WorkItem.State ItemState { get; set; }
         public String Name { get; set; }
-        public DateTime Created { get; set; }
+        public DateTime Created { get; private set; }
         public DateTime Entered { get; set; }
         #endregion
 
@@ -199,6 +212,7 @@ namespace DataCapture.Workflow.Db
                 IDbCommand command = dbConn.CreateCommand();
                 command.CommandText = SELECT_BY_QUEUE_PRIORITY;
                 DbUtil.AddParameter(command, "@queue_id", queue.Id);
+                DbUtil.AddParameter(command, "@available", (int)WorkItem.State.Available);
                 reader = command.ExecuteReader();
 
                 if (reader == null) return null;
@@ -217,6 +231,32 @@ namespace DataCapture.Workflow.Db
             finally
             {
                 DbUtil.ReallyClose(reader);
+            }
+        }
+        #endregion
+
+        #region CRUD: Update
+        public void Update(IDbConnection dbConn)
+        {
+            IDbCommand command = dbConn.CreateCommand();
+            command.CommandText = UPDATE;
+            DbUtil.AddParameter(command, "@step_id", this.StepId);
+            DbUtil.AddParameter(command, "@name", this.Name);
+            DbUtil.AddParameter(command, "@state", (int)this.ItemState);
+            DbUtil.AddParameter(command, "@priority", this.Priority);
+            DbUtil.AddParameter(command, "@created", this.Created);
+            DbUtil.AddParameter(command, "@entered", this.Entered);
+            DbUtil.AddParameter(command, "@session_id", this.SessionId);
+            DbUtil.AddParameter(command, "@item_id", this.Id);
+            try
+            {
+                              command.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(UPDATE);
+                Console.WriteLine(ex.Message);
+                throw;
             }
         }
         #endregion
