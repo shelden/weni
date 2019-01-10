@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Data;
+using System.Collections.Generic;
 using DataCapture.Workflow.Db;
 
 namespace DataCapture.Workflow.Test
@@ -101,6 +102,71 @@ namespace DataCapture.Workflow.Test
                 Console.WriteLine(msg);
                 throw new Exception(msg);
             }
+        }
+        #endregion
+
+        #region Select Count
+        // Utility function (mostly for unit tests) to do a select count * from
+        // table.  If you're writing a GUI, you should use parameters hanging
+        // off your DataReader, as opposed to this method.
+        public static int SelectCount(IDbConnection dbConn, string table)
+        {
+
+            var command = dbConn.CreateCommand();
+            var sql = new StringBuilder();
+            sql.Append("SELECT COUNT(1) FROM ");
+            sql.Append(table);
+            command.CommandText = sql.ToString();
+            return Convert.ToInt32(command.ExecuteScalar());
+        }
+        #endregion
+
+        #region WF Connection Helpers
+        public static Connection CreateConnected()
+        {
+            var user = TestUtil.MakeUser(ConnectionFactory.Create());
+            var wfConn = new Connection();
+            wfConn.Connect(user.Login);
+            return wfConn;
+        }
+        public static Dictionary<String, String> CreateBasicMap()
+        {
+            var dbConn = ConnectionFactory.Create();
+
+            var map = TestUtil.MakeMap(dbConn);
+            var queue = TestUtil.MakeQueue(dbConn);
+            var end = Step.Insert(dbConn
+                , "End" + TestUtil.NextString()
+                , map
+                , queue
+                , Step.StepType.Terminating
+             );
+
+            var start = Step.Insert(dbConn
+                , "Start" + TestUtil.NextString()
+                , map
+                , queue
+                , end
+                , Step.StepType.Start
+                );
+
+            return new Dictionary<String, String>() {
+                {  "queue", queue.Name }
+                , { "map", map.Name }
+                , {  "startStep", start.Name }
+                , {  "endStep", end.Name }
+            };
+        }
+
+        public static Dictionary<String, String> CreatePairs()
+        {
+            Dictionary<String, String> tmp = new Dictionary<String, String>();
+            int count = TestUtil.RANDOM.Next(1, 5);
+            for (int i = 0; i < count; i++)
+            {
+                tmp.Add("key" + i + "of" + count, TestUtil.NextString());
+            }
+            return tmp;
         }
         #endregion
 

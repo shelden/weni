@@ -1,63 +1,13 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using DataCapture.Workflow;
-using DataCapture.Workflow.Db; // for DbUtil.SelectCount
+using DataCapture.Workflow.Db;
 using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test
 {
     public class ApiAddItemTest
     {
-        #region util
-        public static Connection CreateConnected()
-        {
-            var user = TestUtil.MakeUser(ConnectionFactory.Create());
-            var wfConn = new Connection();
-            wfConn.Connect(user.Login);
-            return wfConn;
-        }
-        public static Dictionary<String, String> CreateBasicMap()
-        {
-            var dbConn = ConnectionFactory.Create();
 
-            var map = TestUtil.MakeMap(dbConn);
-            var queue = TestUtil.MakeQueue(dbConn);
-            var end = Step.Insert(dbConn
-                , "End" + TestUtil.NextString()
-                , map
-                , queue
-                , Step.StepType.Terminating
-             );
-
-            var start = Step.Insert(dbConn
-                , "Start" + TestUtil.NextString()
-                , map
-                , queue
-                , end
-                , Step.StepType.Start
-                );
-
-            return new Dictionary<String, String>() {
-                {  "queue", queue.Name }
-                , { "map", map.Name }
-                , {  "startStep", start.Name }
-                , {  "endStep", end.Name }
-            };
-        }
-
-        static Dictionary<String, String> CreatePairs()
-        {
-            Dictionary<String, String> tmp = new Dictionary<String, String>();
-            int count = TestUtil.RANDOM.Next(1, 5);
-            for (int i = 0; i < count; i++)
-            {
-                tmp.Add("key" + i + "of" + count, TestUtil.NextString());
-            }
-            return tmp;
-        }
-        #endregion
 
         [Test()]
         public void CanCreateItem()
@@ -65,13 +15,13 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             String itemName = "Item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(-100, 100);
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var wfConn = CreateConnected();
+            var wfConn = TestUtil.CreateConnected();
 
-            var where = CreateBasicMap();
-            var inboundPairs = CreatePairs();
+            var where = TestUtil.CreateBasicMap();
+            var inboundPairs = TestUtil.CreatePairs();
             wfConn.CreateItem(where["map"]
                 , itemName
                 , where["startStep"]
@@ -79,8 +29,8 @@ namespace DataCapture.Workflow.Test
                 , priority
                 );
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             Assert.AreEqual(beforeItems + 1, afterItems);
             Assert.Greater(inboundPairs.Count, 0);
@@ -112,12 +62,12 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             String itemName = "Item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(-100, 100);
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var where = CreateBasicMap();
-            var inboundPairs = CreatePairs();
-            var wfConn = CreateConnected();
+            var where = TestUtil.CreateBasicMap();
+            var inboundPairs = TestUtil.CreatePairs();
+            var wfConn = TestUtil.CreateConnected();
             wfConn.CreateItem(where["map"]
                 , itemName
                 , where["startStep"]
@@ -125,8 +75,8 @@ namespace DataCapture.Workflow.Test
                 , priority
                 );
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             // since we created the item with a blank set of NVPs,
             //afterNvps should not increase:
@@ -150,12 +100,12 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             String itemName = "Item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(-100, 100);
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var where = CreateBasicMap();
-            var inboundPairs = CreatePairs();
-            var wfConn = CreateConnected();
+            var where = TestUtil.CreateBasicMap();
+            var inboundPairs = TestUtil.CreatePairs();
+            var wfConn = TestUtil.CreateConnected();
             wfConn.CreateItem(where["map"]
                 , itemName
                 , where["startStep"]
@@ -163,8 +113,8 @@ namespace DataCapture.Workflow.Test
                 , priority
                 );
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             // since we created the item with a blank set of NVPs,
             //afterNvps should not increase:
@@ -187,11 +137,11 @@ namespace DataCapture.Workflow.Test
         {
             String itemName = "Item" + TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var where = CreateBasicMap();
-            var wfConn = CreateConnected();
+            var where = TestUtil.CreateBasicMap();
+            var wfConn = TestUtil.CreateConnected();
 
             String bogus = "Bogus." + TestUtil.NextString();
             String msg = "";
@@ -200,7 +150,7 @@ namespace DataCapture.Workflow.Test
                 wfConn.CreateItem(where["map"]
                     , itemName
                     , bogus
-                    , CreatePairs()
+                    , TestUtil.CreatePairs()
                     );
             }
             catch (Exception ex)
@@ -210,8 +160,8 @@ namespace DataCapture.Workflow.Test
             Assert.That(!String.IsNullOrEmpty(msg));
             Assert.That(msg.Contains("step [" + bogus + "]"));
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             Assert.AreEqual(beforeItems, afterItems);
             Assert.AreEqual(beforeNvps, afterNvps);
@@ -223,11 +173,11 @@ namespace DataCapture.Workflow.Test
         {
             String itemName = "Item" + TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var where = CreateBasicMap();
-            var wfConn = CreateConnected();
+            var where = TestUtil.CreateBasicMap();
+            var wfConn = TestUtil.CreateConnected();
 
             String msg = "";
             try
@@ -235,20 +185,19 @@ namespace DataCapture.Workflow.Test
                 wfConn.CreateItem(where["map"]
                     , itemName
                     , where["endStep"]
-                    , CreatePairs()
+                    , TestUtil.CreatePairs()
                     );
             }
             catch (Exception ex)
             {
                 msg = ex.Message;
             }
-            Console.WriteLine(msg);
             Assert.That(!String.IsNullOrEmpty(msg));
             Assert.That(msg.Contains("on start steps"));
             Assert.That(msg.Contains("[" + where["endStep"] + "]"));
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             Assert.AreEqual(beforeItems, afterItems);
             Assert.AreEqual(beforeNvps, afterNvps);
@@ -259,11 +208,11 @@ namespace DataCapture.Workflow.Test
         {
             String itemName = "Item" + TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int beforeItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int beforeNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int beforeItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int beforeNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
-            var where = CreateBasicMap();
-            var wfConn = CreateConnected();
+            var where = TestUtil.CreateBasicMap();
+            var wfConn = TestUtil.CreateConnected();
             String bogus = "Bogus" + TestUtil.NextString();
 
             String msg = "";
@@ -272,7 +221,7 @@ namespace DataCapture.Workflow.Test
                 wfConn.CreateItem(bogus
                     , itemName
                     , where["startStep"]
-                    , CreatePairs()
+                    , TestUtil.CreatePairs()
                     );
             }
             catch (Exception ex)
@@ -283,8 +232,8 @@ namespace DataCapture.Workflow.Test
             Assert.That(msg.Contains("No such map"));
             Assert.That(msg.Contains("[" + bogus + "]"));
 
-            int afterItems = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
-            int afterNvps = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int afterItems = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int afterNvps = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             Assert.AreEqual(beforeItems, afterItems);
             Assert.AreEqual(beforeNvps, afterNvps);

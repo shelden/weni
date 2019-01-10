@@ -116,7 +116,7 @@ namespace DataCapture.Workflow
         }
         #endregion
 
-        #region Create Items
+        #region Add/Get Items
         public void CreateItem(String mapName
             , String itemName
             , String stepName
@@ -124,61 +124,136 @@ namespace DataCapture.Workflow
             , int priority = 0
             )
         {
-            // XXX start transaction
-            var step = Step.Select(dbConn_, stepName);
-            if (step == null)
+            IDbTransaction transaction = null;
+            try
             {
-                var msg = new StringBuilder();
-                msg.Append("No such step [");
-                msg.Append(stepName);
-                msg.Append("]");
-                throw new Exception(msg.ToString());
-            }
-            if (step.Type != Step.StepType.Start)
-            {
-                var msg = new StringBuilder();
-                msg.Append("One may only CreateItem() on start steps.  ");
-                msg.Append("[");
-                msg.Append(step.Name);
-                msg.Append("] is type [");
-                msg.Append(step.Type);
-                msg.Append("]");
-                throw new Exception(msg.ToString());
-            }
+                transaction = dbConn_.BeginTransaction();
 
-            var map = Map.Select(dbConn_, mapName);
-            if (map == null)
-            {
-                var msg = new StringBuilder();
-                msg.Append("No such map [");
-                msg.Append(mapName);
-                msg.Append("]");
-                throw new Exception(msg.ToString());
-            }
+                var map = Map.Select(dbConn_, mapName);
+                if (map == null)
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("No such map [");
+                    msg.Append(mapName);
+                    msg.Append("]");
+                    throw new Exception(msg.ToString());
+                }
 
-            if (map.Id != step.MapId)
-            {
-                var msg = new StringBuilder();
-                msg.Append("Step [");
-                msg.Append(stepName);
-                msg.Append("] is in map #");
-                msg.Append(step.MapId);
-                msg.Append(", not #");
-                msg.Append(map.Id); // TODO: look up correct map and report here
-                throw new Exception(msg.ToString());
-            }
+                var step = Step.Select(dbConn_, stepName, map.Id);
 
-            // XXX state should be enum
-            var item = WorkItem.Insert(dbConn_
-                , step
-                , itemName
-                , priority
-                , session_
-                );
-            if (data == null) return;
-            foreach(String key in data.Keys)
+                if (step == null)
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("No such step [");
+                    msg.Append(stepName);
+                    msg.Append("] in map [");
+                    msg.Append(map.Name);
+                    msg.Append("]");
+                    throw new Exception(msg.ToString());
+                }
+
+                if (step.Type != Step.StepType.Start)
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("One may only CreateItem() on start steps.  ");
+                    msg.Append("[");
+                    msg.Append(step.Name);
+                    msg.Append("] is type [");
+                    msg.Append(step.Type);
+                    msg.Append("]");
+                    throw new Exception(msg.ToString());
+                }
+
+                if (map.Id != step.MapId)
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("Step [");
+                    msg.Append(stepName);
+                    msg.Append("] is in map #");
+                    msg.Append(step.MapId);
+                    msg.Append(", not #");
+                    msg.Append(map.Id); // TODO: look up correct map name and report it here
+                    throw new Exception(msg.ToString());
+                }
+
+
+
+
+                var item = WorkItem.Insert(dbConn_
+                    , step
+                    , itemName
+                    , priority
+                    , session_
+                    );
+                if (data != null)
+                {
+                    foreach (String key in data.Keys)
+                    {
+                        var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
+                    }
+                }
+                transaction.Commit();
+                transaction = null;
+            }
+            finally
             {
-                var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
+                DbUtil.ReallyClose(transaction);
+            }
+        }
+
+        public WorkItemInfo GetItem(String queueName)
+        {
+            IDbTransaction transaction = null;
+            try
+            {
+                transaction = dbConn_.BeginTransaction();
+
+                var queue = Queue.Select(dbConn_, queueName);
+                if (queue == null) throw new Exception("unknown queue [" + queueName + "]");
+
+                //TODO check queue perms here:
+                //var allowed = AllowedQueue.Select(dbConn_, this.user_, queue);
+
+                var items = WorkItem.SelectByPriority(dbConn_, queue);
+                if (items == null || items.Count == 0) return null;
+
+
+
+                int x = 0;
+                foreach (var i in items)
+                {
+                    Console.WriteLine(x + ") " + i);
+                    var s = Step.Select(dbConn_, i.StepId);
+                    Console.WriteLine(x + ") " + s);
+                    Console.WriteLine(x + ") " + Queue.Select(dbConn_, s.QueueId));
+                    x++;
+                }
+
+                var item = items[0];
+                var step = Step.Select(dbConn_, item.StepId);
+                var map = Map.Select(dbConn_, step.MapId);
+
+
+
+
+                
+
+
+
+
+                // stuff
+                transaction.Commit();
+                transaction = null;
+                return new WorkItemInfo(item
+                    , map
+                    , step
+                    , queue
+                    , WorkItemData.SelectAll(dbConn_, item.Id)
+                    );
+            }
+            finally
+            {
+                DbUtil.ReallyClose(transaction);
             }
         }
         #endregion

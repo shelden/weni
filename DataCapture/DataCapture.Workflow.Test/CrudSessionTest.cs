@@ -12,12 +12,12 @@ namespace DataCapture.Workflow.Test
         public void CanInsert()
         {
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Session.TABLE);
 
             var user = TestUtil.MakeUser(dbConn);
             var session = Session.Insert(dbConn, user);
 
-            int after = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(before + 1, after);
             Assert.GreaterOrEqual(session.Id, 1);
             Assert.AreEqual(session.UserId, user.Id);

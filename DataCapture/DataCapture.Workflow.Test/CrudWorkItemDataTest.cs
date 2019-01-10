@@ -11,11 +11,11 @@ namespace DataCapture.Workflow.Test
         {
             var dbConn = ConnectionFactory.Create();
             var item = TestUtil.MakeWorkItem(dbConn);
-            int before = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int before = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
 
             WorkItemData.Insert(dbConn, item, "variable0", TestUtil.NextString());
 
-            int after = DbUtil.SelectCount(dbConn, WorkItemData.TABLE);
+            int after = TestUtil.SelectCount(dbConn, WorkItemData.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 

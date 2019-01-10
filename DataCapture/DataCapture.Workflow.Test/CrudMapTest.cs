@@ -11,9 +11,9 @@ namespace DataCapture.Workflow.Test
         {
             String name = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Map.TABLE);
             Map.Insert(dbConn, name, 1);
-            int after = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Map.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 
@@ -64,16 +64,16 @@ namespace DataCapture.Workflow.Test
         {
             String name = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Map.TABLE);
             var insertedv1 = Map.InsertWithMaxVersion(dbConn, name);
-            int afterv1 = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int afterv1 = TestUtil.SelectCount(dbConn, Map.TABLE);
             Assert.AreEqual(before + 1, afterv1);
             Assert.AreEqual(insertedv1.Version, Map.VERSION);
 
             // now try and insert again.  When doing so, the version
             // should increase.
             var insertedv2 = Map.InsertWithMaxVersion(dbConn, name);
-            int afterv2 = DbUtil.SelectCount(dbConn, Map.TABLE);
+            int afterv2 = TestUtil.SelectCount(dbConn, Map.TABLE);
 
 
             Assert.AreEqual(afterv2, before + 2);

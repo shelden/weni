@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Text;
+using System.Collections.Generic;
 
 namespace DataCapture.Workflow.Db
 {
@@ -58,6 +59,31 @@ namespace DataCapture.Workflow.Db
                 + "AND   name = @name "
                 ;
 
+        public static readonly String SELECT_BY_QUEUE_PRIORITY = ""
+                + "select "
+                + "     w.item_id "
+                + "     , w.step_id "
+                + "     , w.name "
+                + "     , w.state "
+                + "     , w.priority "
+                + "     , w.created "
+                + "     , w.entered "
+                + "     , w.session_id "
+                + "FROM "
+                + TABLE + " w "
+                + ", " + Queue.TABLE + " q "
+                + ", " + Step.TABLE + " s "
+                + "WHERE 0 = 0 "
+                + "AND s.step_id = w.step_id " // XXX: use 21st century join syntax :-)
+                + "AND s.queue_id = q.queue_id "
+                + "AND q.queue_id = @queue_id "
+                + "AND w.state = " + (int)WorkItem.State.Available  // XXX that's a hack; use property
+                + " ORDER BY w.priority "
+                + "         , w.created "
+            ;
+
+
+
         #endregion
                     
         #region Properties
@@ -75,7 +101,7 @@ namespace DataCapture.Workflow.Db
         public WorkItem(int id
                         , int stepId
                         , String name
-                        , WorkItem.State state // XXX enum
+                        , WorkItem.State state
                         , int priority
                         , DateTime created
                         , DateTime entered
@@ -91,6 +117,18 @@ namespace DataCapture.Workflow.Db
             Priority = priority;
             ItemState = state;
         }
+        public WorkItem(IDataReader reader)
+            : this(DbUtil.GetInt(reader, "item_id")
+                  , DbUtil.GetInt(reader, "step_id")
+                  , DbUtil.GetString(reader, "name")
+                  , (WorkItem.State)DbUtil.GetInt(reader, "state")
+                  , DbUtil.GetInt(reader, "priority")
+                  , DbUtil.GetDateTime(reader, "created")
+                  , DbUtil.GetDateTime(reader, "entered")
+                  , DbUtil.GetInt(reader, "session_id")
+                  )
+        { /* no code */ }
+
         #endregion
 
         #region CRUD: Insert
@@ -141,15 +179,40 @@ namespace DataCapture.Workflow.Db
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new WorkItem(DbUtil.GetInt(reader, "item_id")
-                    , DbUtil.GetInt(reader, "step_id")
-                    , DbUtil.GetString(reader, "name")
-                    , (WorkItem.State)DbUtil.GetInt(reader, "state")
-                    , DbUtil.GetInt(reader, "priority")
-                    , DbUtil.GetDateTime(reader, "created")
-                    , DbUtil.GetDateTime(reader, "entered")
-                    , DbUtil.GetInt(reader, "session_id")
-                    );
+                return new WorkItem(reader);
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
+
+        // TODO: spec overloads this method with ranges.
+        //       which is a good idea as opposed to the quick-
+        //       and-dirty "slurp" method written below.
+        public static IList<WorkItem> SelectByPriority(IDbConnection dbConn, Queue queue)
+        {
+            IDataReader reader = null;
+            List<WorkItem> tmp = new List<WorkItem>();
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_QUEUE_PRIORITY;
+                DbUtil.AddParameter(command, "@queue_id", queue.Id);
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                while(reader.Read())
+                {
+                    tmp.Add(new WorkItem(reader));
+                }
+                return tmp;
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("SBP: " + ex.Message);
+                Console.WriteLine("SBP: " + SELECT_BY_QUEUE_PRIORITY);
+                throw;
             }
             finally
             {

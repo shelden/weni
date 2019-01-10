@@ -12,9 +12,9 @@ namespace DataCapture.Workflow.Test
         {
             String login = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, User.TABLE);
+            int before = TestUtil.SelectCount(dbConn, User.TABLE);
             User.Insert(dbConn, login, 1);
-            int after = DbUtil.SelectCount(dbConn, User.TABLE);
+            int after = TestUtil.SelectCount(dbConn, User.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 
@@ -66,9 +66,9 @@ namespace DataCapture.Workflow.Test
         {
             String login = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, User.TABLE);
+            int before = TestUtil.SelectCount(dbConn, User.TABLE);
             User.Insert(dbConn, login, 1);
-            int after0 = DbUtil.SelectCount(dbConn, User.TABLE);
+            int after0 = TestUtil.SelectCount(dbConn, User.TABLE);
             Assert.AreEqual(before + 1, after0);
 
             // now try and insert again, it should fail:
@@ -76,7 +76,7 @@ namespace DataCapture.Workflow.Test
             try
             {
                 User.Insert(dbConn, login, 1);
-                int after1 = DbUtil.SelectCount(dbConn, User.TABLE);
+                int after1 = TestUtil.SelectCount(dbConn, User.TABLE);
             }
             catch (Exception ex)
             {
@@ -85,7 +85,7 @@ namespace DataCapture.Workflow.Test
 
             Console.WriteLine("expected exception: " + msg);
             Assert.AreNotEqual(msg, "", "expected exception not thrown");
-            int after2 = DbUtil.SelectCount(dbConn, User.TABLE);
+            int after2 = TestUtil.SelectCount(dbConn, User.TABLE);
             Assert.AreEqual(after2, before + 1);
         }
 

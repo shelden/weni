@@ -14,13 +14,13 @@ namespace DataCapture.Workflow.Test
             int state = TestUtil.RANDOM.Next(1, 100);
 
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int before = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
 
             var step = TestUtil.MakeStep(dbConn);
             var session = TestUtil.MakeSession(dbConn);
             var item = WorkItem.Insert(dbConn, step, workItemName, priority, session);
 
-            int after = DbUtil.SelectCount(dbConn, WorkItem.TABLE);
+            int after = TestUtil.SelectCount(dbConn, WorkItem.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 

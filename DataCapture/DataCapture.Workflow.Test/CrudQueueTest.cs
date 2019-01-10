@@ -16,17 +16,17 @@ namespace DataCapture.Workflow.Test
             String unspec = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
 
-            int before = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Queue.Insert(dbConn, regular, true);
-            int after = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(before + 1, after);
 
             Queue.Insert(dbConn, fail, false);
-            after = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            after = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(before + 2, after);
 
             Queue.Insert(dbConn, unspec);
-            after = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            after = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(before + 3, after);
         }
 
@@ -97,9 +97,9 @@ namespace DataCapture.Workflow.Test
         {
             String name = TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Queue.Insert(dbConn, name);
-            int after0 = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            int after0 = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(before + 1, after0);
 
             // now try and insert again, it should fail:
@@ -115,7 +115,7 @@ namespace DataCapture.Workflow.Test
 
             Assert.AreNotEqual(msg, "", "expected exception not thrown");
             Console.WriteLine("expected exception: " + msg);
-            int after2 = DbUtil.SelectCount(dbConn, Queue.TABLE);
+            int after2 = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(after2, before + 1);
         }
 

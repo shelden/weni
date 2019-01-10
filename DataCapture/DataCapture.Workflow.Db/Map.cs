@@ -9,13 +9,13 @@ namespace DataCapture.Workflow.Db
         #region Constants
         public static readonly String TABLE = "workflow.maps";
 	    public static readonly int VERSION = 1;
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
             + "insert into "
             + TABLE
             + " (name, version) "
             + "values (@name, @version) "
             ;
-        public static readonly String SELECT_BY_NAME = ""
+        private static readonly String SELECT_BY_NAME = ""
             + "select map_id "
             + "   , name "
             + "   , version "
@@ -25,6 +25,15 @@ namespace DataCapture.Workflow.Db
             + "AND   name = @name "
             + "ORDER BY version DESC "
             ;
+        private static readonly String SELECT_BY_ID = ""
+             + "select map_id "
+             + "   , name "
+             + "   , version "
+              + " from "
+         + TABLE + " "
+         + "WHERE 0 = 0 "
+          + "AND   map_id = @map_id "
+          ;
         #endregion
 
         #region Properties
@@ -111,6 +120,25 @@ namespace DataCapture.Workflow.Db
                 // Note: this assumes that we only every want the one with the
                 // max version.  If that stops being true, we will need an
                 // overload that specifies the version.
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
+        public static Map Select(IDbConnection dbConn, int mapId)
+        {
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_ID;
+                DbUtil.AddParameter(command, "@map_id", mapId);
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new Map(reader);
             }
             finally
             {

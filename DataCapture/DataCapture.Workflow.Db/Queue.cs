@@ -8,20 +8,25 @@ namespace DataCapture.Workflow.Db
     {
         #region Constants
         public static readonly String TABLE = "workflow.queues";
-        public static readonly String INSERT = ""
-            + "insert into "
+        private static readonly String INSERT = ""
+            + "INSERT INTO "
             + TABLE
             + " (name, is_fail) "
-            + "values (@name, @is_fail) "
+            + "VALUES (@name, @is_fail) "
             ;
-        public static readonly String SELECT_BY_NAME = ""
-            + "select queue_id "
+        private static readonly String SELECT_BASE = ""
+            + "SELECT queue_id "
             + "   , name "
             + "   , is_fail "
             + " from "
             + TABLE + " "
             + "WHERE 0 = 0 "
+            ;
+        private static readonly String SELECT_BY_NAME = SELECT_BASE
             + "AND   name = @name "
+            ;
+        private static readonly String SELECT_BY_ID = SELECT_BASE 
+            + "AND   queue_id = @queue_id "
             ;
         #endregion
 
@@ -86,6 +91,25 @@ namespace DataCapture.Workflow.Db
                 IDbCommand command = dbConn.CreateCommand();
                 command.CommandText = SELECT_BY_NAME;
                 DbUtil.AddParameter(command, "@name", name); 
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new Queue(reader);
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
+        public static Queue Select(IDbConnection dbConn, int queueId)
+        {
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_ID;
+                DbUtil.AddParameter(command, "@queue_id", queueId);
                 reader = command.ExecuteReader();
 
                 if (reader == null) return null;

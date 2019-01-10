@@ -31,7 +31,7 @@ namespace DataCapture.Workflow.Test
             String value = TestUtil.NextString();
             int order = TestUtil.RANDOM.Next(10, 100);
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Rule.TABLE);
             Rule.Insert(dbConn
                 , key
                 , nextCompare()
@@ -40,7 +40,7 @@ namespace DataCapture.Workflow.Test
                 , TestUtil.MakeStep(dbConn)
                 , TestUtil.MakeStep(dbConn)
                 );
-            int after = DbUtil.SelectCount(dbConn, Rule.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Rule.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 
