@@ -164,7 +164,7 @@ namespace DataCapture.Workflow.Test
             int count = TestUtil.RANDOM.Next(1, 5);
             for (int i = 0; i < count; i++)
             {
-                tmp.Add("key" + i + "of" + count, TestUtil.NextString());
+                tmp.Add("clef" + (i + 1) + "of" + count, TestUtil.NextString());
             }
             return tmp;
         }

@@ -5,10 +5,9 @@ using DataCapture.Workflow.Db;
 
 namespace DataCapture.Workflow
 {
-    public class WorkItemInfo
+    public class WorkItemInfo : Dictionary<String, String>
     {
         #region members
-        private Dictionary<String, String> pairs_ = new Dictionary<String, String>();
         #endregion
 
         #region properties
@@ -38,8 +37,16 @@ namespace DataCapture.Workflow
             this.Created = item.Created;
             this.Entered = item.Entered;
 
-            // XXX now add the KVPs
+            if (data == null) return;
+            foreach(var kvp in data)
+            {
+                this.Add(kvp.VariableName, kvp.VariableValue);
+            }
         }
+        #endregion
+
+        #region Dictionary
+
         #endregion
 
         #region ToString

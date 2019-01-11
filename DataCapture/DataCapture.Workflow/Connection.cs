@@ -185,11 +185,13 @@ namespace DataCapture.Workflow
                     , priority
                     , session_
                     );
+
                 if (data != null)
                 {
                     foreach (String key in data.Keys)
                     {
                         var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
+                        Console.WriteLine(kvp);
                     }
                 }
                 transaction.Commit();
