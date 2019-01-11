@@ -8,72 +8,6 @@ namespace DataCapture.Workflow.Test
 {
     public class ApiGetItemTest
     {
-        #region util
-        public static void AssertSame(IDictionary<String, String> left
-            , IDictionary<String, String> right
-            )
-        {
-            if (left == null && right == null) return;
-            if (left == null && right != null) 
-            {
-                Assert.Fail("left is null but right has data");
-            }
-            if (left != null && right == null)
-            {
-                Assert.Fail("left had data but right is null");
-            }
-
-            var msg = new StringBuilder();
-            foreach (var key in left.Keys)
-            {
-                if (!right.ContainsKey(key))
-                {
-                    msg.Append(", right is missing key [");
-                    msg.Append(key);
-                    msg.Append("]");
-                }
-                else if (!left[key].Equals(right[key]))
-                {
-                    msg.Append(", mismatch in key [");
-                    msg.Append(key);
-                    msg.Append("]: ");
-                    msg.Append(left[key]);
-                    msg.Append(" vs ");
-                    msg.Append(right[key]);
-                }
-            }
-
-
-            foreach (var key in right.Keys)
-            {
-                if (!left.ContainsKey(key))
-                {
-                    msg.Append(", left is missing key [");
-                    msg.Append(key);
-                    msg.Append("]");
-                }
-                else if (!right[key].Equals(left[key]))
-                {
-                    msg.Append(", mismatch in key [");
-                    msg.Append(key);
-                    msg.Append("]: ");
-                    msg.Append(left[key]);
-                    msg.Append(" vs ");
-                    msg.Append(right[key]);
-                }
-            }
-
-            if (msg.Length >= 2)
-            {
-                msg.Remove(0, 2); // make pretty by removing the leading ", "
-                Console.WriteLine(msg);
-
-                Assert.Fail(msg.ToString());
-            }
-
-        }
-
-        #endregion
 
         [Test()]
         public void CanRetrieve()
@@ -90,27 +24,12 @@ namespace DataCapture.Workflow.Test
                 , pairs
                 , priority
                 );
-
+            var item = wfConn.GetItem(names["queue"]);
             DateTime post = DateTime.UtcNow;
 
 
-            var item = wfConn.GetItem(names["queue"]);
-
-            Assert.IsNotNull(item);
-            Assert.Greater(item.Id, 0);
-            Assert.Less(start, item.Created);
-            Assert.Less(start, item.Entered);
-            Assert.Greater(post, item.Created);
-            Assert.AreEqual(item.MapName, names["map"]);
-            Assert.AreEqual(item.StepName, names["startStep"]);
-            Assert.AreEqual(item.Name, itemName);
-            Assert.AreEqual(item.Priority, priority);
-
-            AssertSame(pairs, item);
-
-            var item2 = wfConn.GetItem(names["queue"]);
-            Assert.IsNull(item2);
-
+            TestUtil.AssertSame(item, itemName, pairs, start, post, priority);
+            TestUtil.AssertRightPlaces(item, names["map"], names["startStep"]);
         }
 
         [Test()]
@@ -123,7 +42,6 @@ namespace DataCapture.Workflow.Test
             var names = TestUtil.CreateBasicMap();
             var pairsNeg = TestUtil.CreatePairs();
             var pairsPos = TestUtil.CreatePairs();
-
 
             // first put in item with a positive priority
             wfConn.CreateItem(names["map"]
@@ -141,36 +59,71 @@ namespace DataCapture.Workflow.Test
                 , -priority
             );
 
-            DateTime post = DateTime.UtcNow;
 
             // the negative priority-item should be retrieved first
 
             var negative = wfConn.GetItem(names["queue"]);
-            Assert.IsNotNull(negative);
-            Assert.Greater(negative.Id, 0);
-            Assert.Less(start, negative.Created);
-            Assert.Less(start, negative.Entered);
-            Assert.Greater(post, negative.Created);
-            Assert.AreEqual(negative.MapName, names["map"]);
-            Assert.AreEqual(negative.StepName, names["startStep"]);
-            Assert.AreEqual(negative.Name, itemName + "negative");
-            Assert.AreEqual(negative.Priority, -priority);
-            AssertSame(pairsNeg, negative);
+            DateTime post = DateTime.UtcNow;
+
+            TestUtil.AssertSame(negative, itemName + "negative", pairsNeg, start, post, -priority);
+            TestUtil.AssertRightPlaces(negative, names["map"], names["startStep"]);
 
             // followed by the positive one:
 
             var positive = wfConn.GetItem(names["queue"]);
-            Assert.IsNotNull(positive);
-            Assert.Greater(positive.Id, 0);
-            Assert.Less(start, positive.Created);
-            Assert.Less(start, positive.Entered);
-            Assert.Greater(post, positive.Created);
-            Assert.AreEqual(positive.MapName, names["map"]);
-            Assert.AreEqual(positive.StepName, names["startStep"]);
-            Assert.AreEqual(positive.Name, itemName + "positive");
-            Assert.AreEqual(positive.Priority, priority);
-            AssertSame(pairsPos, positive);
+            post = DateTime.UtcNow;
+            TestUtil.AssertSame(positive, itemName + "positive", pairsPos, start, post, priority);
+            TestUtil.AssertRightPlaces(positive, names["map"], names["startStep"]);
 
+            var nomore = wfConn.GetItem(names["queue"]);
+            Assert.IsNull(nomore);
+        }
+
+
+        public void PriorityTiesResolvedByTime()
+        {
+            DateTime pretime = DateTime.UtcNow;
+            String itemName0 = "early" + TestUtil.NextString();
+            String itemName1 = "late" + TestUtil.NextString();
+            int priority = TestUtil.RANDOM.Next(1, 100);
+            var wfConn = TestUtil.CreateConnected();
+            var names = TestUtil.CreateBasicMap();
+            var pairs0 = TestUtil.CreatePairs();
+            var pairs1 = TestUtil.CreatePairs();
+
+            // first put in two items with same priority, but
+            // different attributes
+            wfConn.CreateItem(names["map"]
+                , itemName0
+                , names["startStep"]
+                , pairs0
+                , priority
+                );
+            System.Threading.Thread.Sleep(100);
+            wfConn.CreateItem(names["map"]
+                , itemName1
+                , names["startStep"]
+                , pairs1
+            );
+
+            // the earlier item should be retrieved first
+
+            var item0 = wfConn.GetItem(names["queue"]);
+
+            DateTime posttime = DateTime.UtcNow;
+
+            TestUtil.AssertSame(item0, itemName0, pairs0, pretime, posttime, -priority);
+            TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
+
+            // followed by the later one:
+            var item1 = wfConn.GetItem(names["queue"]);
+
+            posttime = DateTime.UtcNow;
+
+            TestUtil.AssertSame(item1, itemName1, pairs1, pretime, posttime, priority);
+            TestUtil.AssertRightPlaces(item1, names["map"], names["startStep"]);
+
+            // followed by none:
             var nomore = wfConn.GetItem(names["queue"]);
             Assert.IsNull(nomore);
         }

@@ -45,10 +45,6 @@ namespace DataCapture.Workflow
         }
         #endregion
 
-        #region Dictionary
-
-        #endregion
-
         #region ToString
         public override string ToString()
         {

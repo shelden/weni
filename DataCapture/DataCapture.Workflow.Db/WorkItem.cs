@@ -11,10 +11,10 @@ namespace DataCapture.Workflow.Db
         public enum State
         {
             Available = 1
-                , Locked = 2
-                , InProgress = 3
-                , Suspended = 4
-                , Terminated = 9
+            , Locked = 2
+            , InProgress = 3
+            , Suspended = 4
+            , Terminated = 9
         };
         #endregion
 
@@ -42,8 +42,7 @@ namespace DataCapture.Workflow.Db
                 + "     , @session_id "
                 + ") "
             ;
-                
-        private static readonly String SELECT_BY_NAME = ""
+        private static readonly String SELECT_BASE = ""
                 + "select "
                 + "     item_id "
                 + "     , step_id "
@@ -56,8 +55,13 @@ namespace DataCapture.Workflow.Db
                 + "FROM "
                 + TABLE + " "
                 + "WHERE 0 = 0 "
+            ;
+        private static readonly String SELECT_BY_NAME = SELECT_BASE 
                 + "AND   name = @name "
                 ;
+        private static readonly String SELECT_BY_ID = SELECT_BASE
+            + "AND   item_id = @item_id "
+            ;
 
         private static readonly String SELECT_BY_QUEUE_PRIORITY = ""
                 + "select "
@@ -78,8 +82,8 @@ namespace DataCapture.Workflow.Db
                 + "AND s.queue_id = q.queue_id "
                 + "AND q.queue_id = @queue_id "
                 + "AND w.state = @available " 
-                + "ORDER BY w.priority "
-                + "         , w.created "
+                + "ORDER BY w.priority ASC "
+                + "         , w.created ASC "
             ;
         private static readonly String UPDATE = ""
             + "UPDATE " + TABLE + " set "
@@ -93,17 +97,19 @@ namespace DataCapture.Workflow.Db
             + "WHERE 0 = 0 "
             + "AND   item_id = @item_id "
             ;
-                
-
-
+        private static readonly String DELETE_BY_ID = ""
+            + "DELETE FROM " + TABLE + " "
+            + "WHERE 0 = 0 "
+            + "AND item_id = @item_id "
+            ;
 
         #endregion
 
         #region Properties
         public int Id { get; private set; }
-        public int StepId { get; private set; }
+        public int StepId { get; set; }
         public int SessionId { get; set; }
-        public int Priority { get; set; }
+        public int Priority { get; private set; }
         public WorkItem.State ItemState { get; set; }
         public String Name { get; set; }
         public DateTime Created { get; private set; }
@@ -199,6 +205,25 @@ namespace DataCapture.Workflow.Db
                 DbUtil.ReallyClose(reader);
             }
         }
+        public static WorkItem Select(IDbConnection dbConn, int itemId)
+        {
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_ID;
+                DbUtil.AddParameter(command, "@item_id", itemId);
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new WorkItem(reader);
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
 
         // TODO: spec overloads this method with ranges.
         //       which is a good idea as opposed to the quick-
@@ -222,12 +247,6 @@ namespace DataCapture.Workflow.Db
                 }
                 return tmp;
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine("SBP: " + ex.Message);
-                Console.WriteLine("SBP: " + SELECT_BY_QUEUE_PRIORITY);
-                throw;
-            }
             finally
             {
                 DbUtil.ReallyClose(reader);
@@ -248,15 +267,33 @@ namespace DataCapture.Workflow.Db
             DbUtil.AddParameter(command, "@entered", this.Entered);
             DbUtil.AddParameter(command, "@session_id", this.SessionId);
             DbUtil.AddParameter(command, "@item_id", this.Id);
-            try
+            command.ExecuteNonQuery();
+
+        }
+        #endregion
+
+        #region CRUD: Delete
+        public void Delete(IDbConnection dbConn)
+        {
+            IDbCommand command = dbConn.CreateCommand();
+            command.CommandText = DELETE_BY_ID;
+            DbUtil.AddParameter(command, "@item_id", this.Id);
+            int rows = command.ExecuteNonQuery();
+            // This assumes that the work_item_data rows are deleted in a cascading way
+            // by the DB.  It's enforced by unit tests.
+            switch (rows)
             {
-                              command.ExecuteNonQuery();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(UPDATE);
-                Console.WriteLine(ex.Message);
-                throw;
+                case 0:
+                    // strange; not even there.  Maybe warn?
+                    break;
+                case 1:
+                    // working correctly.
+                    break;
+                default:
+                    var msg = new StringBuilder();
+                    msg.Append("internal error: delete by ID returned multiple rows? ");
+                    msg.Append(this);
+                    throw new Exception(msg.ToString());
             }
         }
         #endregion

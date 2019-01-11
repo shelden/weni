@@ -72,7 +72,6 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
 
-            Console.WriteLine("expected api exception: " + msg); 
             if (String.IsNullOrEmpty(msg))
             {
                 Assert.Fail("connection limit violated but no exception thrown");

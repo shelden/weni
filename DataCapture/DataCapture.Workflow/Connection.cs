@@ -222,7 +222,7 @@ namespace DataCapture.Workflow
                 var items = WorkItem.SelectByPriority(dbConn_, queue);
                 if (items == null || items.Count == 0) return null;
 
-               int x = 0;
+                int x = 0;
                 foreach (var i in items)
                 {
                     Console.WriteLine(x + ") " + i);
@@ -264,7 +264,62 @@ namespace DataCapture.Workflow
         }
         #endregion
 
-        #region ToString
+        #region Finish / Return Item
+        public void FinishItem(WorkItemInfo toBeFinished)
+        {
+            IDbTransaction transaction = null;
+            try
+            {
+                transaction = dbConn_.BeginTransaction();
+
+                var item = WorkItem.Select(dbConn_, toBeFinished.Id);
+                if (item == null)
+                {
+                    var msg = new StringBuilder();
+                    msg.Append("cannot finish item [");
+                    msg.Append(item.Name);
+                    msg.Append("], #");
+                    msg.Append(item.Id);
+                    msg.Append("; not found in database");
+                    throw new Exception(msg.ToString());
+                }
+
+                var currentStep = Step.Select(dbConn_, item.StepId);
+                if (currentStep == null) throw new Exception("internal error, no such current step on " + item.ToString());
+
+
+                // update the step and state:
+                if (currentStep.Type == Step.StepType.Terminating)
+                {
+                    item.Delete(dbConn_);
+                }
+                else if (currentStep.NextStepId == Step.NO_NEXT_STEP)
+                {
+                    throw new Exception("internal error: no next step, but not a terminating step: " + currentStep);
+                }
+                else
+                {
+                    // XXX: this assumes that no rules apply.
+                    // XXX: it also assumes that we always want to 
+                    //      finish by moving it along.
+                    item.StepId = currentStep.NextStepId;
+                    item.ItemState = WorkItem.State.Available;
+                    item.Entered = DateTime.UtcNow;
+                    item.SessionId = session_.Id;
+                    item.Update(dbConn_);
+                }
+
+                transaction.Commit();
+                transaction = null;
+            }
+            finally
+            {
+                DbUtil.ReallyBackout(transaction);
+            }
+        }
+        #endregion
+
+            #region ToString
         public override string ToString()
         {
             var sb = new StringBuilder();

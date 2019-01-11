@@ -50,6 +50,7 @@
     <Compile Include="XmlImportTest.cs" />
     <Compile Include="ApiAddItemTest.cs" />
     <Compile Include="ApiGetItemTest.cs" />
+    <Compile Include="ApiFinishItemTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">

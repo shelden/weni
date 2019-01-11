@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Text;
-using System.Data;
-using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+    using System.Text;
+    using System.Data;
+    using System.Collections.Generic;
+    using DataCapture.Workflow.Db;
+    using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test
 {
@@ -45,7 +46,7 @@ namespace DataCapture.Workflow.Test
         {
             String stepName = "Step" + TestUtil.NextString();
             Step.StepType type = Step.StepType.Terminating;
-            switch(RANDOM.Next(0, 4))
+            switch (RANDOM.Next(0, 4))
             {
                 case 0:
                     type = Step.StepType.Failure;
@@ -151,11 +152,11 @@ namespace DataCapture.Workflow.Test
                 );
 
             return new Dictionary<String, String>() {
-                {  "queue", queue.Name }
-                , { "map", map.Name }
-                , {  "startStep", start.Name }
-                , {  "endStep", end.Name }
-            };
+                    {  "queue", queue.Name }
+                    , { "map", map.Name }
+                    , {  "startStep", start.Name }
+                    , {  "endStep", end.Name }
+                };
         }
 
         public static Dictionary<String, String> CreatePairs()
@@ -168,7 +169,131 @@ namespace DataCapture.Workflow.Test
             }
             return tmp;
         }
-        #endregion
 
+        /// <summary>
+        /// Asserts that two things that implement IDictionary have the
+        /// same key value pairs.  I.e. a WorkItemItem since it implements
+        /// IDictionary.
+        /// </summary>
+        /// <param name="left">Left.</param>
+        /// <param name="right">Right.</param>
+        public static void AssertSame(IDictionary<String, String> left
+            , IDictionary<String, String> right
+            )
+        {
+            if (left == null && right == null) return;
+            if (left == null && right != null)
+            {
+                NUnit.Framework.Assert.Fail("left is null but right has data");
+            }
+            if (left != null && right == null)
+            {
+                NUnit.Framework.Assert.Fail("left had data but right is null");
+            }
+
+            var msg = new StringBuilder();
+            foreach (var key in left.Keys)
+            {
+                if (!right.ContainsKey(key))
+                {
+                    msg.Append(", right is missing key [");
+                    msg.Append(key);
+                    msg.Append("]");
+                }
+                else if (!left[key].Equals(right[key]))
+                {
+                    msg.Append(", mismatch in key [");
+                    msg.Append(key);
+                    msg.Append("]: ");
+                    msg.Append(left[key]);
+                    msg.Append(" vs ");
+                    msg.Append(right[key]);
+                }
+            }
+
+
+            foreach (var key in right.Keys)
+            {
+                if (!left.ContainsKey(key))
+                {
+                    msg.Append(", left is missing key [");
+                    msg.Append(key);
+                    msg.Append("]");
+                }
+                else if (!right[key].Equals(left[key]))
+                {
+                    msg.Append(", mismatch in key [");
+                    msg.Append(key);
+                    msg.Append("]: ");
+                    msg.Append(left[key]);
+                    msg.Append(" vs ");
+                    msg.Append(right[key]);
+                }
+            }
+
+            if (msg.Length >= 2)
+            {
+                msg.Remove(0, 2); // make pretty by removing the leading ", "
+                Console.WriteLine(msg);
+
+                Assert.Fail(msg.ToString());
+            }
+
+        }
+
+        /// <summary>
+        /// Assert that a work item has all its expected values.
+        /// </summary>
+        /// <param name="item">the work item returned by the API</param>
+        /// <param name="before">a UTC timestamp before the item was entered</param>
+        /// <param name="after">a UTC timestamp after the item was returned</param>
+        /// <param name="expectedPairs">The Key-value pairs we expect to be in the
+        /// work item</param>
+        public static void AssertSame(WorkItemInfo item
+            , String expectedItemName
+            , IDictionary<String, String> expectedPairs
+            , DateTime before
+            , DateTime after
+            , int expectedPriority
+            )
+        {
+            Assert.IsNotNull(item);
+            Assert.Greater(item.Id, 0);
+            Assert.AreEqual(item.State, (int)WorkItem.State.InProgress); // the other states can't really be in a work item in
+            Assert.AreEqual(item.Name, expectedItemName);
+
+            //Console.WriteLine(before.ToString(DbUtil.FORMAT));
+            //Console.WriteLine(" " + item.Created.ToString(DbUtil.FORMAT));
+            //Console.WriteLine("  " + item.Entered.ToString(DbUtil.FORMAT));
+            //Console.WriteLine("   " + after.ToString(DbUtil.FORMAT));
+
+            Assert.GreaterOrEqual(item.Created, before);
+            Assert.GreaterOrEqual(item.Entered, before);
+            Assert.LessOrEqual(item.Created, item.Entered);
+            Assert.GreaterOrEqual(after, item.Created);
+            Assert.GreaterOrEqual(after, item.Entered);
+            Assert.AreEqual(item.Priority, expectedPriority);
+            AssertSame(expectedPairs, item);
+        }
+
+        /// <summary>
+        /// Utility method to assert that a work item info is in
+        /// the right step and queue after we've processed it.
+        /// </summary>
+        /// <param name="item">Item.</param>
+        /// <param name="map">name of map</param>
+        /// <param name="step">name of step</param>
+        public static void AssertRightPlaces(WorkItemInfo item
+            , String map
+            , String step
+            )
+        {
+            Assert.IsNotNull(item);
+            Assert.AreEqual(item.StepName, step);
+            Assert.AreEqual(item.MapName, map);
+            // XXX map version?
+        }
+        #endregion
     }
 }
+

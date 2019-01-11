@@ -95,7 +95,7 @@ namespace DataCapture.Workflow.Test
         }
 
         [Test()]
-        public void CanCreateNullItem()
+        public void CanCreateItemWithoutPairs()
         {
             var dbConn = ConnectionFactory.Create();
             String itemName = "Item" + TestUtil.NextString();
