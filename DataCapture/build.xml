@@ -2,13 +2,13 @@
          default="all"
          basedir="."
          >
-    <!-- ================================================================== -->
+    <!-- ============================================================== -->
     <property environment="env" />
-    <!-- ================================================================== -->
+    <!-- ============================================================ -->
     <target name="all" 
             depends="echo,version,build,db.init,test"
             />
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="clean">
         <delete>
             <fileset dir="." includes="**/DataCapture*.dll" />
@@ -16,33 +16,33 @@
             <fileset dir="." includes="**/TestResult*.xml" />
         </delete>
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
               failonerror="true"
-              input="DataCapture.Workflow.Db/sql/WorkflowDDL.sql"
+              input="DataCapture.Workflow/sql/WorkflowDDL.sql"
               >
             <arg value="-u" />
             <arg value="${db.mysql.user}" />
             <arg value="--verbose" />
         </exec>
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="test">
         <nunitconsole namespace="DataCapture.Example.Test" />
         <nunitconsole namespace="DataCapture.IO.Test" />
         <nunitconsole namespace="DataCapture.Workflow.Test" />
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="echo">
         <echo message="${env.PATH}" />
         <echo message="${env.Path}" />
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="build">
         <msbuild solution="DataCapture.Workflow.sln" />
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <target name="version">
         <property name="version.number"
                   value="0.10.*"
@@ -72,11 +72,11 @@
             <arg value="${version.number}" />
         </exec>
     </target>
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <!-- compile section -->
-    <!-- ================================================================== -->
-    <!-- msbuild is not likely in your path on Windows.  Non-windows folks  -->
-    <!-- need to add it to their path.                                      -->
+    <!-- =============================================================== -->
+    <!-- msbuild is not likely in your path on Windows.  Non-windows     -->
+    <!-- folks need to add it to their path                              -->
     <condition property="compile.msbuild.prog"
                value="C:\Windows\Microsoft.NET\Framework64\v4.0.30319\msbuild.exe"
                >
@@ -98,22 +98,23 @@
         </sequential>
     </macrodef>
 
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <!-- nunit test runner section -->
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
     <property name="test.runner.prog"
               location="3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
               />
-    <!-- run nunit-console based on some standard naming conventions.       -->
-    <!-- 1. we assume that the test dll foo lives in                        -->
-    <!--    DataCapture/foo/bin/Release/foo.dll.  A standard but not        -->
-    <!--    required layout                                                 -->
-    <!-- 2. We run nunit console over each DLL in its own directory.        -->
-    <!--    that way, each TestResults.xml is findable by the NUnit         -->
-    <!--    plugin                                                          -->
-    <!-- 3. Lastly test DLLs are not current "found," but listed by hand    -->
-    <!--    in the target test.  Boo.  In the future we could specify       -->
-    <!--    **/*Test?*.dll and then call this macro.                        -->
+    <!-- run nunit-console based on some standard naming conventions.    -->
+    <!-- 1. we assume that the test dll foo lives in                     -->
+    <!--    DataCapture/foo/bin/Release/foo.dll.  A standard but not     -->
+    <!--    required layout                                              -->
+    <!-- 2. We run nunit console over each DLL in its own directory.     -->
+    <!--    that way, each TestResults.xml is findable by the NUnit      -->
+    <!--    plugin                                                       -->
+    <!-- 3. Lastly test DLLs are not currently "found," but listed by    -->
+    <!--    and in the target test.  Boo.  Maybe a fileset?              -->
+    <!--    In the future we could specify **/*Test?*.dll and then call  -->
+    <!--    this macro.                                                  -->
     <macrodef name="nunitconsole">
         <attribute name="namespace" />
         <sequential>
@@ -136,9 +137,9 @@
             </exec>
         </sequential>
     </macrodef>
-    <!-- ================================================================== -->
-    <!-- mysql section                                                      -->
-    <!-- ================================================================== -->
+    <!-- =============================================================== -->
+    <!-- mysql section                                                   -->
+    <!-- =============================================================== -->
     <property name="db.mysql.user"     value="workflow" />
     <property name="db.mysql.password" value="" />
     <property name="db.mysql.server"   value="localhost:3306" />
