@@ -14,14 +14,15 @@ namespace DataCapture.Workflow.Db
             + " (user_id, queue_id) "
             + "values (@user_id, @queue_id) "
             ;
-        public static readonly String SELECT_BY_ID = ""
+        public static readonly String SELECT_BY_USER_QUEUE_ID = ""
             + "select allowed_id "
             + "   , user_id "
             + "   , queue_id "
             + " from "
             + TABLE + " "
             + "WHERE 0 = 0 "
-            + "AND   allowed_id = @id "
+            + "AND   user_id = @user_id "
+            + "AND   queue_id = @queue_id "
             ;
         #endregion
 
@@ -41,6 +42,12 @@ namespace DataCapture.Workflow.Db
             UserId = userId;
             QueueId = queueId;
         }
+        public AllowedQueue(IDataReader reader)
+            : this(DbUtil.GetInt(reader, "allowed_id")
+                  , DbUtil.GetInt(reader, "user_id")
+                  , DbUtil.GetInt(reader, "queue_id")
+                  )
+        { /* no code */ }
         #endregion
 
         #region CRUD: Insert
@@ -61,27 +68,21 @@ namespace DataCapture.Workflow.Db
         #endregion
 
         #region CRUD: Select
-        public static AllowedQueue Select(IDbConnection dbConn, String name)
+        public static AllowedQueue Select(IDbConnection dbConn, User user, Queue queue)
         {
             IDataReader reader = null;
 
-
             try
             {
-                return null;
-                /*
                 IDbCommand command = dbConn.CreateCommand();
-                command.CommandText = SELECT_BY_NAME;
-                DbUtil.AddParameter(command, "@name", name); 
+                command.CommandText = SELECT_BY_USER_QUEUE_ID;
+                DbUtil.AddParameter(command, "@queue_id", queue.Id);
+                DbUtil.AddParameter(command, "@user_id", user.Id);
                 reader = command.ExecuteReader();
 
                 if (reader == null) return null;
                 if (!reader.Read()) return null;
-                return new Queue(reader.GetInt32(0) // XXX bad practice to use indexes.  Use names.
-                    , reader.GetString(1)
-                    , reader.GetInt32(2)
-                    );
-                    */
+                return new AllowedQueue(reader);
             }
             finally
             {

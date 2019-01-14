@@ -319,10 +319,7 @@ namespace DataCapture.Workflow
             finally
             {
                 map_ = null;
-                if (transaction != null)
-                {
-                    transaction.Rollback();
-                }
+                DbUtil.ReallyClose(transaction);
             }
         }
         #endregion

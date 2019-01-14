@@ -13,12 +13,12 @@ namespace DataCapture.Workflow.Test
             var item = TestUtil.MakeWorkItem(dbConn);
             var good = TestUtil.MakeUser(dbConn);
             var bad = TestUtil.MakeUser(dbConn);
-            int before = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
+            int before = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
 
             WorkItemAccess.Insert(dbConn, item, good, true);
             WorkItemAccess.Insert(dbConn, item, bad, false);
 
-            int after = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
+            int after = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
             Assert.AreEqual(before + 2, after);
         }
 
@@ -28,10 +28,10 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             var item = TestUtil.MakeWorkItem(dbConn);
             var user = TestUtil.MakeUser(dbConn);
-            int before = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
+            int before = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
 
             var access = WorkItemAccess.Insert(dbConn, item, user, true);
-            int after0 = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
+            int after0 = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
             Assert.AreNotEqual(access, null);
             Assert.AreEqual(before + 1, after0);
 
@@ -50,7 +50,7 @@ namespace DataCapture.Workflow.Test
             Console.WriteLine("expected exception: " + msg);
             Assert.AreNotEqual(msg, "", "expected exception not thrown");
 
-            int after1 = DbUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
+            int after1 = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
             Assert.AreEqual(before + 1, after0);
 
         }

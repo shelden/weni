@@ -90,22 +90,6 @@ namespace DataCapture.Workflow.Db
         }
         #endregion
 
-        #region SelectCount
-        // Utility function (mostly for unit tests) to do a select count * from
-        // table.  If you're writing a GUI, you should use parameters hanging
-        // off your DataReader, as opposed to this method.
-        public static int SelectCount(IDbConnection dbConn, string table)
-        {
- 
-            var command = dbConn.CreateCommand();
-            var sql = new StringBuilder();
-            sql.Append("SELECT COUNT(1) FROM ");
-            sql.Append(table);
-            command.CommandText = sql.ToString();
-            return Convert.ToInt32(command.ExecuteScalar());
-        }
-        #endregion
-
         #region Really
         // Less verbose utility methods to really close objects --
         // even if null -- which often happens in catch / finally blocks.
@@ -127,6 +111,22 @@ namespace DataCapture.Workflow.Db
             try
             {
                 dbConn.Close();
+            }
+            catch
+            {
+                ; // no code; per contract
+            }
+        }
+        public static void ReallyClose(IDbTransaction transaction)
+        {
+            DbUtil.ReallyBackout(transaction);
+        }
+        public static void ReallyBackout(IDbTransaction transaction)
+        {
+            if (transaction == null) return;
+            try
+            {
+                transaction.Rollback();
             }
             catch
             {

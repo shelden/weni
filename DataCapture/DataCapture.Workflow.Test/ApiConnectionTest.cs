@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DataCapture.Workflow;
-using DataCapture.Workflow.Db; // for DbUtil.SelectCount
+using DataCapture.Workflow.Db; // for TestUtil.SelectCount
 using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test
@@ -15,17 +15,17 @@ namespace DataCapture.Workflow.Test
             var user = TestUtil.MakeUser(dbConn);
             var wfConn = new DataCapture.Workflow.Connection();
 
-            int before = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(wfConn.IsConnected, false);
             Assert.GreaterOrEqual(before, 0);
 
             wfConn.Connect(user.Login);
-            int afterConnect = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int afterConnect = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(wfConn.IsConnected, true);
             Assert.AreEqual(before + 1, afterConnect);
 
             wfConn.Disconnect();
-            int afterDisconnect = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int afterDisconnect = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(wfConn.IsConnected, false);
             Assert.AreEqual(before, afterDisconnect);
         }
@@ -34,14 +34,14 @@ namespace DataCapture.Workflow.Test
         public void DisposeDisconnects()
         {
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Session.TABLE);
 
             using (var wfConn = new DataCapture.Workflow.Connection())
             {
                 Assert.IsNotNull(wfConn);
                 Console.WriteLine(wfConn);
             }
-            int after = DbUtil.SelectCount(dbConn, Session.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(before, after);
         }
 
@@ -72,7 +72,6 @@ namespace DataCapture.Workflow.Test
                 msg = ex.Message;
             }
 
-            Console.WriteLine("expected api exception: " + msg); 
             if (String.IsNullOrEmpty(msg))
             {
                 Assert.Fail("connection limit violated but no exception thrown");

@@ -31,9 +31,9 @@ namespace DataCapture.Workflow.Test
         public IDictionary<String, int> BuildCounts(System.Data.IDbConnection dbConn)
         {
             var tmp = new Dictionary<String, int>();
-            tmp["steps"] = DbUtil.SelectCount(dbConn, Step.TABLE);
-            tmp["rules"] = DbUtil.SelectCount(dbConn, Rule.TABLE);
-            tmp["maps"] = DbUtil.SelectCount(dbConn, Map.TABLE);
+            tmp["steps"] = TestUtil.SelectCount(dbConn, Step.TABLE);
+            tmp["rules"] = TestUtil.SelectCount(dbConn, Rule.TABLE);
+            tmp["maps"] = TestUtil.SelectCount(dbConn, Map.TABLE);
             var map = Map.Select(dbConn, MAP_NAME);
             tmp["mapVersion"] = map == null ? Map.VERSION - 1 : map.Version;
             return tmp;

@@ -35,7 +35,7 @@ namespace DataCapture.Workflow.Driver
             var queue = TestUtil.MakeQueue(dbConn);
             Console.WriteLine(queue);
 
-            var step0 = TestUtil.MakeStep(dbConn);
+            var step0 = Step.Insert(dbConn, "step0", map, queue, Step.StepType.Start); 
             Console.WriteLine(step0);
 
             var wfConn = new Connection();
@@ -43,7 +43,13 @@ namespace DataCapture.Workflow.Driver
 
             Console.WriteLine(wfConn);
 
+
+
             wfConn.CreateItem(map.Name, "foo", step0.Name, null);
+
+            var item = wfConn.GetItem(queue.Name);
+
+            Console.WriteLine(item);
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }

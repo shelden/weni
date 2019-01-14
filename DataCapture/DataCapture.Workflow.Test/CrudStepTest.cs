@@ -14,7 +14,7 @@ namespace DataCapture.Workflow.Test
 
             Step.StepType type = Step.StepType.Standard;
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Step.TABLE);
 
             var step = Step.Insert(dbConn
                 , stepName
@@ -25,7 +25,7 @@ namespace DataCapture.Workflow.Test
 
             Assert.AreEqual(step.NextStepId, Step.NO_NEXT_STEP);
 
-            int after = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Step.TABLE);
             Assert.AreEqual(before + 1, after);
         }
 
@@ -36,7 +36,7 @@ namespace DataCapture.Workflow.Test
             String step0Name = TestUtil.NextString();
             int type = TestUtil.RANDOM.Next(2, 100);
             var dbConn = ConnectionFactory.Create();
-            int before = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int before = TestUtil.SelectCount(dbConn, Step.TABLE);
             var queue = TestUtil.MakeQueue(dbConn);
             var map = TestUtil.MakeMap(dbConn);
 
@@ -48,7 +48,7 @@ namespace DataCapture.Workflow.Test
             ///Assert.AreEqual(step1.Type, Step.StepType.Terminating);
             //Assert.AreEqual(step0.Type, Step.StepType.Start);
 
-            int after = DbUtil.SelectCount(dbConn, Step.TABLE);
+            int after = TestUtil.SelectCount(dbConn, Step.TABLE);
             Assert.AreEqual(before + 2, after);
         }
 

@@ -19,7 +19,7 @@ namespace DataCapture.Workflow.Db
         #region Constants
         public static readonly String TABLE = "workflow.steps";
         public static readonly int NO_NEXT_STEP = -1;
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
             + "INSERT INTO "
             + TABLE
             + " ("
@@ -36,7 +36,7 @@ namespace DataCapture.Workflow.Db
             + "    , @type "
             + ") "
             ;
-        public static readonly String SELECT_BY_NAME = ""
+        private static readonly String SELECT_BASE = ""
                 + "select step_id "
                 + "       , name " 
                 + "       , map_id "
@@ -46,9 +46,17 @@ namespace DataCapture.Workflow.Db
                 + "FROM "
                 + TABLE + " "
                 + "WHERE 0 = 0 "
-                + "AND   name = @name "
                 ;
-        public static readonly String UPDATE = ""
+        private static readonly String SELECT_BY_NAME = SELECT_BASE
+            + "AND name = @name "
+            ;
+        private static readonly String SELECT_BY_ID = SELECT_BASE
+            + "AND step_id = @step_id "
+            ;
+        private static readonly String SELECT_BY_NAME_MAP = SELECT_BY_NAME
+            + "AND map_id = @map_id "
+            ;
+        private static readonly String UPDATE = ""
                 + "UPDATE " + TABLE + " set "
                 + "    map_id = @map_id "
                 + "    queue_id = @queue_id "
@@ -148,7 +156,9 @@ namespace DataCapture.Workflow.Db
                     );
             return tmp;
         }
+        #endregion
 
+        #region CRUD: Update
         public void Update(IDbConnection dbConn)
         {
             IDbCommand command = dbConn.CreateCommand();
@@ -183,6 +193,52 @@ namespace DataCapture.Workflow.Db
                 DbUtil.ReallyClose(reader);
             }
         }
+        public static Step Select(IDbConnection dbConn, String name, int mapId)
+        {
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_NAME_MAP;
+                DbUtil.AddParameter(command, "@name", name);
+                DbUtil.AddParameter(command, "@map_id", mapId);
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new Step(reader);
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
+
+        public static Step Select(IDbConnection dbConn, int stepId)
+        {
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_ID;
+                DbUtil.AddParameter(command, "@step_id", stepId);
+                reader = command.ExecuteReader();
+
+                if (reader == null) return null;
+                if (!reader.Read()) return null;
+                return new Step(reader);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+        }
+
         #endregion
 
         #region ToString()
@@ -194,6 +250,10 @@ namespace DataCapture.Workflow.Db
             sb.Append(this.Id);
             sb.Append(", name=");
             sb.Append(this.Name);
+            sb.Append(", map=");
+            sb.Append(this.MapId);
+            sb.Append(", q=");
+            sb.Append(this.QueueId);
             sb.Append(", next=");
             sb.Append(this.NextStepId);
             sb.Append(", type=");
