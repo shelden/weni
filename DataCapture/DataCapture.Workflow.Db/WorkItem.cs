@@ -8,12 +8,16 @@ namespace DataCapture.Workflow.Db
     public class WorkItem
     {
         #region Enums
+        // TODO: remove this enum when we move Db into the same library
+        //       as DataCapture.Workflow.  Right now it's duplicated
+        //       so as to prevent a circular dependency between DC.W 
+        //       and DC.W.Db
         public enum State
         {
             Available = 1
             , Locked = 2
             , InProgress = 3
-            , Suspended = 4
+            , Suspended = 5
             , Terminated = 9
         };
         #endregion
