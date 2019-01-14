@@ -6,7 +6,7 @@ using DataCapture.Workflow.Yeti;
 using DataCapture.IO;
 using NUnit.Framework;
 
-namespace DataCapture.Workflow.Test
+namespace DataCapture.Workflow.Yeti.Test
 {
     public class XmlImportTest
     {

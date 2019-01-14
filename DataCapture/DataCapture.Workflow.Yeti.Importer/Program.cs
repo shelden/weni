@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DataCapture.Workflow.Yeti;
 using DataCapture.Workflow.Yeti.Db;
 
-namespace DataCapture.Workflow.Importer
+namespace DataCapture.Workflow.Yeti.Importer
 {
     public class Program
     {
@@ -29,14 +29,14 @@ namespace DataCapture.Workflow.Importer
         #region Go
         public void Go()
         {
-            Console.WriteLine("--> DataCapture.Workflow.Importer()");
+            Console.WriteLine("--> DataCapture.Workflow.Yeti.Importer()");
             var dbConn = ConnectionFactory.Create();
             XmlImporter importer = new XmlImporter();
             foreach(var f in files_)
             {
                 importer.Import(dbConn, f);
             }
-            Console.WriteLine("<-- DataCapture.Workflow.Importer()");
+            Console.WriteLine("<-- DataCapture.Workflow.Yeti.Importer()");
         }
 
         #endregion

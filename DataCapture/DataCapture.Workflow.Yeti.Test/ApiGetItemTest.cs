@@ -2,7 +2,7 @@
 using DataCapture.Workflow.Yeti;
 using NUnit.Framework;
 
-namespace DataCapture.Workflow.Test
+namespace DataCapture.Workflow.Yeti.Test
 {
     public class ApiGetItemTest
     {

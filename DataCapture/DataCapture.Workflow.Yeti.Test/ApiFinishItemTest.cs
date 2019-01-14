@@ -4,7 +4,7 @@ using DataCapture.Workflow.Yeti;
 using DataCapture.Workflow.Yeti.Db;
 using NUnit.Framework;
 
-namespace DataCapture.Workflow.Test
+namespace DataCapture.Workflow.Yeti.Test
 {
     public class ApiFinishItemTest
     {

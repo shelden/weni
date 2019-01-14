@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0d35e20e-01f1-0fa5-3662-b74c460e541f|</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DataCapture.Workflow.Importer</RootNamespace>
-    <AssemblyName>DataCapture.Workflow.Importer</AssemblyName>
+    <RootNamespace>DataCapture.Workflow.Yeti.Importer</RootNamespace>
+    <AssemblyName>DataCapture.Workflow.Yeti.Importer</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>

@@ -1,9 +1,19 @@
 ﻿using System;
+using DataCapture.Workflow.Yeti;
 using DataCapture.Workflow.Yeti.Db;
-using DataCapture.Workflow.Test;
-using DataCapture.Workflow;
+using DataCapture.Workflow.Yeti.Test;
 
-namespace DataCapture.Workflow.Driver
+
+// this program is a driver program for the Yeti Workflow.
+// It doesn't have a specified purpose; mostly I keep it
+// around because I can't figure out how to debug into 
+// NUnit tests.  :-) When I can't I can't figure out why 
+// a test is failing, I'll just paste some similar code
+// here, and then you get debug into the problematic API
+// easily from here.  YMMV.
+// --shelden 14 Jan 2019
+
+namespace DataCapture.Workflow.Yeti.Driver
 {
     public class Program
     {
@@ -24,7 +34,7 @@ namespace DataCapture.Workflow.Driver
         #region Go
         public void Go()
         {
-            Console.WriteLine("--> DataCapture.Workflow.Driver()");
+            Console.WriteLine("--> DataCapture.Workflow.Yeti.Driver()");
             String itemName0 = "early" + TestUtil.NextString();
             String itemName1 = "late" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(1, 100);
@@ -57,7 +67,7 @@ namespace DataCapture.Workflow.Driver
             Console.WriteLine(item0);
             Console.WriteLine(item1);
 
-            Console.WriteLine("<-- DataCapture.Workflow.Driver()");
+            Console.WriteLine("<-- DataCapture.Workflow.Yeti.Driver()");
         }
 
         #endregion
