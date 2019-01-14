@@ -1,4 +1,4 @@
-<project name="DataCapture.Workflow"
+<project name="DataCapture.Workflow.Yeti"
          default="all"
          basedir="."
          >
@@ -20,7 +20,7 @@
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
               failonerror="true"
-              input="DataCapture.Workflow/sql/WorkflowDDL.sql"
+              input="DataCapture.Workflow.Yeti/sql/WorkflowDDL.sql"
               >
             <arg value="-u" />
             <arg value="${db.mysql.user}" />
@@ -31,7 +31,7 @@
     <target name="test">
         <nunitconsole namespace="DataCapture.Example.Test" />
         <nunitconsole namespace="DataCapture.IO.Test" />
-        <nunitconsole namespace="DataCapture.Workflow.Test" />
+        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test" />
     </target>
     <!-- =============================================================== -->
     <target name="echo">
