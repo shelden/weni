@@ -9,13 +9,13 @@ namespace DataCapture.Workflow.Db
     {
         #region Constants
         public static readonly String TABLE = "workflow.sessions";
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
             + "insert into "
             + TABLE
             + " (user_id, host_name, start_time) "
             + "values (@user_id, @host_name, @start_time) "
             ;
-        public static readonly String SELECT_BY_USER_ID = ""
+        private static readonly String SELECT_BY_USER_ID = ""
             + "select session_id "
             + "   , user_id "
             + "   , start_time "
@@ -25,7 +25,7 @@ namespace DataCapture.Workflow.Db
             + "WHERE 0 = 0 "
             + "AND   user_id = @user_id "
             ;
-        public static readonly String DELETE_BY_ID = ""
+        private static readonly String DELETE_BY_ID = ""
             + "delete from "
             + TABLE
             + " WHERE 0 = 0"

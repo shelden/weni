@@ -27,7 +27,7 @@ namespace DataCapture.Workflow.Test
             DateTime post = DateTime.UtcNow;
             TestUtil.AssertSame(item0, itemName, pairs, start, post, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
-            
+
             Assert.IsNotNull(item0);
 
             // now finish the item.  It should move to the
@@ -55,5 +55,58 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item0.Id).Count);
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item1.Id).Count);
         }
+
+
+        [Test()]
+        public void CanModifyWorkItem()
+        {
+            DateTime before = DateTime.UtcNow;
+            var itemName = TestUtil.NextString();
+            int priority = TestUtil.RANDOM.Next(-100, 100);
+            var wfConn = TestUtil.CreateConnected();
+            var names = TestUtil.CreateBasicMap();
+            var startPairs = new Dictionary<String, String>()
+            {
+                { "foo", "1"}
+                , { "bar", "2"}
+            };
+            var endPairs = new Dictionary<String, String>()
+            {
+                { "New York", "Giants"}
+                , { "Washington", "Redskins"}
+                , { "London", "Monarchs"}
+            };
+            wfConn.CreateItem(names["map"]
+                , itemName
+                , names["startStep"]
+                , startPairs
+                , priority
+                );
+
+            var modifyMe = wfConn.GetItem(names["queue"]);
+            DateTime after = DateTime.UtcNow;
+            TestUtil.AssertSame(modifyMe, itemName, startPairs, before, after, priority);
+            TestUtil.AssertRightPlaces(modifyMe, names["map"], names["startStep"]);
+
+            // now let's change things in the workitem:
+            modifyMe.Remove("foo");
+            modifyMe.Remove("bar");
+            modifyMe.Add("New York", endPairs["New York"]);
+            modifyMe.Add("London", endPairs["London"]);
+            modifyMe.Add("Washington", endPairs["Washington"]);
+            modifyMe.Priority = 7;
+            modifyMe.Name = "changed" + itemName;
+
+            // and finish it.  The new values should be updated:
+            wfConn.FinishItem(modifyMe);
+
+            var hopefullyModified = wfConn.GetItem(names["queue"]);
+
+            after = DateTime.UtcNow;
+
+            TestUtil.AssertSame(hopefullyModified, "changed" + itemName, endPairs, before, after, 7);
+            TestUtil.AssertRightPlaces(hopefullyModified, names["map"], names["endStep"]);
+        }
     }
 }
+

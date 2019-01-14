@@ -176,9 +176,6 @@ namespace DataCapture.Workflow
                     throw new Exception(msg.ToString());
                 }
 
-
-
-
                 var item = WorkItem.Insert(dbConn_
                     , step
                     , itemName
@@ -295,8 +292,18 @@ namespace DataCapture.Workflow
                     item.ItemState = WorkItemState.Available;
                     item.Entered = DateTime.UtcNow;
                     item.SessionId = session_.Id;
+                    item.Priority = toBeFinished.Priority;
+                    item.Name = toBeFinished.Name;
                     item.Update(dbConn_);
+
+                    // probably more efficient to update the matching
+                    // ones, then to delete them all and recreate.  But
+                    // also harder to code correctly.  Can be updated 
+                    // later if efficiency becomes a problem
+                    WorkItemData.DeleteAll(dbConn_, item.Id);
+                    WorkItemData.Insert(dbConn_, item, toBeFinished);
                 }
+
 
                 transaction.Commit();
                 transaction = null;
