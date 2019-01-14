@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Driver
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Yeti", "DataCapture.Workflow.Yeti\DataCapture.Workflow.Yeti.csproj", "{DB68AA81-C4E9-4350-9153-9821DADA7420}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Test", "DataCapture.Workflow.Test\DataCapture.Workflow.Test.csproj", "{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Workflow.Yeti.Test", "DataCapture.Workflow.Yeti.Test\DataCapture.Workflow.Yeti.Test.csproj", "{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataCapture.Example.Test", "DataCapture.Example.Test\DataCapture.Example.Test.csproj", "{59D41ACA-2299-6E6E-40AE-A966531967E5}"
 EndProject

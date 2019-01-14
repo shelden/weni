@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>DataCapture.Workflow.Test</RootNamespace>
-    <AssemblyName>DataCapture.Workflow.Test</AssemblyName>
+    <RootNamespace>DataCapture.Workflow.Yeti.Test</RootNamespace>
+    <AssemblyName>DataCapture.Workflow.Yeti.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
