@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataCapture.Workflow;
-using DataCapture.Workflow.Db; // for TestUtil.SelectCount
+using DataCapture.Workflow.Yeti;
+using DataCapture.Workflow.Yeti.Db;
 using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test
@@ -13,7 +13,7 @@ namespace DataCapture.Workflow.Test
         {
             var dbConn = ConnectionFactory.Create();
             var user = TestUtil.MakeUser(dbConn);
-            var wfConn = new DataCapture.Workflow.Connection();
+            var wfConn = new DataCapture.Workflow.Yeti.Connection();
 
             int before = TestUtil.SelectCount(dbConn, Session.TABLE);
             Assert.AreEqual(wfConn.IsConnected, false);
@@ -36,7 +36,7 @@ namespace DataCapture.Workflow.Test
             var dbConn = ConnectionFactory.Create();
             int before = TestUtil.SelectCount(dbConn, Session.TABLE);
 
-            using (var wfConn = new DataCapture.Workflow.Connection())
+            using (var wfConn = new DataCapture.Workflow.Yeti.Connection())
             {
                 Assert.IsNotNull(wfConn);
                 Console.WriteLine(wfConn);

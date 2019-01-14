@@ -3,7 +3,7 @@ using System.Data;
 using System.Text;
 using MySql.Data.MySqlClient;
 
-namespace DataCapture.Workflow.Db
+namespace DataCapture.Workflow.Yeti.Db
 {
     /// <summary>
     /// This class creates a DB connection to the supported databases.  In here

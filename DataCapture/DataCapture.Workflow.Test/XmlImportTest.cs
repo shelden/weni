@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
+using DataCapture.Workflow.Yeti;
 using DataCapture.IO;
 using NUnit.Framework;
 

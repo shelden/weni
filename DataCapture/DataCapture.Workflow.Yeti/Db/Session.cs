@@ -3,7 +3,7 @@ using System.Data;
 using System.Text;
 using System.Collections.Generic;
 
-namespace DataCapture.Workflow.Db
+namespace DataCapture.Workflow.Yeti.Db
 {
     public class Session
     {

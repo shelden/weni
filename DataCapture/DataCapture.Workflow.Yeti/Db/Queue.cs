@@ -2,7 +2,7 @@
 using System.Data;
 using System.Text;
 
-namespace DataCapture.Workflow.Db
+namespace DataCapture.Workflow.Yeti.Db
 {
     public class Queue
     {

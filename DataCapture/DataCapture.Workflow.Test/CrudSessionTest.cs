@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Data;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
 using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test

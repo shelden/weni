@@ -1,5 +1,5 @@
 ﻿using System;
-namespace DataCapture.Workflow
+namespace DataCapture.Workflow.Yeti
 {
     public enum WorkItemState
     {

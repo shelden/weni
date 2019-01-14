@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
 
-namespace DataCapture.Workflow
+namespace DataCapture.Workflow.Yeti
 {
     public class WorkItemInfo : Dictionary<String, String>
     {

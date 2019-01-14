@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using DataCapture.Workflow;
+using DataCapture.Workflow.Yeti;
 using NUnit.Framework;
 
 namespace DataCapture.Workflow.Test

@@ -1,8 +1,8 @@
 using System;
-using System.Text;
 using System.IO;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti;
+using DataCapture.Workflow.Yeti.Db;
 
 namespace DataCapture.Workflow.Importer
 {
@@ -23,7 +23,6 @@ namespace DataCapture.Workflow.Importer
                 var f = new FileInfo(s);
                 files_.Add(f);
             }
-            files_.Add(new FileInfo("/tmp/foo.xml"));
         }
         #endregion
 

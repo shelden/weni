@@ -2,9 +2,9 @@
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
 
-namespace DataCapture.Workflow
+namespace DataCapture.Workflow.Yeti
 {
     using KeyValuePairs = Dictionary<String, String>;
     public class Connection : IDisposable

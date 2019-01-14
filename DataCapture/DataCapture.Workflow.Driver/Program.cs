@@ -1,5 +1,5 @@
 ﻿using System;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
 using DataCapture.Workflow.Test;
 using DataCapture.Workflow;
 

@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 using DataCapture.Workflow;
 
-namespace DataCapture.Workflow.Db
+namespace DataCapture.Workflow.Yeti.Db
 {
     public class WorkItem
     {

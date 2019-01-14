@@ -4,9 +4,9 @@ using System.IO;
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
-using DataCapture.Workflow.Db;
+using DataCapture.Workflow.Yeti.Db;
 
-namespace DataCapture.Workflow
+namespace DataCapture.Workflow.Yeti
 {
     public class XmlImporter
     {
@@ -144,7 +144,7 @@ namespace DataCapture.Workflow
         {
             return (T)Enum.Parse(typeof(T), value, true);
         }
-        public static DataCapture.Workflow.Db.Rule.Compare ParseCompare(String value)
+        public static DataCapture.Workflow.Yeti.Db.Rule.Compare ParseCompare(String value)
         {
             switch (value.ToLower())
             {
@@ -152,28 +152,28 @@ namespace DataCapture.Workflow
                 case "greaterthan":
                 case "gt":
                 case ">":
-                    return DataCapture.Workflow.Db.Rule.Compare.Greater;
+                    return DataCapture.Workflow.Yeti.Db.Rule.Compare.Greater;
                 case "less":
                 case "lessthan":
                 case "lt":
                 case "<":
-                    return DataCapture.Workflow.Db.Rule.Compare.Less;
+                    return DataCapture.Workflow.Yeti.Db.Rule.Compare.Less;
                 case "equal":
                 case "equals":
                 case "eq":
                 case "==":
                 case "=":
-                    return DataCapture.Workflow.Db.Rule.Compare.Equal;
+                    return DataCapture.Workflow.Yeti.Db.Rule.Compare.Equal;
                 case "notequal":
                 case "notequals":
                 case "ne":
                 case "<>":
                 case "!=":
-                    return DataCapture.Workflow.Db.Rule.Compare.NotEqual;
+                    return DataCapture.Workflow.Yeti.Db.Rule.Compare.NotEqual;
                 default:
                     break;
             }
-            return DataCapture.Workflow.Db.Rule.Compare.Equal;
+            return DataCapture.Workflow.Yeti.Db.Rule.Compare.Equal;
         }
         #endregion
 
@@ -262,7 +262,7 @@ namespace DataCapture.Workflow
 
                         var step = steps[stepName];
                         var next = steps[nextStepName];
-                        var rule = DataCapture.Workflow.Db.Rule.Insert(dbConn
+                        var rule = DataCapture.Workflow.Yeti.Db.Rule.Insert(dbConn
                             , GetRequiredAttribute(element, "variable")
                             , ParseCompare(GetAttribute(element, "compare", "Equals"))
                             , GetRequiredAttribute(element, "value")
