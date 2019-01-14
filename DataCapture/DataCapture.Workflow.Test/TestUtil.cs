@@ -112,7 +112,6 @@ namespace DataCapture.Workflow.Test
         // off your DataReader, as opposed to this method.
         public static int SelectCount(IDbConnection dbConn, string table)
         {
-
             var command = dbConn.CreateCommand();
             var sql = new StringBuilder();
             sql.Append("SELECT COUNT(1) FROM ");
@@ -259,7 +258,7 @@ namespace DataCapture.Workflow.Test
         {
             Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
-            Assert.AreEqual(item.State, (int)WorkItem.State.InProgress); // the other states can't really be in a work item info; GetItem() doesn't return them
+            Assert.AreEqual(item.State, WorkItemState.InProgress); // the other states can't really be in a work item info; GetItem() doesn't return them
             Assert.AreEqual(item.Name, expectedItemName);
 
             //Console.WriteLine(before.ToString(DbUtil.FORMAT));

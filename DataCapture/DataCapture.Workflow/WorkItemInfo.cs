@@ -15,7 +15,7 @@ namespace DataCapture.Workflow
         public String Name { get; private set; }
         public String MapName { get; private set; }
         public int MapVersion { get; private set; }
-        public int State { get; private set; } // XXX move this enum up to this package
+        public WorkItemState State { get; private set; }
         public int Priority { get; private set; }
         public String QueueName { get; private set; }
         public String StepName { get; private set; }
@@ -30,7 +30,7 @@ namespace DataCapture.Workflow
             this.Name = item.Name;
             this.MapName = map.Name;
             this.MapVersion = map.Version;
-            this.State = (int)item.ItemState;
+            this.State = (WorkItemState)item.ItemState;
             this.Priority = item.Priority;
             this.QueueName = queue.Name;
             this.StepName = step.Name;
