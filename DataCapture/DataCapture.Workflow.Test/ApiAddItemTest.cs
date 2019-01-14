@@ -7,8 +7,6 @@ namespace DataCapture.Workflow.Test
 {
     public class ApiAddItemTest
     {
-
-
         [Test()]
         public void CanCreateItem()
         {

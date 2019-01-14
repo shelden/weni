@@ -12,11 +12,11 @@ namespace DataCapture.Workflow
 
         #region properties
         public int Id { get; private set; }
-        public String Name { get; private set; }
+        public String Name { get; set; }
         public String MapName { get; private set; }
         public int MapVersion { get; private set; }
         public WorkItemState State { get; private set; }
-        public int Priority { get; private set; }
+        public int Priority { get; set; }
         public String QueueName { get; private set; }
         public String StepName { get; private set; }
         public DateTime Created { get; private set; }
@@ -56,8 +56,10 @@ namespace DataCapture.Workflow
             sb.Append(this.Id);
             sb.Append(", state=");
             sb.Append(this.State);
-            sb.Append(", created=");
-            sb.Append(this.Created);
+            sb.Append(", entered=");
+            sb.Append(this.Entered);
+            sb.Append(", step=");
+            sb.Append(this.StepName);
             return sb.ToString();
         }
         #endregion

@@ -102,7 +102,7 @@ namespace DataCapture.Workflow.Db
         public int Id { get; private set; }
         public int StepId { get; set; }
         public int SessionId { get; set; }
-        public int Priority { get; private set; }
+        public int Priority { get; set; }
         public WorkItemState ItemState { get; set; }
         public String Name { get; set; }
         public DateTime Created { get; private set; }

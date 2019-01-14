@@ -9,7 +9,7 @@ namespace DataCapture.Workflow.Db
     {
         #region Constants
         public static readonly String TABLE = "workflow.work_item_data";
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
                 + "INSERT INTO "
                 + TABLE
                 + " ( "
@@ -24,7 +24,7 @@ namespace DataCapture.Workflow.Db
                 + ") "
             ;
                 
-        public static readonly String SELECT_BY_DATA_ID = ""
+        private static readonly String SELECT_BY_DATA_ID = ""
                 + "SELECT "
                 + "     data_id "
                 + "     , item_id "
@@ -35,8 +35,8 @@ namespace DataCapture.Workflow.Db
                 + "WHERE 0 = 0 "
                 + "AND   data_id = @data_id "
                 ;
-        public static readonly String SELECT_BY_WORK_ITEM_ID = ""
-                + "select "
+        private static readonly String SELECT_BY_WORK_ITEM_ID = ""
+                + "SELECT "
                 + "     data_id "
                 + "     , item_id "
                 + "     , variable_name "
@@ -46,6 +46,13 @@ namespace DataCapture.Workflow.Db
                 + "WHERE 0 = 0 "
                 + "AND   item_id = @item_id "
                 ;
+
+        private static readonly String DELETE_BY_ITEM_ID = ""
+            + "DELETE from "
+            + TABLE
+            + " WHERE 0 = 0"
+            + " AND item_id = @item_id"
+    ;
         #endregion
 
         #region Properties
@@ -68,12 +75,12 @@ namespace DataCapture.Workflow.Db
             VariableValue = variableValue;
         }
         public WorkItemData(IDataReader reader)
-        {
-            Id = DbUtil.GetInt(reader, "data_id");
-            WorkItemId = DbUtil.GetInt(reader, "item_id");
-            VariableName = DbUtil.GetString(reader, "variable_name");
-            VariableValue = DbUtil.GetString(reader, "variable_value");
-        }
+            : this(DbUtil.GetInt(reader, "data_id")
+                  , DbUtil.GetInt(reader, "item_id")
+                  , DbUtil.GetString(reader, "variable_name")
+                  , DbUtil.GetString(reader, "variable_value")
+                  )
+        { /* no code */ }
         #endregion
 
         #region CRUD: Insert
@@ -98,6 +105,19 @@ namespace DataCapture.Workflow.Db
                                     , value
                                     );
                                                                      
+        }
+        public static IList<WorkItemData> Insert(IDbConnection dbConn
+                    , WorkItem item
+                    , IDictionary<String, String> pairs
+                    )
+        {
+            var tmp = new List<WorkItemData>();
+            if (pairs == null) return tmp;
+            foreach (var key in pairs.Keys)
+            {
+                tmp.Add(WorkItemData.Insert(dbConn, item, key, pairs[key]));
+            }
+            return tmp;
         }
         #endregion
 
@@ -145,6 +165,17 @@ namespace DataCapture.Workflow.Db
                 DbUtil.ReallyClose(reader);
             }
         }
+        #endregion
+
+        #region CRUD: Delete
+        public static void DeleteAll(IDbConnection dbConn, int workItemId)
+        {
+            IDbCommand command = dbConn.CreateCommand();
+            command.CommandText = DELETE_BY_ITEM_ID;
+            DbUtil.AddParameter(command, "@item_id", workItemId);
+            command.ExecuteScalar();
+        }
+
         #endregion
 
         #region ToString()

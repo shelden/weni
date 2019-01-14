@@ -271,6 +271,7 @@ namespace DataCapture.Workflow.Test
             Assert.LessOrEqual(item.Created, item.Entered);
             Assert.GreaterOrEqual(after, item.Created);
             Assert.GreaterOrEqual(after, item.Entered);
+
             Assert.AreEqual(item.Priority, expectedPriority);
             AssertSame(expectedPairs, item);
         }
@@ -290,8 +291,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.StepName, step);
             Assert.AreEqual(item.MapName, map);
-            // XXX map version?
-        }
+}
         #endregion
     }
 }
