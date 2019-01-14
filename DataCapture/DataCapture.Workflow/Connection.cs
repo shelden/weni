@@ -232,7 +232,7 @@ namespace DataCapture.Workflow
 
                 // Now update the work item, otherwise it will always be the
                 // one returned:
-                item.ItemState = WorkItem.State.InProgress;
+                item.ItemState = WorkItemState.InProgress;
                 item.Entered = DateTime.UtcNow;
                 item.SessionId = session_.Id;
                 item.Update(dbConn_);
@@ -292,7 +292,7 @@ namespace DataCapture.Workflow
                     // XXX: it also assumes that we always want to 
                     //      finish by moving it along.
                     item.StepId = currentStep.NextStepId;
-                    item.ItemState = WorkItem.State.Available;
+                    item.ItemState = WorkItemState.Available;
                     item.Entered = DateTime.UtcNow;
                     item.SessionId = session_.Id;
                     item.Update(dbConn_);

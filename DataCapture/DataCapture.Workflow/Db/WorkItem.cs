@@ -2,26 +2,12 @@
 using System.Data;
 using System.Text;
 using System.Collections.Generic;
+using DataCapture.Workflow;
 
 namespace DataCapture.Workflow.Db
 {
     public class WorkItem
     {
-        #region Enums
-        // TODO: remove this enum when we move Db into the same library
-        //       as DataCapture.Workflow.  Right now it's duplicated
-        //       so as to prevent a circular dependency between DC.W 
-        //       and DC.W.Db
-        public enum State
-        {
-            Available = 1
-            , Locked = 2
-            , InProgress = 3
-            , Suspended = 5
-            , Terminated = 9
-        };
-        #endregion
-
         #region Constants
         public static readonly String TABLE = "workflow.work_items";
         private static readonly String INSERT = ""
@@ -117,7 +103,7 @@ namespace DataCapture.Workflow.Db
         public int StepId { get; set; }
         public int SessionId { get; set; }
         public int Priority { get; private set; }
-        public WorkItem.State ItemState { get; set; }
+        public WorkItemState ItemState { get; set; }
         public String Name { get; set; }
         public DateTime Created { get; private set; }
         public DateTime Entered { get; set; }
@@ -127,7 +113,7 @@ namespace DataCapture.Workflow.Db
         public WorkItem(int id
                         , int stepId
                         , String name
-                        , WorkItem.State state
+                        , WorkItemState state
                         , int priority
                         , DateTime created
                         , DateTime entered
@@ -147,7 +133,7 @@ namespace DataCapture.Workflow.Db
             : this(DbUtil.GetInt(reader, "item_id")
                   , DbUtil.GetInt(reader, "step_id")
                   , DbUtil.GetString(reader, "name")
-                  , (WorkItem.State)DbUtil.GetInt(reader, "state")
+                  , (WorkItemState)DbUtil.GetInt(reader, "state")
                   , DbUtil.GetInt(reader, "priority")
                   , DbUtil.GetDateTime(reader, "created")
                   , DbUtil.GetDateTime(reader, "entered")
@@ -173,7 +159,7 @@ namespace DataCapture.Workflow.Db
 
             DbUtil.AddParameter(command, "@step_id", step.Id);
             DbUtil.AddParameter(command, "@name", name);
-            DbUtil.AddParameter(command, "@state", (int)WorkItem.State.Available);
+            DbUtil.AddParameter(command, "@state", (int)WorkItemState.Available);
             DbUtil.AddParameter(command, "@priority", priority);
             DbUtil.AddParameter(command, "@created", when);
             DbUtil.AddParameter(command, "@entered", when);
@@ -183,7 +169,7 @@ namespace DataCapture.Workflow.Db
             return new WorkItem(id
                                     , step.Id
                                     , name
-                                    , WorkItem.State.Available
+                                    , WorkItemState.Available
                                     , priority
                                     , when
                                     , when
@@ -244,7 +230,7 @@ namespace DataCapture.Workflow.Db
                 IDbCommand command = dbConn.CreateCommand();
                 command.CommandText = SELECT_BY_QUEUE_PRIORITY;
                 DbUtil.AddParameter(command, "@queue_id", queue.Id);
-                DbUtil.AddParameter(command, "@available", (int)WorkItem.State.Available);
+                DbUtil.AddParameter(command, "@available", (int)WorkItemState.Available);
                 reader = command.ExecuteReader();
 
                 if (reader == null) return null;

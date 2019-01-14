@@ -31,6 +31,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="MySql.Data">
+      <HintPath>..\3rdParty\MySql.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection.cs" />
@@ -38,12 +41,18 @@
     <Compile Include="XmlImporter.cs" />
     <Compile Include="WorkItemInfo.cs" />
     <Compile Include="WorkItemState.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\DataCapture.Workflow.Db\DataCapture.Workflow.Db.csproj">
-      <Project>{A8420AAC-FEBC-4B6E-90E0-35977C7266A0}</Project>
-      <Name>DataCapture.Workflow.Db</Name>
-    </ProjectReference>
+    <Compile Include="Db\AllowedQueue.cs" />
+    <Compile Include="Db\ConnectionFactory.cs" />
+    <Compile Include="Db\DbUtil.cs" />
+    <Compile Include="Db\Map.cs" />
+    <Compile Include="Db\Queue.cs" />
+    <Compile Include="Db\Rule.cs" />
+    <Compile Include="Db\Session.cs" />
+    <Compile Include="Db\Step.cs" />
+    <Compile Include="Db\User.cs" />
+    <Compile Include="Db\WorkItem.cs" />
+    <Compile Include="Db\WorkItemAccess.cs" />
+    <Compile Include="Db\WorkItemData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

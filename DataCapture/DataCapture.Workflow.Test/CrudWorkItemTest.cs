@@ -47,7 +47,7 @@ namespace DataCapture.Workflow.Test
             Assert.AreEqual(inserted.StepId, step.Id);
             Assert.AreEqual(inserted.SessionId, session.Id);
             Assert.AreEqual(inserted.Priority, priority);
-            Assert.AreEqual(inserted.ItemState, WorkItem.State.Available);
+            Assert.AreEqual(inserted.ItemState, WorkItemState.Available);
             Assert.GreaterOrEqual(inserted.Created, startup);
             Assert.GreaterOrEqual(inserted.Entered, startup);
             Assert.AreEqual(inserted.Entered, inserted.Created);
