@@ -40,7 +40,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.AreEqual(item.Name, itemName);
-            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
+            Assert.AreEqual(item.ItemState, WorkItemState.Available);
             Assert.Greater(item.Id, 0);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
@@ -87,7 +87,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.Greater(item.Id, 0);
-            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
+            Assert.AreEqual(item.ItemState, WorkItemState.Available);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
             Assert.IsNotNull(selectedPairs);
@@ -125,7 +125,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNotNull(item);
             Assert.AreEqual(item.Priority, priority);
             Assert.Greater(item.Id, 0);
-            Assert.AreEqual(item.ItemState, WorkItem.State.Available);
+            Assert.AreEqual(item.ItemState, WorkItemState.Available);
 
             var selectedPairs = WorkItemData.SelectAll(dbConn, item.Id);
             Assert.IsNotNull(selectedPairs);
