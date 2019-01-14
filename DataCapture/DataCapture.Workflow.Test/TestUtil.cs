@@ -259,7 +259,7 @@ namespace DataCapture.Workflow.Test
         {
             Assert.IsNotNull(item);
             Assert.Greater(item.Id, 0);
-            Assert.AreEqual(item.State, (int)WorkItem.State.InProgress); // the other states can't really be in a work item in
+            Assert.AreEqual(item.State, (int)WorkItem.State.InProgress); // the other states can't really be in a work item info; GetItem() doesn't return them
             Assert.AreEqual(item.Name, expectedItemName);
 
             //Console.WriteLine(before.ToString(DbUtil.FORMAT));
@@ -277,8 +277,8 @@ namespace DataCapture.Workflow.Test
         }
 
         /// <summary>
-        /// Utility method to assert that a work item info is in
-        /// the right step and queue after we've processed it.
+        /// Utility method to assert that a work item is in
+        /// the right step and map after we've processed it.
         /// </summary>
         /// <param name="item">Item.</param>
         /// <param name="map">name of map</param>

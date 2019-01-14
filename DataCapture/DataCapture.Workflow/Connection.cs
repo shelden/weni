@@ -191,7 +191,6 @@ namespace DataCapture.Workflow
                     foreach (String key in data.Keys)
                     {
                         var kvp = WorkItemData.Insert(dbConn_, item, key, data[key]);
-                        Console.WriteLine(kvp);
                     }
                 }
                 transaction.Commit();
@@ -222,20 +221,10 @@ namespace DataCapture.Workflow
                 var items = WorkItem.SelectByPriority(dbConn_, queue);
                 if (items == null || items.Count == 0) return null;
 
-                int x = 0;
-                foreach (var i in items)
-                {
-                    Console.WriteLine(x + ") " + i);
-                    var s = Step.Select(dbConn_, i.StepId);
-                    Console.WriteLine(x + ") " + s);
-                    Console.WriteLine(x + ") " + Queue.Select(dbConn_, s.QueueId));
-                    x++;
-                }
-
                 // WorkItemInfos have information about the item's
                 // step, and map; and the queue under which we queried
                 // for it.  Therefore we need all 4 things to build
-                // WorkItemInfo:  
+                // a WorkItemInfo:  
 
                 var item = items[0];
                 var step = Step.Select(dbConn_, item.StepId);
@@ -319,7 +308,7 @@ namespace DataCapture.Workflow
         }
         #endregion
 
-            #region ToString
+        #region ToString
         public override string ToString()
         {
             var sb = new StringBuilder();

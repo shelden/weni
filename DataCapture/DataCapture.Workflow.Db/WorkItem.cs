@@ -64,7 +64,7 @@ namespace DataCapture.Workflow.Db
             ;
 
         private static readonly String SELECT_BY_QUEUE_PRIORITY = ""
-                + "select "
+                + "SELECT "
                 + "     w.item_id "
                 + "     , w.step_id "
                 + "     , w.name "
@@ -75,15 +75,18 @@ namespace DataCapture.Workflow.Db
                 + "     , w.session_id "
                 + "FROM "
                 + TABLE + " w "
-                + ", " + Queue.TABLE + " q "
-                + ", " + Step.TABLE + " s "
+                + "      , " + Queue.TABLE + " q "
+                + "      , " + Step.TABLE + " s "
                 + "WHERE 0 = 0 "
-                + "AND s.step_id = w.step_id " // XXX: use 21st century join syntax :-)
-                + "AND s.queue_id = q.queue_id "
-                + "AND q.queue_id = @queue_id "
-                + "AND w.state = @available " 
+                + "AND   s.step_id = w.step_id " 
+                + "AND   s.queue_id = q.queue_id "
+                + "AND   q.queue_id = @queue_id "
+                + "AND   w.state = @available " 
                 + "ORDER BY w.priority ASC "
-                + "         , w.created ASC "
+                // using w.item_id as a proxy for w.created.  A query on item_id 
+                // should be faster since a) it's an int and b) it's already indexed
+                // because it's the PK
+                + "         , w.item_id ASC " 
             ;
         private static readonly String UPDATE = ""
             + "UPDATE " + TABLE + " set "

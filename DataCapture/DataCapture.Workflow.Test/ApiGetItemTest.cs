@@ -8,7 +8,6 @@ namespace DataCapture.Workflow.Test
 {
     public class ApiGetItemTest
     {
-
         [Test()]
         public void CanRetrieve()
         {
@@ -26,8 +25,6 @@ namespace DataCapture.Workflow.Test
                 );
             var item = wfConn.GetItem(names["queue"]);
             DateTime post = DateTime.UtcNow;
-
-
             TestUtil.AssertSame(item, itemName, pairs, start, post, priority);
             TestUtil.AssertRightPlaces(item, names["map"], names["startStep"]);
         }
@@ -79,7 +76,7 @@ namespace DataCapture.Workflow.Test
             Assert.IsNull(nomore);
         }
 
-
+        [Test()]
         public void PriorityTiesResolvedByTime()
         {
             DateTime pretime = DateTime.UtcNow;
@@ -99,20 +96,19 @@ namespace DataCapture.Workflow.Test
                 , pairs0
                 , priority
                 );
-            System.Threading.Thread.Sleep(100);
             wfConn.CreateItem(names["map"]
                 , itemName1
                 , names["startStep"]
                 , pairs1
+                , priority
             );
 
             // the earlier item should be retrieved first
-
             var item0 = wfConn.GetItem(names["queue"]);
 
             DateTime posttime = DateTime.UtcNow;
 
-            TestUtil.AssertSame(item0, itemName0, pairs0, pretime, posttime, -priority);
+            TestUtil.AssertSame(item0, itemName0, pairs0, pretime, posttime, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
             // followed by the later one:

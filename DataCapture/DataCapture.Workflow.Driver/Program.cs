@@ -25,31 +25,37 @@ namespace DataCapture.Workflow.Driver
         public void Go()
         {
             Console.WriteLine("--> DataCapture.Workflow.Driver()");
-            var dbConn = ConnectionFactory.Create();
-            var user = TestUtil.MakeUser(dbConn);
-            Console.WriteLine(user);
+            String itemName0 = "early" + TestUtil.NextString();
+            String itemName1 = "late" + TestUtil.NextString();
+            int priority = TestUtil.RANDOM.Next(1, 100);
+            var wfConn = TestUtil.CreateConnected();
+            var names = TestUtil.CreateBasicMap();
+            var pairs0 = TestUtil.CreatePairs();
+            var pairs1 = TestUtil.CreatePairs();
 
-            var map = TestUtil.MakeMap(dbConn);
-            Console.WriteLine(map);
+            // first put in two items with same priority, but
+            // different attributes
+            wfConn.CreateItem(names["map"]
+                , itemName0
+                , names["startStep"]
+                , pairs0
+                , priority
+                );
+            wfConn.CreateItem(names["map"]
+                , itemName1
+                , names["startStep"]
+                , pairs1
+                , priority
+            );
 
-            var queue = TestUtil.MakeQueue(dbConn);
-            Console.WriteLine(queue);
+            // the earlier item should be retrieved first
+            var item0 = wfConn.GetItem(names["queue"]);
 
-            var step0 = Step.Insert(dbConn, "step0", map, queue, Step.StepType.Start); 
-            Console.WriteLine(step0);
+            // the later item should be retrieved next
+            var item1 = wfConn.GetItem(names["queue"]);
 
-            var wfConn = new Connection();
-            wfConn.Connect(user.Login);
-
-            Console.WriteLine(wfConn);
-
-
-
-            wfConn.CreateItem(map.Name, "foo", step0.Name, null);
-
-            var item = wfConn.GetItem(queue.Name);
-
-            Console.WriteLine(item);
+            Console.WriteLine(item0);
+            Console.WriteLine(item1);
 
             Console.WriteLine("<-- DataCapture.Workflow.Driver()");
         }
