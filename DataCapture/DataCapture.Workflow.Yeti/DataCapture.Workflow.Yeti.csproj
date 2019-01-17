@@ -53,6 +53,7 @@
     <Compile Include="Db\WorkItem.cs" />
     <Compile Include="Db\WorkItemAccess.cs" />
     <Compile Include="Db\WorkItemData.cs" />
+    <Compile Include="RuleCalculator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

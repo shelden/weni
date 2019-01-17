@@ -6,16 +6,16 @@ using NUnit.Framework;
 
 namespace DataCapture.Workflow.Yeti.Test
 {
-    public class ApiFinishItemTest
+    public class ApiRulesTest
     {
         [Test()]
-        public void FinishThenFinishGoesAway()
+        public void RuleThatSkipsMiddle()
         {
             DateTime start = DateTime.UtcNow;
             String itemName = "item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(-100, 100);
             var wfConn = TestUtil.CreateConnected();
-            var names = TestUtil.CreateBasicMap();
+            var names = TestUtil.CreateMapWithRules();
             var pairs = TestUtil.CreatePairs();
             wfConn.CreateItem(names["map"]
                 , itemName
@@ -24,19 +24,25 @@ namespace DataCapture.Workflow.Yeti.Test
                 , priority
                 );
             var item0 = wfConn.GetItem(names["queue"]);
+            
             DateTime post = DateTime.UtcNow;
             TestUtil.AssertSame(item0, itemName, pairs, start, post, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
             Assert.IsNotNull(item0);
 
-            // now finish the item.  It should move to the
-            // end step in our simple map setup:
+
+            // now finish the item.  The rule skip=true should be applied; and
+            // the item should go from the start step to the endStep; skipping
+            // the middle step
+            item0["skipMiddle"] = "true";
             wfConn.FinishItem(item0);
             var item1 = wfConn.GetItem(names["queue"]);
             post = DateTime.UtcNow;
-            TestUtil.AssertSame(item1, itemName, pairs, start, post, priority);
+            TestUtil.AssertSame(item1, itemName, item0, start, post, priority);
             TestUtil.AssertRightPlaces(item1, names["map"], names["endStep"]);
+
+            /*
 
             // now, since we're in an end step, finishing the item should make
             // it go away:
@@ -53,6 +59,8 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.IsNull(WorkItem.Select(dbConn, item1.Id));
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item0.Id).Count);
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item1.Id).Count);
+            */
+
         }
 
     }

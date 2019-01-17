@@ -52,13 +52,15 @@ namespace DataCapture.Workflow.Yeti
             Connect(Environment.UserName);
         }
 
-        // this should be protected so we can test connecting as other people.
+        // this method should be protected so we can unit test connecting as other people.
         // We don't want this exposed for the general public XXX
         public void Connect(String asUser)
         {
+            IDbTransaction transaction = null;
             try
             {
-                dbConn_ = ConnectionFactory.Create(); /// XXX transactions?
+                dbConn_ = ConnectionFactory.Create();
+                transaction = dbConn_.BeginTransaction();
                 user_ = User.Select(dbConn_, asUser);
                 if (user_ == null)
                 {
@@ -81,6 +83,8 @@ namespace DataCapture.Workflow.Yeti
                     throw new Exception(msg.ToString());
                 }
                 session_ = Session.Insert(dbConn_, user_);
+                transaction.Commit();
+                transaction = null;
             }
             catch
             {
@@ -88,6 +92,10 @@ namespace DataCapture.Workflow.Yeti
                 session_ = null;
                 user_ = null;
                 throw;
+            }
+            finally
+            {
+                DbUtil.ReallyClose(transaction);
             }
         }
         // note, Disconnect is called from Dispose, so it cannot throw
@@ -216,19 +224,21 @@ namespace DataCapture.Workflow.Yeti
                 //var allowed = AllowedQueue.Select(dbConn_, this.user_, queue);
 
                 var items = WorkItem.SelectByPriority(dbConn_, queue);
+
+                // if there are no Available items in the queue, return null
+                // per design:
                 if (items == null || items.Count == 0) return null;
 
                 // WorkItemInfos have information about the item's
                 // step, and map; and the queue under which we queried
-                // for it.  Therefore we need all 4 things to build
+                // for it.  Therefore we need all 3 objects to build
                 // a WorkItemInfo:  
-
                 var item = items[0];
                 var step = Step.Select(dbConn_, item.StepId);
                 var map = Map.Select(dbConn_, step.MapId);
 
-                // Now update the work item, otherwise it will always be the
-                // one returned:
+                // Now update the work item, otherwise this one will always be
+                // the WorkItemInfo one returned in an infinite loop:
                 item.ItemState = WorkItemState.InProgress;
                 item.Entered = DateTime.UtcNow;
                 item.SessionId = session_.Id;
@@ -273,22 +283,20 @@ namespace DataCapture.Workflow.Yeti
                 var currentStep = Step.Select(dbConn_, item.StepId);
                 if (currentStep == null) throw new Exception("internal error, no such current step on " + item.ToString());
 
+                var calc = new RuleCalculator();
+                var nextStep = calc.FindNextStep(dbConn_, toBeFinished, currentStep);
 
-                // update the step and state:
-                if (currentStep.Type == Step.StepType.Terminating)
+                if (nextStep == null)
                 {
+                    // RuleCalculator enforces that this is a
+                    // terminating step, that there is no next step
+                    // etc.  So we're clear to just delete the item
+                    // here:
                     item.Delete(dbConn_);
-                }
-                else if (currentStep.NextStepId == Step.NO_NEXT_STEP)
-                {
-                    throw new Exception("internal error: no next step, but not a terminating step: " + currentStep);
                 }
                 else
                 {
-                    // XXX: this assumes that no rules apply.
-                    // XXX: it also assumes that we always want to 
-                    //      finish by moving it along.
-                    item.StepId = currentStep.NextStepId;
+                    item.StepId = nextStep.Id;
                     item.ItemState = WorkItemState.Available;
                     item.Entered = DateTime.UtcNow;
                     item.SessionId = session_.Id;
@@ -296,14 +304,9 @@ namespace DataCapture.Workflow.Yeti
                     item.Name = toBeFinished.Name;
                     item.Update(dbConn_);
 
-                    // probably more efficient to update the matching
-                    // ones, then to delete them all and recreate.  But
-                    // also harder to code correctly.  Can be updated 
-                    // later if efficiency becomes a problem
                     WorkItemData.DeleteAll(dbConn_, item.Id);
                     WorkItemData.Insert(dbConn_, item, toBeFinished);
                 }
-
 
                 transaction.Commit();
                 transaction = null;
