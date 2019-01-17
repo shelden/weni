@@ -224,19 +224,21 @@ namespace DataCapture.Workflow.Yeti
                 //var allowed = AllowedQueue.Select(dbConn_, this.user_, queue);
 
                 var items = WorkItem.SelectByPriority(dbConn_, queue);
+
+                // if there are no Available items in the queue, return null
+                // per design:
                 if (items == null || items.Count == 0) return null;
 
                 // WorkItemInfos have information about the item's
                 // step, and map; and the queue under which we queried
-                // for it.  Therefore we need all 4 things to build
+                // for it.  Therefore we need all 3 objects to build
                 // a WorkItemInfo:  
-
                 var item = items[0];
                 var step = Step.Select(dbConn_, item.StepId);
                 var map = Map.Select(dbConn_, step.MapId);
 
-                // Now update the work item, otherwise it will always be the
-                // one returned:
+                // Now update the work item, otherwise this one will always be
+                // the WorkItemInfo one returned in an infinite loop:
                 item.ItemState = WorkItemState.InProgress;
                 item.Entered = DateTime.UtcNow;
                 item.SessionId = session_.Id;
@@ -282,14 +284,14 @@ namespace DataCapture.Workflow.Yeti
                 if (currentStep == null) throw new Exception("internal error, no such current step on " + item.ToString());
 
                 var calc = new RuleCalculator();
-                var nextStep = calc.Apply(dbConn_, toBeFinished, currentStep);
-
-                Console.WriteLine("next step, by rule, is [" + nextStep + "]");
+                var nextStep = calc.FindNextStep(dbConn_, toBeFinished, currentStep);
 
                 if (nextStep == null)
                 {
-                    // XXX: make sure no next step and is terminating etc
-                    // are enforced here
+                    // RuleCalculator enforces that this is a
+                    // terminating step, that there is no next step
+                    // etc.  So we're clear to just delete the item
+                    // here:
                     item.Delete(dbConn_);
                 }
                 else

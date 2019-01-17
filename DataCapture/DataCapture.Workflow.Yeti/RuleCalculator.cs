@@ -34,30 +34,69 @@ namespace DataCapture.Workflow.Yeti
                     throw new Exception(msg.ToString());
             }
         }
-        public static Step GetNextStepOrThrow(IDbConnection dbConn, Db.Rule rule)
+        public static Step GetRuleBasedNext(IDbConnection dbConn, Db.Rule rule)
         {
+            if (rule == null) throw new ArgumentNullException("rule");
             var tmp = Step.Select(dbConn, rule.NextStepId);
             if (tmp == null)
             {
                 var msg = new StringBuilder();
-                msg.Append("internal error: rule applies ");
+                msg.Append("internal error: the rule applies ");
                 msg.Append("but we can't find next step #");
                 msg.Append(rule.NextStepId);
-                msg.Append(", ");
+                msg.Append(" in the database [");
                 msg.Append(rule.ToString());
+                msg.Append("]");
                 throw new Exception(msg.ToString());
             }
             return tmp;
         }
+        public static Step GetStepBasedNext(IDbConnection dbConn, Step step)
+        {
+            if (step == null) throw new ArgumentNullException("step");
+            if (step.NextStepId == Step.NO_NEXT_STEP 
+                && step.Type == Step.StepType.Terminating
+                )
+            {
+                // this is ok.  Correctly configured final step.
+                return null;
+            }
 
-        public Step Apply(IDbConnection dbConn
+            if (step.NextStepId == Step.NO_NEXT_STEP)
+            {
+                var msg = new StringBuilder();
+                msg.Append("internal error: step has no next step.  ");
+                msg.Append("However, it is not a terminating step [");
+                msg.Append(step.Type);
+                msg.Append("]  ");
+                msg.Append(step);
+            }
+
+
+            var tmp = Step.Select(dbConn, step.NextStepId);
+            if (tmp == null)
+            {
+                var msg = new StringBuilder();
+                msg.Append("internal error: no rule applies ");
+                msg.Append("but the step's next step is missing #");
+                msg.Append(step.NextStepId);
+                msg.Append(" in the database [");
+                msg.Append(step.ToString());
+                msg.Append("]");
+                throw new Exception(msg.ToString());
+            }
+            return tmp;
+
+        }
+
+        public Step FindNextStep(IDbConnection dbConn
             , WorkItemInfo item
             , Step currentStep
             )
         {
             var rules = Db.Rule.Select(dbConn, currentStep);
-            if (rules == null) return null;
-            if (rules.Count == 0) return null;
+            if (rules == null) return GetStepBasedNext(dbConn, currentStep);
+            if (rules.Count == 0) return GetStepBasedNext(dbConn, currentStep);
 
 
             foreach (var rule in rules)
@@ -69,21 +108,12 @@ namespace DataCapture.Workflow.Yeti
 
                 if (Applies(rule, inRule, inItem))
                 {
-                    return GetNextStepOrThrow(dbConn, rule);
+                    return GetRuleBasedNext(dbConn, rule);
                 }
             }
             // if none of the rules apply, return step.NextStep
-
-            if (currentStep.NextStepId == Step.NO_NEXT_STEP)
-                return null;
-            if (currentStep.Type == Step.StepType.Terminating)
-                return null;
-            var tmp = Step.Select(dbConn, currentStep.NextStepId); // XXX or throw
-
-            Console.WriteLine("<-- Apply()");
-
-            return tmp;
-        }
+            return GetStepBasedNext(dbConn, currentStep);
+}
         #endregion
     }
 }
