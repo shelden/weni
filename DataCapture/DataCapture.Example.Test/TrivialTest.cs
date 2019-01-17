@@ -17,7 +17,7 @@ namespace DataCapture.Example.Test
             Console.WriteLine("...or Test Explorer");
             Console.WriteLine("...simply uncomment the next line in ");
             Console.WriteLine(this.GetType().FullName);
-            //Assert.AreEqual(1, -1);
+            Assert.AreEqual(1, -1);
         }
     }
 }
