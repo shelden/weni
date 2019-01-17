@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{59D41ACA-2299-6E6E-40AE-A966531967E5}</ProjectGuid>
+    <ProjectGuid>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>DataCapture.Example.Test</RootNamespace>
-    <AssemblyName>DataCapture.Example.Test</AssemblyName>
+    <RootNamespace>DataCapture.Workflow.Yeti.Test</RootNamespace>
+    <AssemblyName>DataCapture.Workflow.Yeti.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,12 +36,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TrivialTest.cs" />
+    <Compile Include="TestUtil.cs" />
+    <Compile Include="CrudUserTest.cs" />
+    <Compile Include="CrudSessionTest.cs" />
+    <Compile Include="CrudQueueTest.cs" />
+    <Compile Include="CrudMapTest.cs" />
+    <Compile Include="CrudStepTest.cs" />
+    <Compile Include="CrudRuleTest.cs" />
+    <Compile Include="CrudWorkItemTest.cs" />
+    <Compile Include="CrudWorkItemDataTest.cs" />
+    <Compile Include="CrudWorkItemAccessTest.cs" />
+    <Compile Include="ApiConnectionTest.cs" />
+    <Compile Include="XmlImportTest.cs" />
+    <Compile Include="ApiAddItemTest.cs" />
+    <Compile Include="ApiGetItemTest.cs" />
+    <Compile Include="ApiFinishItemTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataCapture.Workflow\DataCapture.Workflow.csproj">
+    <ProjectReference Include="..\DataCapture.IO\DataCapture.IO.csproj">
+      <Project>{5AFC4BB5-843C-C180-AE73-47F5A1978B22}</Project>
+      <Name>DataCapture.IO.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataCapture.Workflow.Yeti\DataCapture.Workflow.Yeti.csproj">
       <Project>{DB68AA81-C4E9-4350-9153-9821DADA7420}</Project>
-      <Name>DataCapture.Workflow</Name>
+      <Name>DataCapture.Workflow.Yeti</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
