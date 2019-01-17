@@ -144,7 +144,7 @@
     <property name="db.mysql.password" value="" />
     <property name="db.mysql.server"   value="localhost:3306" />
     <condition property="db.mysql.prog"
-               value="C:\Program Files\MySQL\MySQL Workbench 8.0 CE\mysql.exe"
+               value="C:\Program Files\MariaDB 10.3\bin\mysql.exe"
                >
         <os family="windows" />
     </condition>
