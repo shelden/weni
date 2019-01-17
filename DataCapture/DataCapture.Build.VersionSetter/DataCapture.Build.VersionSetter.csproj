@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5a93f5e9-6b69-8b1b-551b-4402169ca283}</ProjectGuid>
+    <ProjectGuid>{5A93F5E9-6B69-8B1B-551B-4402169CA283}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>DataCapture.Build.VersionSetter</RootNamespace>
     <AssemblyName>DataCapture.Build.VersionSetter</AssemblyName>
@@ -38,8 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataCapture.IO\DataCapture.IO.csproj">
-      <Project>{5AFC4BB5-843C-C180-AE73-47F5A1978B22}</Project>
-      <Name>DataCapture.IO.Test</Name>
+      <Project>{c7508bd7-082d-49e1-9fa2-af22231f82c8}</Project>
+      <Name>DataCapture.IO</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

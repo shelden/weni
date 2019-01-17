@@ -17,7 +17,7 @@ namespace DataCapture.Workflow.Yeti.Db
         #region AddParameter 
         // these utility functions allows us to add a named parameter,
         // generically, to a IDbCommand.  There should be no mysql / oracle
-        // SqlServer code in these functions
+        // SqlServer / MariaDB code in these functions
         public static void AddParameter(IDbCommand command, String name, String value)
         {
             var param = command.CreateParameter();
@@ -36,10 +36,20 @@ namespace DataCapture.Workflow.Yeti.Db
         }
         public static void AddParameter(IDbCommand command, String name, DateTime value)
         {
+            var copy = new DateTime(value.Year
+                , value.Month
+                , value.Day
+                , value.Hour
+                , value.Minute
+                , value.Second
+                , value.Millisecond // rounds down to Millisecond precision; which is all we have in the DB
+                , value.Kind
+                );
+
             var param = command.CreateParameter();
             param.DbType = System.Data.DbType.DateTime;
             param.ParameterName = name;
-            param.Value = value;
+            param.Value = copy;
             command.Parameters.Add(param);
         }
         public static void AddParameter(IDbCommand command, String name, bool value)

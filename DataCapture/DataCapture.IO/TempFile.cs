@@ -5,6 +5,22 @@ using System.Text;
 namespace DataCapture.IO
 {
     /// <summary>
+    /// Often programs need Temporary Files.  The System.IO 
+    /// methods to create temporary files, sure, but not
+    /// in a very OO way.  They work on Strings, for example, 
+    /// FileInfos.
+    /// 
+    /// This class creates a Temporary File, as a FileInfo, 
+    /// with a specified suffix.  The file will be removed
+    /// upon disposal / garbage collection in a RAII way.
+    /// 
+    /// I.e., if you need to recreate
+    /// a temporary .xml file?  Do this:
+    /// using(var tmp = new TempFile(".xml")) {
+    ///      // process tmp
+    /// }
+    /// 
+    /// tmp will be deleted when leaving that using statement.
     /// </summary>
     public class TempFile : IDisposable
     {

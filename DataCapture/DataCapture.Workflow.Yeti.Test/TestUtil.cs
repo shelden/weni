@@ -97,13 +97,14 @@ namespace DataCapture.Workflow.Yeti.Test
       var bstring = b.ToString(FORMAT);
       if (astring != bstring)
       {
-          String msg = "Expected DateTimes to be the same: "
-            + astring
-            + " vs "
-            + bstring
-            ;
+          var msg = new StringBuilder();
+          msg.Append("Expected DateTimes to be the same [");
+          msg.Append(astring);
+          msg.Append("] vs [");
+          msg.Append(bstring);
+          msg.Append(']');
           Console.WriteLine(msg);
-          throw new Exception(msg);
+          Assert.Fail(msg.ToString());
         }
     }
     #endregion
@@ -134,7 +135,6 @@ namespace DataCapture.Workflow.Yeti.Test
     public static Dictionary<String, String> CreateBasicMap()
     {
       var dbConn = ConnectionFactory.Create();
-
       var map = TestUtil.MakeMap(dbConn);
       var queue = TestUtil.MakeQueue(dbConn);
       var end = Step.Insert(dbConn
@@ -225,7 +225,7 @@ namespace DataCapture.Workflow.Yeti.Test
       };
     }
 
-    public static Dictionary<String, String> CreatePairs()
+    public static IDictionary<String, String> CreatePairs()
     {
       Dictionary<String, String> tmp = new Dictionary<String, String>();
       int count = TestUtil.RANDOM.Next(1, 5);
@@ -238,8 +238,8 @@ namespace DataCapture.Workflow.Yeti.Test
 
     /// <summary>
     /// Asserts that two things that implement IDictionary have the
-    /// same key value pairs.  I.e. a WorkItemItem since it implements
-    /// IDictionary.
+    /// same key value pairs.  I.e. a WorkItemInfo vs a regular
+    //  Dictionary.  (WorkItemInfos implement IDictionary)
     /// </summary>
     /// <param name="left">Left.</param>
     /// <param name="right">Right.</param>
@@ -305,7 +305,7 @@ namespace DataCapture.Workflow.Yeti.Test
     }
 
     /// <summary>
-    /// Assert that a work item has all its expected values.
+    /// Assert that a WorkItemInfo has all its expected values.
     /// </summary>
     /// <param name="item">the work item returned by the API</param>
     /// <param name="before">a UTC timestamp before the item was created</param>
@@ -322,7 +322,9 @@ namespace DataCapture.Workflow.Yeti.Test
     {
       Assert.IsNotNull(item);
       Assert.Greater(item.Id, 0);
-      Assert.AreEqual(item.State, WorkItemState.InProgress); // we're assuming it was returned by GetItem().  This is the only possible such state. info; GetItem() doesn't return them that way
+      // The only state that makes sense for a WII is InProgress.  GetItem()
+      // Has the side effect of setting items to InProgress.
+      Assert.AreEqual(item.State, WorkItemState.InProgress);
       Assert.AreEqual(item.Name, expectedItemName);
 
       //Console.WriteLine(before.ToString(DbUtil.FORMAT));
