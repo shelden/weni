@@ -24,13 +24,12 @@ namespace DataCapture.Workflow.Yeti.Test
                 , priority
                 );
             var item0 = wfConn.GetItem(names["queue"]);
-            
+
             DateTime post = DateTime.UtcNow;
             TestUtil.AssertSame(item0, itemName, pairs, start, post, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
             Assert.IsNotNull(item0);
-
 
             // now finish the item.  The rule skip=true should be applied; and
             // the item should go from the start step to the endStep; skipping
@@ -42,7 +41,6 @@ namespace DataCapture.Workflow.Yeti.Test
             TestUtil.AssertSame(item1, itemName, item0, start, post, priority);
             TestUtil.AssertRightPlaces(item1, names["map"], names["endStep"]);
 
-            /*
 
             // now, since we're in an end step, finishing the item should make
             // it go away:
@@ -59,10 +57,80 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.IsNull(WorkItem.Select(dbConn, item1.Id));
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item0.Id).Count);
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item1.Id).Count);
-            */
-
+        }
+        
+        private void Verify(Db.Rule.Compare op
+            , String left
+            , String right
+            , bool expected
+            )
+        {
+            var rule = new Db.Rule(-1 // not in db, so no id
+                , -1 // not in db, so no step
+                , "variable name irrelevant for RC.Applies()"
+                , op
+                , left
+                , TestUtil.RANDOM.Next() // order also irrelvant for this test
+                , Step.NO_NEXT_STEP
+                );
+            bool result = RuleCalculator.Applies(rule, right);
+            var msg = new System.Text.StringBuilder();
+            msg.Append("Rule with operator ");
+            msg.Append(op);
+            msg.Append(" [");
+            msg.Append(left);
+            msg.Append("] vs [");
+            msg.Append(right);
+            msg.Append("] we expect to evaulate to ");
+            msg.Append(expected);
+            if (result != expected)
+            {
+                Console.WriteLine(msg);
+            }
+            Assert.That(result == expected, msg.ToString());
         }
 
+        [Test()]
+        public void VerifyComparisons()
+        {
+            var randomString = TestUtil.NextString();
+            Verify(Db.Rule.Compare.Equal, "a", "a", true);
+            Verify(Db.Rule.Compare.Equal, randomString, randomString, true);
+            Verify(Db.Rule.Compare.Equal, "a", "b", false);
+            Verify(Db.Rule.Compare.Equal, "Qwerty", "Qwerty", true);
+            Verify(Db.Rule.Compare.Equal, "", "", true);
+            Verify(Db.Rule.Compare.Equal, "ABC", "abc", false);
+            Verify(Db.Rule.Compare.Equal, randomString, TestUtil.NextString(), false);
+
+            // Equal is a string comparison.  Just so there's no confusion:
+            Verify(Db.Rule.Compare.Equal, "12345", "12345", true);
+            Verify(Db.Rule.Compare.Equal, "12345", "12345  ", false);
+            Verify(Db.Rule.Compare.Equal, "    12345", "12345", false);
+            Verify(Db.Rule.Compare.Equal, "0012345", "12345", false);
+            Verify(Db.Rule.Compare.Equal, "0xff", "255", false);
+
+            Verify(Db.Rule.Compare.NotEqual, "a", "a", false);
+            Verify(Db.Rule.Compare.NotEqual, randomString, randomString, false);
+            Verify(Db.Rule.Compare.NotEqual, "a", "b", true);
+            Verify(Db.Rule.Compare.NotEqual, "Qwerty", "Qwerty", false);
+            Verify(Db.Rule.Compare.NotEqual, "", "", false);
+            Verify(Db.Rule.Compare.NotEqual, "ABC", "abc", true);
+            Verify(Db.Rule.Compare.NotEqual, randomString, TestUtil.NextString(), true);
+
+            // NotEqual is a string comparison.  Just so there's no confusion:
+            Verify(Db.Rule.Compare.NotEqual, "12345", "12345", false);
+            Verify(Db.Rule.Compare.NotEqual, "12345", "12345  ", true);
+            Verify(Db.Rule.Compare.NotEqual, "    12345", "12345", true);
+            Verify(Db.Rule.Compare.NotEqual, "0012345", "12345", true);
+            Verify(Db.Rule.Compare.NotEqual, "0xff", "255", true);
+
+
+
+
+
+
+
+        }
     }
 }
 
