@@ -262,10 +262,10 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.AreEqual(item.State, WorkItemState.InProgress); // the other states can't really be in a work item info; GetItem() doesn't return them
             Assert.AreEqual(item.Name, expectedItemName);
 
-            //Console.WriteLine(before.ToString(DbUtil.FORMAT));
-            //Console.WriteLine(" " + item.Created.ToString(DbUtil.FORMAT));
-            //Console.WriteLine("  " + item.Entered.ToString(DbUtil.FORMAT));
-            //Console.WriteLine("   " + after.ToString(DbUtil.FORMAT));
+            Console.WriteLine(before.ToString(DbUtil.FORMAT));
+            Console.WriteLine(" " + item.Created.ToString(DbUtil.FORMAT));
+            Console.WriteLine("  " + item.Entered.ToString(DbUtil.FORMAT));
+            Console.WriteLine("   " + after.ToString(DbUtil.FORMAT));
 
             Assert.GreaterOrEqual(item.Created, before);
             Assert.GreaterOrEqual(item.Entered, before);

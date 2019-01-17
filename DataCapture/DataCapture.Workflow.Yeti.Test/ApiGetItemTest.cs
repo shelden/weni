@@ -27,7 +27,7 @@ namespace DataCapture.Workflow.Yeti.Test
             TestUtil.AssertRightPlaces(item, names["map"], names["startStep"]);
         }
 
-        //XXX: commented out until we can fix the MariaDB issue
+        [Test()]
         public void CanRetrieveInPriorityOrder()
         {
             DateTime start = DateTime.UtcNow;
@@ -74,9 +74,7 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.IsNull(nomore);
         }
 
-        /// <summary>
-        /// XXX commented out until we fix the mariadb issue
-        /// </summary>
+        [Test()]
         public void PriorityTiesResolvedByTime()
         {
             DateTime pretime = DateTime.UtcNow;
