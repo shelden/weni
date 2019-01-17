@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("DataCapture.IO")]
-[assembly: AssemblyDescription("$Id$")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vermont Purple, LLC")]
 [assembly: AssemblyProduct("DataCapture.IO")]
