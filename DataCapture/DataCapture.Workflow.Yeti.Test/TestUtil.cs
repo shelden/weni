@@ -159,6 +159,54 @@ namespace DataCapture.Workflow.Yeti.Test
                 };
         }
 
+        public static Dictionary<String, String> CreateMapWithRules()
+        {
+            var dbConn = ConnectionFactory.Create();
+
+            var map = TestUtil.MakeMap(dbConn);
+            var queue = TestUtil.MakeQueue(dbConn);
+            var end = Step.Insert(dbConn
+                , "End" + TestUtil.NextString()
+                , map
+                , queue
+                , Step.StepType.Terminating
+             );
+
+            var middle = Step.Insert(dbConn
+                , "Middle" + TestUtil.NextString()
+                , map
+                , queue
+                , end
+                , Step.StepType.Standard
+                );
+
+            var start = Step.Insert(dbConn
+                , "Start" + TestUtil.NextString()
+                , map
+                , queue
+                , middle
+                , Step.StepType.Start
+                );
+
+            var rule = DataCapture.Workflow.Yeti.Db.Rule.Insert(dbConn
+                , "skipMiddle"
+                , Db.Rule.Compare.Equal
+                , "true"
+                , 0
+                , start
+                , end
+                );
+
+
+            return new Dictionary<String, String>() {
+                    {  "queue", queue.Name }
+                    , { "map", map.Name }
+                    , { "startStep", start.Name }
+                    , { "endStep", end.Name }
+                    , { "middleStep", middle.Name }
+                };
+        }
+
         public static Dictionary<String, String> CreatePairs()
         {
             Dictionary<String, String> tmp = new Dictionary<String, String>();
@@ -235,7 +283,6 @@ namespace DataCapture.Workflow.Yeti.Test
             {
                 msg.Remove(0, 2); // make pretty by removing the leading ", "
                 Console.WriteLine(msg);
-
                 Assert.Fail(msg.ToString());
             }
 
@@ -245,7 +292,7 @@ namespace DataCapture.Workflow.Yeti.Test
         /// Assert that a work item has all its expected values.
         /// </summary>
         /// <param name="item">the work item returned by the API</param>
-        /// <param name="before">a UTC timestamp before the item was entered</param>
+        /// <param name="before">a UTC timestamp before the item was created</param>
         /// <param name="after">a UTC timestamp after the item was returned</param>
         /// <param name="expectedPairs">The Key-value pairs we expect to be in the
         /// work item</param>
@@ -290,9 +337,10 @@ namespace DataCapture.Workflow.Yeti.Test
             )
         {
             Assert.IsNotNull(item);
+            Console.WriteLine(item.StepName + " expecting " + step);
             Assert.AreEqual(item.StepName, step);
             Assert.AreEqual(item.MapName, map);
-}
+        }
         #endregion
     }
 }

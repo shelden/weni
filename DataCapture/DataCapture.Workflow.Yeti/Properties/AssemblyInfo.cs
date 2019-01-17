@@ -4,11 +4,11 @@ using System.Runtime.CompilerServices;
 // Information about this assembly is defined by the following attributes. 
 // Change them to the values specific to your project.
 
-[assembly: AssemblyTitle("DataCapture.Workflow")]
+[assembly: AssemblyTitle("DataCapture.Workflow.Yeti")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Vermont Purple, LLC")]
-[assembly: AssemblyProduct("")]
+[assembly: AssemblyProduct("DataCapture.Workflow.Yeti")]
 [assembly: AssemblyCopyright("Copyright (C) 2018 - 2019 Vermont Purple, LLC")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

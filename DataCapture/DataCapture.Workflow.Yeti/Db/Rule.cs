@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Text;
+using System.Collections.Generic;
 
 namespace DataCapture.Workflow.Yeti.Db
 {
@@ -18,7 +19,7 @@ namespace DataCapture.Workflow.Yeti.Db
 
         #region Constants
         public static readonly String TABLE = "workflow.rules";
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
                 + "insert into "
                 + TABLE
                 + " ( "
@@ -37,20 +38,26 @@ namespace DataCapture.Workflow.Yeti.Db
                 + "     , @comparison "
                 + "     , @next_step_id "
                 + ") "
+		;
+        private static readonly String SELECT_BASE = ""
+            + "SELECT rule_id "
+            + "       , step_id "
+            + "       , rule_order "
+            + "       , variable_name "
+            + "       , variable_value "
+            + "       , comparison "
+            + "       , next_step_id "
+            + " FROM "
+            + TABLE + " "
+            + "WHERE 0 = 0 "
             ;
-        public static readonly String SELECT_BY_ID = ""
-                + "select rule_id "
-                + "       , step_id "
-                + "       , rule_order "
-                + "       , variable_name "
-                + "       , variable_value "
-                + "       , comparison "
-                + "       , next_step_id "
-                + " from "
-                + TABLE + " "
-                + "WHERE 0 = 0 "
-                + "AND   rule_id = @id "
-                ;
+        private static readonly String SELECT_BY_ID = SELECT_BASE
+            + "AND       rule_id = @id ";
+        private static readonly String SELECT_BY_STEP_ID = SELECT_BASE
+            + "AND       step_id = @step_id "
+            + "ORDER BY  rule_order "
+            + "          , rule_id "
+            ;
         #endregion
 
         #region Properties
@@ -104,27 +111,34 @@ namespace DataCapture.Workflow.Yeti.Db
             )
 
         {
-            IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
 
-            DbUtil.AddParameter(command, "@rule_order", ruleOrder);
-            DbUtil.AddParameter(command, "@variable_name", variableName);
-            DbUtil.AddParameter(command, "@variable_value", variableValue);
-            DbUtil.AddParameter(command, "@comparison", (int)(compare));
-            DbUtil.AddParameter(command, "@step_id", step.Id);
-            DbUtil.AddParameter(command, "@next_step_id", nextStep.Id);
+                DbUtil.AddParameter(command, "@rule_order", ruleOrder);
+                DbUtil.AddParameter(command, "@variable_name", variableName);
+                DbUtil.AddParameter(command, "@variable_value", variableValue);
+                DbUtil.AddParameter(command, "@comparison", (int)(compare));
+                DbUtil.AddParameter(command, "@step_id", step.Id);
+                DbUtil.AddParameter(command, "@next_step_id", nextStep.Id);
 
-            int id = Convert.ToInt32(command.ExecuteScalar());
-            return new Rule(id
-                , step.Id
-                , variableName
-                                , compare
-
-                , variableValue
-                                , ruleOrder
-
-                , nextStep.Id
-                );
+                int id = Convert.ToInt32(command.ExecuteScalar());
+                return new Rule(id
+                    , step.Id
+                    , variableName
+                    , compare
+                    , variableValue
+                    , ruleOrder
+                    , nextStep.Id
+                    );
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(INSERT);
+                throw;
+            }
         }
         #endregion
 
@@ -148,6 +162,36 @@ namespace DataCapture.Workflow.Yeti.Db
             {
                 DbUtil.ReallyClose(reader);
             }
+        }
+
+        /// <summary>
+        /// Find all the rules hanging of a specified step, in order
+        /// </summary>
+        /// <returns>The select.</returns>
+        /// <param name="dbconn">connection to database</param>
+        /// <param name="step">The step</param>
+        public static IList<Rule> Select(IDbConnection dbConn, Step step)
+        {
+            var tmp = new List<Rule>();
+            IDataReader reader = null;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = SELECT_BY_STEP_ID;
+                DbUtil.AddParameter(command, "@step_id", step.Id);
+                reader = command.ExecuteReader();
+                if (reader == null) return null;
+                while(reader.Read())
+                {
+                    tmp.Add(new Rule(reader));
+                }
+                return tmp;
+            }
+            finally
+            {
+                DbUtil.ReallyClose(reader);
+            }
+
         }
         #endregion
 
