@@ -327,16 +327,17 @@ namespace DataCapture.Workflow.Yeti.Test
       Assert.AreEqual(item.State, WorkItemState.InProgress);
       Assert.AreEqual(item.Name, expectedItemName);
 
-      //Console.WriteLine(before.ToString(DbUtil.FORMAT));
-      //Console.WriteLine(" " + item.Created.ToString(DbUtil.FORMAT));
-      //Console.WriteLine("  " + item.Entered.ToString(DbUtil.FORMAT));
-      //Console.WriteLine("   " + after.ToString(DbUtil.FORMAT));
+      String format = DbUtil.FORMAT + "fff";
+      Console.WriteLine(before.ToString(format));
+      Console.WriteLine(" " + item.Created.ToString(format));
+      Console.WriteLine("  " + item.Entered.ToString(format));
+      Console.WriteLine("   " + after.ToString(format));
 
-      Assert.GreaterOrEqual(item.Created, before);
-      Assert.GreaterOrEqual(item.Entered, before);
-      Assert.LessOrEqual(item.Created, item.Entered);
-      Assert.GreaterOrEqual(after, item.Created);
-      Assert.GreaterOrEqual(after, item.Entered);
+      Assert.GreaterOrEqual(item.Created, before, "created should be after start of test");
+      Assert.GreaterOrEqual(item.Entered, before, "entered should be after start of test");
+      Assert.LessOrEqual(item.Created, item.Entered, "entered should be >= created");
+      Assert.GreaterOrEqual(after, item.Created, "created should be before GetItem()");
+      Assert.GreaterOrEqual(after, item.Entered, "entered should be before (or equal) GetItem()");
 
       Assert.AreEqual(item.Priority, expectedPriority);
       AssertSame(expectedPairs, item);
