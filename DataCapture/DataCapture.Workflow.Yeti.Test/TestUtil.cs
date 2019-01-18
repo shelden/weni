@@ -327,11 +327,11 @@ namespace DataCapture.Workflow.Yeti.Test
       Assert.AreEqual(item.State, WorkItemState.InProgress);
       Assert.AreEqual(item.Name, expectedItemName);
 
-      String format = DbUtil.FORMAT + "fff";
-      Console.WriteLine(before.ToString(format));
-      Console.WriteLine(" " + item.Created.ToString(format));
-      Console.WriteLine("  " + item.Entered.ToString(format));
-      Console.WriteLine("   " + after.ToString(format));
+      //String format = DbUtil.FORMAT + "fff";
+      //Console.WriteLine(before.ToString(format));
+      //Console.WriteLine(" " + item.Created.ToString(format));
+      //Console.WriteLine("  " + item.Entered.ToString(format));
+      //Console.WriteLine("   " + after.ToString(format));
 
       Assert.GreaterOrEqual(item.Created, before, "created should be after start of test");
       Assert.GreaterOrEqual(item.Entered, before, "entered should be after start of test");

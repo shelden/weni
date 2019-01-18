@@ -24,7 +24,7 @@ namespace DataCapture.Workflow.Yeti.Test
                 msg.Append(" vs ");
                 msg.Append(precise.ToString(format));
 
-                Console.WriteLine(msg);
+                //Console.WriteLine(msg);
 
                 // precise is taken after truncated, so you'd
                 // think precise > truncated, right?
