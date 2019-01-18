@@ -30,7 +30,7 @@ namespace DataCapture.Workflow.Yeti.Test
         // error inserting in this order...
         public void CanSelectThenInsert()
         {
-            DateTime startup = DateTime.UtcNow;
+            DateTime startup = TestUtil.FlooredNow();
             String name = TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(1, 100);
             var dbConn = ConnectionFactory.Create();

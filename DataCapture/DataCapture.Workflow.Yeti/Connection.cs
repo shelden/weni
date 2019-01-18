@@ -6,7 +6,7 @@ using DataCapture.Workflow.Yeti.Db;
 
 namespace DataCapture.Workflow.Yeti
 {
-    using KeyValuePairs = Dictionary<String, String>;
+    using IKeyValuePairs = IDictionary<String, String>;
     public class Connection : IDisposable
     {
         #region constants
@@ -128,7 +128,7 @@ namespace DataCapture.Workflow.Yeti
         public void CreateItem(String mapName
             , String itemName
             , String stepName
-            , KeyValuePairs data
+            , IKeyValuePairs data
             , int priority = 0
             )
         {

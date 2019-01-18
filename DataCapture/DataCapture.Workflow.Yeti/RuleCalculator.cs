@@ -5,7 +5,7 @@ using DataCapture.Workflow.Yeti.Db;
 
 namespace DataCapture.Workflow.Yeti
 {
-    class RuleCalculator
+    public class RuleCalculator
     {
         #region constants
         #endregion
@@ -17,23 +17,89 @@ namespace DataCapture.Workflow.Yeti
         #endregion
 
         #region behavior
-        public static bool Applies(Db.Rule rule, String inRule, String inItem)
+        /// <summary>
+        /// Finds the next step in the workflow.  That step could be:
+        /// * due to an matching / applied rule
+        /// * the next step configured in the workflow
+        /// * null if this is a terminating step, and no rules apply
+        /// </summary>
+        /// <returns>The next step.</returns>
+        /// <param name="dbConn">connection to the underlying database</param>
+        /// <param name="item">Item.</param>
+        /// <param name="step">Current step</param>
+        public Step FindNextStep(IDbConnection dbConn
+            , WorkItemInfo item
+            , Step step
+            )
         {
-            switch(rule.Comparison)
+            if (item == null) throw new ArgumentNullException("item");
+            if (step == null) throw new ArgumentNullException("step");
+
+            var rules = Db.Rule.Select(dbConn, step);
+            if (rules == null) return GetStepBasedNext(dbConn, step);
+            if (rules.Count == 0) return GetStepBasedNext(dbConn, step);
+
+            foreach (var rule in rules)
+            {
+                if (!item.ContainsKey(rule.VariableName)) continue;
+                String inItem = item[rule.VariableName];
+
+                if (Applies(rule, inItem))
+                {
+                    return GetRuleBasedNext(dbConn, rule);
+                }
+            }
+            // if none of the rules apply, return step.NextStep
+            return GetStepBasedNext(dbConn, step);
+        }
+        #endregion
+
+        #region internal behavior
+        /// <summary>
+        /// Returns true iff the value in the rule satisfies the value in
+        /// the item. 
+        /// For example, if the rule says foo!=someValue, and the item
+        /// has the value in foo for otherValue, then this method
+        /// returns true.
+        /// </summary>
+        /// <param name="rule">the rule to apply</param>
+        /// <param name="valueInItem">The value in the item</param>
+        public static bool Applies(Db.Rule rule
+            , String valueInItem
+            )
+        {
+            if (rule == null) throw new ArgumentNullException("rule");
+            String valueInRule = rule.VariableValue;
+
+            int value = String.Compare(valueInRule, valueInItem);
+            switch (rule.Comparison)
             {
                 case Db.Rule.Compare.Equal:
-                    return inRule.Equals(inItem);
+                    return value == 0;
                 case Db.Rule.Compare.NotEqual:
-                    return !inRule.Equals(inItem);
+                    return value != 0;
+                case Db.Rule.Compare.Less:
+                    return value > 0;
+                case Db.Rule.Compare.Greater:
+                    return value < 0;
                 default:
                     var msg = new StringBuilder();
-                    msg.Append("apply rule comparison of type ");
+                    msg.Append("unknown rule comparison of type ");
                     msg.Append(rule.Comparison);
-                    msg.Append(" not yet supported in rule ");
+                    msg.Append(" in rule [");
                     msg.Append(rule.ToString());
+                    msg.Append("]");
                     throw new Exception(msg.ToString());
             }
         }
+
+        /// <summary>
+        /// Helper method to return the next step based on the specified
+        /// rule.  Called after we've determined that the rule applies.
+        /// </summary>
+        /// <returns>The rule based next.</returns>
+        /// <param name="dbConn">connection to the underlying database</param>
+        /// <param name="rule">the matching rule</param>
         public static Step GetRuleBasedNext(IDbConnection dbConn, Db.Rule rule)
         {
             if (rule == null) throw new ArgumentNullException("rule");
@@ -51,10 +117,23 @@ namespace DataCapture.Workflow.Yeti
             }
             return tmp;
         }
+
+        /// <summary>
+        /// Returns the next step to the specified step.
+        /// This method is called when no rules
+        /// apply.
+        /// If the step is a terminating step, it returns null.
+        /// Exceptions are thrown if there is no next step (for
+        /// non-Terminating steps), or if the next step is
+        /// missing from the database.
+        /// </summary>
+        /// <returns>The step configured to be next</returns>
+        /// <param name="dbConn">connection to the underlying database</param>
+        /// <param name="step">the current step</param>
         public static Step GetStepBasedNext(IDbConnection dbConn, Step step)
         {
             if (step == null) throw new ArgumentNullException("step");
-            if (step.NextStepId == Step.NO_NEXT_STEP 
+            if (step.NextStepId == Step.NO_NEXT_STEP
                 && step.Type == Step.StepType.Terminating
                 )
             {
@@ -86,34 +165,7 @@ namespace DataCapture.Workflow.Yeti
                 throw new Exception(msg.ToString());
             }
             return tmp;
-
         }
-
-        public Step FindNextStep(IDbConnection dbConn
-            , WorkItemInfo item
-            , Step currentStep
-            )
-        {
-            var rules = Db.Rule.Select(dbConn, currentStep);
-            if (rules == null) return GetStepBasedNext(dbConn, currentStep);
-            if (rules.Count == 0) return GetStepBasedNext(dbConn, currentStep);
-
-
-            foreach (var rule in rules)
-            {
-                Console.WriteLine("--- " + rule);
-                if (!item.ContainsKey(rule.VariableName)) continue;
-                String inRule = rule.VariableValue;
-                String inItem = item[rule.VariableName];
-
-                if (Applies(rule, inRule, inItem))
-                {
-                    return GetRuleBasedNext(dbConn, rule);
-                }
-            }
-            // if none of the rules apply, return step.NextStep
-            return GetStepBasedNext(dbConn, currentStep);
-}
         #endregion
     }
 }

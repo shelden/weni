@@ -316,10 +316,10 @@ namespace DataCapture.Workflow.Yeti.Test
                                   , String expectedItemName
                                   , IDictionary<String, String> expectedPairs
                                   , DateTime before
-                                  , DateTime after
                                   , int expectedPriority
                                   )
     {
+      DateTime after = DateTime.UtcNow;
       Assert.IsNotNull(item);
       Assert.Greater(item.Id, 0);
       // The only state that makes sense for a WII is InProgress.  GetItem()
@@ -327,16 +327,17 @@ namespace DataCapture.Workflow.Yeti.Test
       Assert.AreEqual(item.State, WorkItemState.InProgress);
       Assert.AreEqual(item.Name, expectedItemName);
 
-      //Console.WriteLine(before.ToString(DbUtil.FORMAT));
-      //Console.WriteLine(" " + item.Created.ToString(DbUtil.FORMAT));
-      //Console.WriteLine("  " + item.Entered.ToString(DbUtil.FORMAT));
-      //Console.WriteLine("   " + after.ToString(DbUtil.FORMAT));
+      //String format = DbUtil.FORMAT + "fff";
+      //Console.WriteLine(before.ToString(format));
+      //Console.WriteLine(" " + item.Created.ToString(format));
+      //Console.WriteLine("  " + item.Entered.ToString(format));
+      //Console.WriteLine("   " + after.ToString(format));
 
-      Assert.GreaterOrEqual(item.Created, before);
-      Assert.GreaterOrEqual(item.Entered, before);
-      Assert.LessOrEqual(item.Created, item.Entered);
-      Assert.GreaterOrEqual(after, item.Created);
-      Assert.GreaterOrEqual(after, item.Entered);
+      Assert.GreaterOrEqual(item.Created, before, "created should be after start of test");
+      Assert.GreaterOrEqual(item.Entered, before, "entered should be after start of test");
+      Assert.LessOrEqual(item.Created, item.Entered, "entered should be >= created");
+      Assert.GreaterOrEqual(after, item.Created, "created should be before GetItem()");
+      Assert.GreaterOrEqual(after, item.Entered, "entered should be before (or equal) GetItem()");
 
       Assert.AreEqual(item.Priority, expectedPriority);
       AssertSame(expectedPairs, item);
@@ -355,10 +356,36 @@ namespace DataCapture.Workflow.Yeti.Test
                                          )
     {
       Assert.IsNotNull(item);
-      Console.WriteLine(item.StepName + " expecting " + step);
       Assert.AreEqual(item.StepName, step);
       Assert.AreEqual(item.MapName, map);
     }
     #endregion
+
+    #region Useful DateTimes
+    /// <summary>
+    /// Returns the current time, in UTC, to the nearest previous
+	/// millisecond.  Doing so makes comparisons in unit
+	/// tests more reliable.
+    /// </summary>
+	/// ...because depending on the precision of a) the clock
+	/// your machine, and b) the DDL you're using to declare
+	/// date times in the database, unpredictable things can
+	/// happen
+    public static DateTime FlooredNow()
+    {
+      var value = DateTime.UtcNow;
+      var copy = new DateTime(value.Year
+															, value.Month
+															, value.Day
+															, value.Hour
+															, value.Minute
+															, value.Second
+															, value.Millisecond
+															, value.Kind
+															);
+                                                            return copy;
+                                                            }
+	#endregion
+			
   }
 }
