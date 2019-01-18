@@ -84,10 +84,11 @@ namespace DataCapture.Workflow.Yeti
                     return value < 0;
                 default:
                     var msg = new StringBuilder();
-                    msg.Append("apply rule comparison of type ");
+                    msg.Append("unknown rule comparison of type ");
                     msg.Append(rule.Comparison);
-                    msg.Append(" not yet supported in rule ");
+                    msg.Append(" in rule [");
                     msg.Append(rule.ToString());
+                    msg.Append("]");
                     throw new Exception(msg.ToString());
             }
         }

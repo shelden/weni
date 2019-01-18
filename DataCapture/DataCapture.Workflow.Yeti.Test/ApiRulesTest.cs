@@ -152,15 +152,12 @@ namespace DataCapture.Workflow.Yeti.Test
             Verify(Db.Rule.Compare.Less, "0", "", true);
             Verify(Db.Rule.Compare.Less, "ABC", "abc", LOWERCASE_SMALLER);
             Verify(Db.Rule.Compare.Less, "abc", "ABC", !LOWERCASE_SMALLER);
-
             Verify(Db.Rule.Compare.Less, "XXX", "XXX", false);
             Verify(Db.Rule.Compare.Less, "XXX", "XXY", false);
             Verify(Db.Rule.Compare.Less, "XXX", "XXW", true);
             Verify(Db.Rule.Compare.Less, "XXX", "XX", true);
             Verify(Db.Rule.Compare.Less, "XXX", "XXXa", false);
             Verify(Db.Rule.Compare.Less, "XXX", "XXX0", false);
-
-
             Verify(Db.Rule.Compare.Less, "XXY", "XXX", true);
             Verify(Db.Rule.Compare.Less, "XXW", "XXX", false);
             Verify(Db.Rule.Compare.Less, "XX", "XXX", false);
@@ -186,7 +183,6 @@ namespace DataCapture.Workflow.Yeti.Test
             Verify(Db.Rule.Compare.Greater, "0", "", false);
             Verify(Db.Rule.Compare.Greater, "ABC", "abc", !LOWERCASE_SMALLER);
             Verify(Db.Rule.Compare.Greater, "abc", "ABC", LOWERCASE_SMALLER);
-
             Verify(Db.Rule.Compare.Greater, "XXX", "XXX", false);
             Verify(Db.Rule.Compare.Greater, "XXX", "XXY", true);
             Verify(Db.Rule.Compare.Greater, "XXX", "XXW", false);
@@ -212,6 +208,102 @@ namespace DataCapture.Workflow.Yeti.Test
             Verify(Db.Rule.Compare.Greater, "0xff", "255", true);
             Verify(Db.Rule.Compare.Greater, "255", "0xff", false);
         }
+
+        [Test()]
+        public void UnknownOperatorThrows()
+        {
+            Console.WriteLine("--> UnknownOperatorThrows()");
+            Dictionary<int, bool> expectedList = null;
+            try
+            {
+                expectedList = new Dictionary<int, bool>()
+            {
+                { (int)Db.Rule.Compare.Equal, false }
+                , { (int)Db.Rule.Compare.NotEqual, false }
+                , { (int)Db.Rule.Compare.Greater, false }
+                , { (int)Db.Rule.Compare.Less, false }
+                , { (int)Db.Rule.Compare.Less + 1, true }
+                , { (int)Db.Rule.Compare.Equal - 1, true }
+                , { TestUtil.RANDOM.Next(int.MinValue, 0), true }
+                , { TestUtil.RANDOM.Next(100, int.MaxValue), true }
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Console.WriteLine("--- UnknownOperatorThrows() 0");
+
+
+            foreach (var i in expectedList.Keys)
+            {
+
+                var expected = expectedList[i];
+                Console.WriteLine(i + ") " + expected);
+                String msg = "";
+                try
+                {
+                    Db.Rule.Compare op = (Db.Rule.Compare)i;
+                    bool verifyShouldReturn = false;
+                    switch(op)
+                    {
+                        case Db.Rule.Compare.Equal:
+                            verifyShouldReturn = true;
+                            break;
+                        case Db.Rule.Compare.NotEqual:
+                        case Db.Rule.Compare.Less:
+                        case Db.Rule.Compare.Greater:
+                            verifyShouldReturn = false;
+                            break;
+                        default:
+                            // doesn't really matter; we want
+                            // it to throw
+                            break;
+                    }
+                    Verify(op, "same", "same", verifyShouldReturn);
+                }
+                catch(Exception ex)
+                {
+                    msg = ex.Message;
+                }
+
+                if (expected)
+                {
+                    Assert.That(msg != "", "we expected an exception to be thrown for " + i);
+                    Assert.That(msg.Contains("unknown rule comparison"));
+                    Assert.That(msg.Contains(i.ToString()));
+                }
+                else
+                {
+                    Assert.That(String.IsNullOrEmpty(msg)
+                        , "we didn't expect an exception for " 
+                        + i 
+                        + " but we got one anyway: " 
+                        + msg
+                        );
+                }
+            }
+        }
+
+        [Test()]
+        public void RulesAppliedInOrder()
+        {
+            //Assert.Fail("not yet implemented");
+        }
+
+        [Test()]
+        public void BadNextStepsThrow()
+        {
+            // check next step in step.  NO_NEXT_STEP only on Terminating
+            //Assert.Fail("check next not yet implemented");
+
+            // check next step in rule.  Non-existent throws
+
+            // check next step in step.  Non-existent throws
+        }
+
+
     }
 }
 
