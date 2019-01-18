@@ -8,6 +8,56 @@ namespace DataCapture.Workflow.Yeti.Test
 {
     public class ApiRulesTest
     {
+        #region constants
+        public static readonly bool SPACES_SMALLER = String.Compare("   Purple", "Purple") < 0;
+        public static readonly bool LOWERCASE_SMALLER = String.Compare("z", "Z") < 0;
+        public static readonly bool DIGITS_SMALLER = String.Compare("0", "A") < 0;
+        #endregion
+
+        #region utility
+        private void Verify(Db.Rule.Compare op
+            , String left
+            , String right
+            , bool expected
+            )
+        {
+            var msg = new System.Text.StringBuilder();
+            try
+            {
+                var rule = new Db.Rule(-1 // not in db, so no id
+                    , -1 // not in db, so no step
+                    , "variable name irrelevant for RC.Applies()"
+                    , op
+                    , left
+                    , TestUtil.RANDOM.Next() // order also irrelvant for this test
+                    , Step.NO_NEXT_STEP
+                    );
+                msg.Append("Rule with operator ");
+                msg.Append(op);
+                msg.Append(" [");
+                msg.Append(left);
+                msg.Append("] vs [");
+                msg.Append(right);
+                msg.Append("] we expect to evaulate to ");
+                msg.Append(expected);
+
+                bool result = RuleCalculator.Applies(rule, right);
+
+                if (result != expected)
+                {
+                    Console.WriteLine(msg);
+                }
+                Assert.That(result == expected, msg.ToString());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(msg);
+                Console.WriteLine("but it threw: " + ex);
+                throw;
+            }
+        }
+        #endregion
+
         [Test()]
         public void RuleThatSkipsMiddle()
         {
@@ -59,54 +109,11 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.AreEqual(0, WorkItemData.SelectAll(dbConn, item1.Id).Count);
         }
         
-        private void Verify(Db.Rule.Compare op
-            , String left
-            , String right
-            , bool expected
-            )
-        {
-            var msg = new System.Text.StringBuilder();
-            try
-            {
-                var rule = new Db.Rule(-1 // not in db, so no id
-                    , -1 // not in db, so no step
-                    , "variable name irrelevant for RC.Applies()"
-                    , op
-                    , left
-                    , TestUtil.RANDOM.Next() // order also irrelvant for this test
-                    , Step.NO_NEXT_STEP
-                    );
-                msg.Append("Rule with operator ");
-                msg.Append(op);
-                msg.Append(" [");
-                msg.Append(left);
-                msg.Append("] vs [");
-                msg.Append(right);
-                msg.Append("] we expect to evaulate to ");
-                msg.Append(expected);
 
-                bool result = RuleCalculator.Applies(rule, right);
-
-                if (result != expected)
-                {
-                    Console.WriteLine(msg);
-                }
-                Assert.That(result == expected, msg.ToString());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(msg);
-                Console.WriteLine("but it threw: " + ex);
-                throw;
-            }
-        }
 
         [Test()]
         public void VerifyComparisons()
         {
-            bool LOWER_SMALLER = String.Compare("a", "A") < 0;
-            bool SPACES_SMALLER = String.Compare("   Purple", "Purple") < 0;
-
             var randomString = TestUtil.NextString();
             Verify(Db.Rule.Compare.Equal, "a", "a", true);
             Verify(Db.Rule.Compare.Equal, randomString, randomString, true);
@@ -143,8 +150,8 @@ namespace DataCapture.Workflow.Yeti.Test
             Verify(Db.Rule.Compare.Less, "", "A", false);
             Verify(Db.Rule.Compare.Less, "A", "", true);
             Verify(Db.Rule.Compare.Less, "0", "", true);
-            Verify(Db.Rule.Compare.Less, "ABC", "abc", LOWER_SMALLER);
-            Verify(Db.Rule.Compare.Less, "abc", "ABC", !LOWER_SMALLER);
+            Verify(Db.Rule.Compare.Less, "ABC", "abc", LOWERCASE_SMALLER);
+            Verify(Db.Rule.Compare.Less, "abc", "ABC", !LOWERCASE_SMALLER);
 
             Verify(Db.Rule.Compare.Less, "XXX", "XXX", false);
             Verify(Db.Rule.Compare.Less, "XXX", "XXY", false);
@@ -171,6 +178,39 @@ namespace DataCapture.Workflow.Yeti.Test
             Verify(Db.Rule.Compare.Less, "12345", "0012345", true);
             Verify(Db.Rule.Compare.Less, "0xff", "255", false);
             Verify(Db.Rule.Compare.Less, "255", "0xff", true);
+
+            Verify(Db.Rule.Compare.Greater, "", "", false);
+            Verify(Db.Rule.Compare.Greater, "", "0", true);
+            Verify(Db.Rule.Compare.Greater, "", "A", true);
+            Verify(Db.Rule.Compare.Greater, "A", "", false);
+            Verify(Db.Rule.Compare.Greater, "0", "", false);
+            Verify(Db.Rule.Compare.Greater, "ABC", "abc", !LOWERCASE_SMALLER);
+            Verify(Db.Rule.Compare.Greater, "abc", "ABC", LOWERCASE_SMALLER);
+
+            Verify(Db.Rule.Compare.Greater, "XXX", "XXX", false);
+            Verify(Db.Rule.Compare.Greater, "XXX", "XXY", true);
+            Verify(Db.Rule.Compare.Greater, "XXX", "XXW", false);
+            Verify(Db.Rule.Compare.Greater, "XXX", "XX", false);
+            Verify(Db.Rule.Compare.Greater, "XXX", "XXXa", true);
+            Verify(Db.Rule.Compare.Greater, "XXX", "XXX0", true);
+            Verify(Db.Rule.Compare.Greater, "XXY", "XXX", false);
+            Verify(Db.Rule.Compare.Greater, "XXW", "XXX", true);
+            Verify(Db.Rule.Compare.Greater, "XX", "XXX", true);
+            Verify(Db.Rule.Compare.Greater, "XXXa", "XXX", false);
+            Verify(Db.Rule.Compare.Greater, "XXX0", "XXX", false);
+
+
+            // Greater is a string comparison.  Just so there's no confusion:
+            Verify(Db.Rule.Compare.Greater, "12345", "12345", false);
+            Verify(Db.Rule.Compare.Greater, "12345", "12345  ", true);
+            Verify(Db.Rule.Compare.Greater, "12345   ", "12345", false);
+            Verify(Db.Rule.Compare.Greater, "12345", "12345    ", true);
+            Verify(Db.Rule.Compare.Greater, "    12345", "12345", SPACES_SMALLER);
+            Verify(Db.Rule.Compare.Greater, "12345", "    12345", !SPACES_SMALLER);
+            Verify(Db.Rule.Compare.Greater, "0012345", "12345", true);
+            Verify(Db.Rule.Compare.Greater, "12345", "0012345", false);
+            Verify(Db.Rule.Compare.Greater, "0xff", "255", true);
+            Verify(Db.Rule.Compare.Greater, "255", "0xff", false);
         }
     }
 }

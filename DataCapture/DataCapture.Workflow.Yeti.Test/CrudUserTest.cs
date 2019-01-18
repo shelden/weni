@@ -63,7 +63,7 @@ namespace DataCapture.Workflow.Yeti.Test
         [Test()]
         public void CannotInsertDuplicate()
         {
-            String login = TestUtil.NextString();
+            String login = "User" + TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
             int before = TestUtil.SelectCount(dbConn, User.TABLE);
             User.Insert(dbConn, login, 1);
@@ -85,7 +85,7 @@ namespace DataCapture.Workflow.Yeti.Test
             Console.WriteLine("expected exception: " + msg);
             Assert.AreNotEqual(msg, "", "expected exception not thrown");
             int after2 = TestUtil.SelectCount(dbConn, User.TABLE);
-            Assert.AreEqual(after2, before + 1);
+            Assert.AreEqual(after2, before + 1); // should be 1
         }
 
         [Test()]
@@ -107,8 +107,6 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.AreNotEqual(found.Id, 0);
         }
 
-        /*
-
         [Test()]
         public void CanUpdate()
         {
@@ -129,7 +127,7 @@ namespace DataCapture.Workflow.Yeti.Test
             // now, let's modify the login and update 
             int id = found.Id;
             found.Login = login1;
-            //found.Update(dbConn_);
+            found.Update(dbConn);
 
             User foundAgain = User.Select(dbConn, login0);
             User updated = User.Select(dbConn, login1);
@@ -138,14 +136,7 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.AreEqual(updated.Id, id);
             Assert.AreEqual(updated.Login, login1);
             Assert.AreEqual(updated.LoginLimit, limit0);
-
-
-
-
-
-
-
         }
-*/
     }
+
 }
