@@ -359,5 +359,32 @@ namespace DataCapture.Workflow.Yeti.Test
       Assert.AreEqual(item.MapName, map);
     }
     #endregion
+
+    #region Useful DateTimes
+    /// <summary>
+    /// Returns the current time, in UTC, to the nearest previous
+	/// millisecond.  Doing so makes comparisons in unit
+	/// tests more reliable.
+    /// </summary>
+	/// ...because depending on the precision of a) the clock
+	/// your machine, and b) the DDL you're using to declare
+	/// date times in the database, unpredictable things can
+	/// happen
+    public static DateTime FlooredNow()
+    {
+      var value = DateTime.UtcNow;
+      var copy = new DateTime(value.Year
+															, value.Month
+															, value.Day
+															, value.Hour
+															, value.Minute
+															, value.Second
+															, value.Millisecond
+															, value.Kind
+															);
+                                                            return copy;
+                                                            }
+	#endregion
+			
   }
 }

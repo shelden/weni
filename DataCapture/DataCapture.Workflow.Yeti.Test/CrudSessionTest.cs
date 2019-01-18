@@ -26,7 +26,7 @@ namespace DataCapture.Workflow.Yeti.Test
         [Test()]
         public void InsertAndSelectEqual()
         {
-            DateTime start = DateTime.UtcNow;
+            DateTime start = TestUtil.FlooredNow();
             var dbConn = ConnectionFactory.Create();
             var user = TestUtil.MakeUser(dbConn);
 

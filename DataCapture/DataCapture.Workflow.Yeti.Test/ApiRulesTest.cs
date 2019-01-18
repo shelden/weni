@@ -61,7 +61,7 @@ namespace DataCapture.Workflow.Yeti.Test
         [Test()]
         public void RuleThatSkipsMiddle()
         {
-            DateTime start = DateTime.UtcNow;
+            DateTime start = TestUtil.FlooredNow();
             String itemName = "item" + TestUtil.NextString();
             int priority = TestUtil.RANDOM.Next(-100, 100);
             var wfConn = TestUtil.CreateConnected();
@@ -75,7 +75,7 @@ namespace DataCapture.Workflow.Yeti.Test
                 );
             var item0 = wfConn.GetItem(names["queue"]);
 
-            DateTime post = DateTime.UtcNow;
+            DateTime post = TestUtil.FlooredNow();
             TestUtil.AssertSame(item0, itemName, pairs, start, post, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
@@ -87,7 +87,7 @@ namespace DataCapture.Workflow.Yeti.Test
             item0["skipMiddle"] = "true";
             wfConn.FinishItem(item0);
             var item1 = wfConn.GetItem(names["queue"]);
-            post = DateTime.UtcNow;
+            post = TestUtil.FlooredNow();
             TestUtil.AssertSame(item1, itemName, item0, start, post, priority);
             TestUtil.AssertRightPlaces(item1, names["map"], names["endStep"]);
 
