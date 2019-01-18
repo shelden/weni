@@ -71,12 +71,17 @@ namespace DataCapture.Workflow.Yeti
             if (rule == null) throw new ArgumentNullException("rule");
             String valueInRule = rule.VariableValue;
 
+            int value = String.Compare(valueInRule, valueInItem);
             switch (rule.Comparison)
             {
                 case Db.Rule.Compare.Equal:
-                    return valueInRule.Equals(valueInItem);
+                    return value == 0;
                 case Db.Rule.Compare.NotEqual:
-                    return !valueInRule.Equals(valueInItem);
+                    return value != 0;
+                case Db.Rule.Compare.Less:
+                    return value > 0;
+                case Db.Rule.Compare.Greater:
+                    return value < 0;
                 default:
                     var msg = new StringBuilder();
                     msg.Append("apply rule comparison of type ");
@@ -119,7 +124,7 @@ namespace DataCapture.Workflow.Yeti
         /// If the step is a terminating step, it returns null.
         /// Exceptions are thrown if there is no next step (for
         /// non-Terminating steps), or if the next step is
-        /// missing.
+        /// missing from the database.
         /// </summary>
         /// <returns>The step configured to be next</returns>
         /// <param name="dbConn">connection to the underlying database</param>
