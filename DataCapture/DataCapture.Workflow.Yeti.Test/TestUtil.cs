@@ -316,10 +316,10 @@ namespace DataCapture.Workflow.Yeti.Test
                                   , String expectedItemName
                                   , IDictionary<String, String> expectedPairs
                                   , DateTime before
-                                  , DateTime after
                                   , int expectedPriority
                                   )
     {
+      DateTime after = DateTime.UtcNow;
       Assert.IsNotNull(item);
       Assert.Greater(item.Id, 0);
       // The only state that makes sense for a WII is InProgress.  GetItem()

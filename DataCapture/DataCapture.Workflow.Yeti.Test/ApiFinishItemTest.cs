@@ -24,8 +24,7 @@ namespace DataCapture.Workflow.Yeti.Test
                 , priority
                 );
             var item0 = wfConn.GetItem(names["queue"]);
-            DateTime post = TestUtil.FlooredNow();
-            TestUtil.AssertSame(item0, itemName, pairs, start, post, priority);
+            TestUtil.AssertSame(item0, itemName, pairs, start, priority);
             TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
             Assert.IsNotNull(item0);
@@ -34,8 +33,7 @@ namespace DataCapture.Workflow.Yeti.Test
             // end step in our simple map setup:
             wfConn.FinishItem(item0);
             var item1 = wfConn.GetItem(names["queue"]);
-            post = TestUtil.FlooredNow();
-            TestUtil.AssertSame(item1, itemName, pairs, start, post, priority);
+            TestUtil.AssertSame(item1, itemName, pairs, start, priority);
             TestUtil.AssertRightPlaces(item1, names["map"], names["endStep"]);
 
             // now, since we're in an end step, finishing the item should make
