@@ -1,4 +1,4 @@
-k﻿using System;
+using System;
 using DataCapture.Workflow.Yeti.Db;
 using NUnit.Framework;
 
