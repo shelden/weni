@@ -49,6 +49,7 @@ namespace DataCapture.Workflow.Yeti.Test
             }
             Console.WriteLine("expected exception: " + msg);
             Assert.AreNotEqual(msg, "", "expected exception not thrown");
+            Assert.That(msg.Contains("[" + user.Login + "]"));
 
             int after1 = TestUtil.SelectCount(dbConn, WorkItemAccess.TABLE);
             Assert.AreEqual(before + 1, after0);
@@ -74,7 +75,6 @@ namespace DataCapture.Workflow.Yeti.Test
             Assert.AreNotEqual(selected, null);
             Assert.GreaterOrEqual(inserted.Id, 1);
             Assert.AreEqual(inserted.Id, selected.Id);
-            Console.WriteLine(inserted.ToString() + " vs " + selected.ToString());
             Assert.AreEqual(inserted.UserId, selected.UserId);
             Assert.AreEqual(inserted.IsAllowed, selected.IsAllowed);
             Assert.AreEqual(inserted.IsAllowed, value);

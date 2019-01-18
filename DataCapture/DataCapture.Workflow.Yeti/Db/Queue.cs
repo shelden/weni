@@ -66,19 +66,30 @@ namespace DataCapture.Workflow.Yeti.Db
 
         #region CRUD: Insert
         public static Queue Insert(IDbConnection dbConn
-                  , String name
-                , bool isFail = false
-                  )
+            , String name
+            , bool isFail = false
+            )
+        { 
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
+                DbUtil.AddParameter(command, "@name", name);
+                DbUtil.AddParameter(command, "@is_fail", isFail);
 
-        {
-            IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
-            DbUtil.AddParameter(command, "@name", name);
-            DbUtil.AddParameter(command, "@is_fail", isFail);
-
-            int id = Convert.ToInt32(command.ExecuteScalar());
-            Queue tmp = new Queue(id, name, isFail);
-            return tmp;
+                int id = Convert.ToInt32(command.ExecuteScalar());
+                Queue tmp = new Queue(id, name, isFail);
+                return tmp;
+            }
+            catch (Exception ex)
+            {
+                var msg = new StringBuilder();
+                msg.Append("Cannot insert queue [");
+                msg.Append(name);
+                msg.Append("]: ");
+                msg.Append(ex.Message);
+                throw new Exception(msg.ToString(), ex);
+            }
         }
         #endregion
 

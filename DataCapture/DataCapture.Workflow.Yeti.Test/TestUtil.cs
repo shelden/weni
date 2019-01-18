@@ -355,7 +355,6 @@ namespace DataCapture.Workflow.Yeti.Test
                                          )
     {
       Assert.IsNotNull(item);
-      Console.WriteLine(item.StepName + " expecting " + step);
       Assert.AreEqual(item.StepName, step);
       Assert.AreEqual(item.MapName, map);
     }

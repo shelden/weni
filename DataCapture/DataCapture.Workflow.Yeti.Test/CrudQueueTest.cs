@@ -94,7 +94,7 @@ namespace DataCapture.Workflow.Yeti.Test
         [Test()]
         public void CannotInsertDuplicate()
         {
-            String name = TestUtil.NextString();
+            String name = "QueueDup" + TestUtil.NextString();
             var dbConn = ConnectionFactory.Create();
             int before = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Queue.Insert(dbConn, name);
@@ -112,8 +112,9 @@ namespace DataCapture.Workflow.Yeti.Test
                 msg = ex.Message;
             }
 
-            Assert.AreNotEqual(msg, "", "expected exception not thrown");
             Console.WriteLine("expected exception: " + msg);
+            Assert.AreNotEqual(msg, "", "expected exception not thrown");
+            Assert.That(msg.Contains("[" + name + "]"), "exception message should contain bad queue");
             int after2 = TestUtil.SelectCount(dbConn, Queue.TABLE);
             Assert.AreEqual(after2, before + 1);
         }

@@ -9,7 +9,7 @@ namespace DataCapture.Workflow.Yeti.Db
     {
         #region Constants
         public static readonly String TABLE = "workflow.work_item_access";
-        public static readonly String INSERT = ""
+        private static readonly String INSERT = ""
                 + "INSERT INTO "
                 + TABLE
                 + " ( "
@@ -23,8 +23,7 @@ namespace DataCapture.Workflow.Yeti.Db
                 + "     , @is_allowed "
                 + ") "
             ;
-
-        public static readonly String SELECT_BY_ID = ""
+        private static readonly String SELECT_BASE = ""
                 + "SELECT "
                 + "     access_id "
                 + "     , item_id "
@@ -33,21 +32,14 @@ namespace DataCapture.Workflow.Yeti.Db
                 + "FROM "
                 + TABLE + " "
                 + "WHERE 0 = 0 "
-                + "AND   access_id = @access_id "
-                ; 
-
-            public static readonly String SELECT_BY_ITEM_USER_ID = ""
-         + "SELECT "
-         + "     access_id "
-         + "     , item_id "
-         + "     , user_id "
-         + "     , is_allowed "
-         + "FROM "
-         + TABLE + " "
-         + "WHERE 0 = 0 "
+            ;
+        private static readonly String SELECT_BY_ID = SELECT_BASE
+            + "AND   access_id = @access_id "
+            ;
+        private static readonly String SELECT_BY_ITEM_USER_ID = SELECT_BASE
             + "AND item_id = @item_id "
-            + "AND user_id = @user_id"
-         ;
+            + "AND user_id = @user_id "
+            ;
         #endregion
 
         #region Properties
@@ -62,7 +54,7 @@ namespace DataCapture.Workflow.Yeti.Db
             , int workItemId
             , int userId
             , bool isAllowed
-                        )
+            )
         {
             Id = id;
             WorkItemId = workItemId;
@@ -80,27 +72,42 @@ namespace DataCapture.Workflow.Yeti.Db
 
         #region CRUD: Insert
         public static WorkItemAccess Insert(IDbConnection dbConn
-                                          , WorkItem workItem
+                                          , WorkItem item
                                           , User user
                                           , bool isAllowed
             )
-                                          
+
         {
-            IDbCommand command = dbConn.CreateCommand();
-            command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
+            try
+            {
+                IDbCommand command = dbConn.CreateCommand();
+                command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
 
-            DbUtil.AddParameter(command, "@item_id", workItem.Id);
-            DbUtil.AddParameter(command, "@user_id", user.Id);
-            DbUtil.AddParameter(command, "@is_allowed", isAllowed);
+                DbUtil.AddParameter(command, "@item_id", item.Id);
+                DbUtil.AddParameter(command, "@user_id", user.Id);
+                DbUtil.AddParameter(command, "@is_allowed", isAllowed);
 
-            int id = Convert.ToInt32(command.ExecuteScalar());
-            return new WorkItemAccess(id
-                                    , workItem.Id
-                                    , user.Id
-                                    , isAllowed
-                                    );
-                                                                     
+                int id = Convert.ToInt32(command.ExecuteScalar());
+                return new WorkItemAccess(id
+                                        , item.Id
+                                        , user.Id
+                                        , isAllowed
+                                        );
+            }
+            catch (Exception ex)
+            {
+                var msg = new StringBuilder();
+                msg.Append("cannot ");
+                msg.Append(isAllowed ? "allow" : "disallow");
+                msg.Append(" access for [");
+                msg.Append(user.Login);
+                msg.Append("] on WorkItem [");
+                msg.Append(item);
+                msg.Append(']');
+                throw new Exception(msg.ToString(), ex);
+            }
         }
+
         #endregion
 
         #region CRUD: Select
