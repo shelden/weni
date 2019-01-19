@@ -231,9 +231,6 @@ namespace DataCapture.Workflow.Yeti.Test
                 Console.WriteLine(ex.Message);
             }
 
-            Console.WriteLine("--- UnknownOperatorThrows() 0");
-
-
             foreach (var i in expectedList.Keys)
             {
 
@@ -284,78 +281,114 @@ namespace DataCapture.Workflow.Yeti.Test
             }
         }
 
+
+        struct StepByRuleOrder
+        {
+            public int middleOrder_;
+            public int endOrder_;
+            public String stepName_;
+
+            public StepByRuleOrder(int middleOrder
+                , int endOrder
+                , String stepName)
+            {
+                middleOrder_ = middleOrder;
+                endOrder_ = endOrder;
+                stepName_ = stepName;
+            }
+        }
+
         [Test()]
         public void RulesAppliedInOrder()
         {
-            // first, some setup.  Create a simple map with some rules:
+
             DateTime startOfTest = TestUtil.FlooredNow();
             var dbConn = ConnectionFactory.Create();
-            String variable = "variable.trigger." + TestUtil.NextString();
-            String target = "shazaam" + TestUtil.NextString();
+
             var names = TestUtil.CreateMapWithRules();
 
             var start = Step.Select(dbConn, names["startStep"]);
             var middle = Step.Select(dbConn, names["middleStep"]);
             var end = Step.Select(dbConn, names["endStep"]);
-
             Assert.IsNotNull(start);
             Assert.IsNotNull(middle);
             Assert.IsNotNull(end);
 
-            // next, let's add the same rule, variable=target, with different
-            // destinations:
+            // then a list of rule orders vs the step name into which
+            // we expect the item to end up.  Basically, if the rule's
+            // order is lower, we expect it to be applied first.
+            var list = new List<StepByRuleOrder>();
 
-            var middleRule = Db.Rule.Insert(dbConn
-                , variable
-                , Db.Rule.Compare.Equal
-                , target
-                , 0
-                , start
-                , middle
-                );
-            var endRule = Db.Rule.Insert(dbConn
-    , variable
-    , Db.Rule.Compare.Equal
-    , target
-    , 1
-    , start
-    , end
-    );
-            Console.WriteLine("applied rule should be " + middleRule);
+            // Note: when setting these up, don't duplicate a rule order.
+            // that voilates a DB constraint
+            list.Add(new StepByRuleOrder(101, 201, names["middleStep"]));
+            list.Add(new StepByRuleOrder(202, 102, names["endStep"]));
+            list.Add(new StepByRuleOrder(0, 1, names["middleStep"]));
+            list.Add(new StepByRuleOrder(1, 0, names["endStep"]));
+            list.Add(new StepByRuleOrder(99999, int.MaxValue, names["middleStep"]));
+            list.Add(new StepByRuleOrder(int.MaxValue, 99999, names["endStep"]));
+
+            // rule order is unsigned in the DB, so, note no comparison betwee rule order -5
+            // and 5
 
 
+            int i = 0;
+            foreach (var e in list)
+            {
+                String variable = "var" + i + TestUtil.NextString();
+                String target = "shazaam" + i + TestUtil.NextString();
+                // now, for each pair of rule orders, create a rule
+                // with the specified rule priority / order:
+                var middleRule = Db.Rule.Insert(dbConn
+                                                , variable
+                                                , Db.Rule.Compare.Equal
+                                                , target
+                                                , e.middleOrder_
+                                                , start
+                                                , middle
+                                                );
+
+                // next, let's add the same rule, variable=target, but
+                // with a different order (and different destination,
+                // so we can tell):
+                var endRule = Db.Rule.Insert(dbConn
+                                             , variable
+                                             , Db.Rule.Compare.Equal
+                                             , target
+                                             , e.endOrder_
+                                             , start
+                                             , end
+                                             );
 
 
-            // now let's insert something with variable=target
-            String itemName = "item4orders" + TestUtil.NextString();
-            int priority = TestUtil.RANDOM.Next(-100, 100);
-            var wfConn = TestUtil.CreateConnected();
-            var pairs = TestUtil.CreatePairs();
-            pairs[variable] = target;
+                // now let's insert something with variable=target
+                String itemName = "item4orders" + TestUtil.NextString();
+                int priority = TestUtil.RANDOM.Next(-100, 100);
+                var wfConn = TestUtil.CreateConnected();
+                var pairs = TestUtil.CreatePairs();
+                pairs[variable] = target;
 
-            wfConn.CreateItem(names["map"]
-                , itemName
-                , names["startStep"]
-                , pairs
-                , priority
-                );
+                wfConn.CreateItem(names["map"]
+                    , itemName
+                    , names["startStep"]
+                    , pairs
+                    , priority
+                    );
 
-            // it should be in the start step:
-            var item0 = wfConn.GetItem(names["queue"]);
-            TestUtil.AssertSame(item0, itemName, pairs, startOfTest, priority);
-            TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
+                // it should be in the start step:
+                var item0 = wfConn.GetItem(names["queue"]);
+                TestUtil.AssertSame(item0, itemName, pairs, startOfTest, priority);
+                TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
 
+                // now, let's finish the item.  The rules should be
+                // applied based on the rule_order attributes specified
+                // in the struct
+                wfConn.FinishItem(item0);
+                var item1 = wfConn.GetItem(names["queue"]);
 
-            // now, let's finish it.  The rules should be applied in order. 
-            wfConn.FinishItem(item0);
-            var item1 = wfConn.GetItem(names["queue"]);
-
-            TestUtil.AssertSame(item1, itemName, pairs, startOfTest, priority);
-            TestUtil.AssertRightPlaces(item1, names["map"], names["middleStep"]);
-
-
-
-
+                TestUtil.AssertSame(item1, itemName, pairs, startOfTest, priority);
+                TestUtil.AssertRightPlaces(item1, names["map"], e.stepName_);
+            }
         }
 
         [Test()]
@@ -368,8 +401,5 @@ namespace DataCapture.Workflow.Yeti.Test
 
             // check next step in step.  Non-existent throws
         }
-
-
     }
 }
-
