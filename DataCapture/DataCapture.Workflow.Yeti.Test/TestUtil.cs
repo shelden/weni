@@ -355,7 +355,8 @@ namespace DataCapture.Workflow.Yeti.Test
                                          , String step
                                          )
     {
-      Assert.IsNotNull(item);
+      Assert.IsNotNull(item); 
+      Console.WriteLine(item.StepName + " vs " + step);
       Assert.AreEqual(item.StepName, step);
       Assert.AreEqual(item.MapName, map);
     }
@@ -375,16 +376,16 @@ namespace DataCapture.Workflow.Yeti.Test
     {
       var value = DateTime.UtcNow;
       var copy = new DateTime(value.Year
-															, value.Month
-															, value.Day
-															, value.Hour
-															, value.Minute
-															, value.Second
-															, value.Millisecond
-															, value.Kind
-															);
-                                                            return copy;
-                                                            }
+							, value.Month
+							, value.Day
+							, value.Hour
+							, value.Minute
+							, value.Second
+							, value.Millisecond
+							, value.Kind
+							);
+       return copy;
+    }
 	#endregion
 			
   }

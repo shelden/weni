@@ -287,7 +287,75 @@ namespace DataCapture.Workflow.Yeti.Test
         [Test()]
         public void RulesAppliedInOrder()
         {
-            //Assert.Fail("not yet implemented");
+            // first, some setup.  Create a simple map with some rules:
+            DateTime startOfTest = TestUtil.FlooredNow();
+            var dbConn = ConnectionFactory.Create();
+            String variable = "variable.trigger." + TestUtil.NextString();
+            String target = "shazaam" + TestUtil.NextString();
+            var names = TestUtil.CreateMapWithRules();
+
+            var start = Step.Select(dbConn, names["startStep"]);
+            var middle = Step.Select(dbConn, names["middleStep"]);
+            var end = Step.Select(dbConn, names["endStep"]);
+
+            Assert.IsNotNull(start);
+            Assert.IsNotNull(middle);
+            Assert.IsNotNull(end);
+
+            // next, let's add the same rule, variable=target, with different
+            // destinations:
+
+            var middleRule = Db.Rule.Insert(dbConn
+                , variable
+                , Db.Rule.Compare.Equal
+                , target
+                , 0
+                , start
+                , middle
+                );
+            var endRule = Db.Rule.Insert(dbConn
+    , variable
+    , Db.Rule.Compare.Equal
+    , target
+    , 1
+    , start
+    , end
+    );
+            Console.WriteLine("applied rule should be " + middleRule);
+
+
+
+
+            // now let's insert something with variable=target
+            String itemName = "item4orders" + TestUtil.NextString();
+            int priority = TestUtil.RANDOM.Next(-100, 100);
+            var wfConn = TestUtil.CreateConnected();
+            var pairs = TestUtil.CreatePairs();
+            pairs[variable] = target;
+
+            wfConn.CreateItem(names["map"]
+                , itemName
+                , names["startStep"]
+                , pairs
+                , priority
+                );
+
+            // it should be in the start step:
+            var item0 = wfConn.GetItem(names["queue"]);
+            TestUtil.AssertSame(item0, itemName, pairs, startOfTest, priority);
+            TestUtil.AssertRightPlaces(item0, names["map"], names["startStep"]);
+
+
+            // now, let's finish it.  The rules should be applied in order. 
+            wfConn.FinishItem(item0);
+            var item1 = wfConn.GetItem(names["queue"]);
+
+            TestUtil.AssertSame(item1, itemName, pairs, startOfTest, priority);
+            TestUtil.AssertRightPlaces(item1, names["map"], names["middleStep"]);
+
+
+
+
         }
 
         [Test()]
