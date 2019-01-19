@@ -14,32 +14,32 @@ namespace DataCapture.Build.VersionSetter
     #endregion
 
     #region members
-    private String version_ = "0.10.*";
-    private String company_ = "Vermont Purple, LLC";
+    private String m_version = "0.10.*";
+    private String m_company = "Vermont Purple, LLC";
     #endregion
 
     #region properties
     public String Version
     {
-      get { return version_; }
-      set { version_ = value; }
+      get { return m_version; }
+      set { m_version = value; }
     }
     public String Company
     {
-      get { return company_; }
-      set { company_ = value; }
+      get { return m_company; }
+      set { m_company = value; }
     }
     #endregion
 
     #region constructor
     public VersionSetter(String version)
     {
-      version_ = version;
+      m_version = version;
     }
     public VersionSetter(String version, String company)
         : this(version)
     {
-      company_ = company;
+      m_company = company;
     }
     #endregion
 
@@ -52,54 +52,53 @@ namespace DataCapture.Build.VersionSetter
     /// <param name="fileToEdit">File to edit.</param>
     public void EditInPlace(FileInfo fileToEdit)
     {
-      using (var tmp = new TempFile(".cs"))
-      { 
-        String line;
-        var input = new System.IO.StreamReader(fileToEdit.FullName);
-        var output = new System.IO.StreamWriter(tmp.Value.FullName);
-        while ((line = input.ReadLine()) != null)
+      var tmp = new TempFile(".cs");
+
+      String line;
+      var input = new System.IO.StreamReader(fileToEdit.FullName);
+      var output = new System.IO.StreamWriter(tmp.Value.FullName);
+      while ((line = input.ReadLine()) != null)
+      {
+        String original = line;
+        if (string.IsNullOrEmpty(line)
+            || string.IsNullOrWhiteSpace(line)
+            || line.StartsWith("//", StringComparison.CurrentCulture)
+            )
+        { /* no code*/ }
+        else if (line.StartsWith(PREFIX_ASSEMBLY, StringComparison.CurrentCulture))
         {
-          String original = line;
-          if (string.IsNullOrEmpty(line)
-              || string.IsNullOrWhiteSpace(line)
-              || line.StartsWith("//", StringComparison.CurrentCulture)
-              )
-          { /* no code*/ }
-          else if (line.StartsWith(PREFIX_ASSEMBLY, StringComparison.CurrentCulture))
+          String key = GetKey(line);
+          String value = GetValue(line);
+          switch (key)
           {
-            String key = GetKey(line);
-            String value = GetValue(line);
-            switch (key)
-            {
-              case "AssemblyCompany":
-                line = MakeLine(key, Company);
-                break;
-              case "AssemblyCopyright":
-                int previous = ExtractYear(value);
-                line = MakeLine(key, GetCopyright(previous));
-                break;
-              case "AssemblyVersion":
-                line = MakeLine(key, Version);
-                break;
-              default:
-                // attribute we don't care about.  Skip, writing
-                // incoming line
-                break;
-            }
+            case "AssemblyCompany":
+              line = MakeLine(key, Company);
+              break;
+            case "AssemblyCopyright":
+              int previous = ExtractYear(value);
+              line = MakeLine(key, GetCopyright(previous));
+              break;
+            case "AssemblyVersion":
+              line = MakeLine(key, Version);
+              break;
+            default:
+              // attribute we don't care about.  Skip, writing
+              // incoming line
+              break;
           }
-          if (!original.Equals(line))
-          {
-            Console.WriteLine(this.GetType().Name + ": Changing line:");
-            Console.WriteLine("from " + original);
-            Console.WriteLine("to   " + line);
-          }
-          output.WriteLine(line);
         }
-        input.Close();
-        output.Close();
-        fileToEdit.Delete();
-        tmp.Value.MoveTo(fileToEdit.FullName);
+        if (!original.Equals(line))
+        {
+          Console.WriteLine(this.GetType().Name + ": Changing line:");
+          Console.WriteLine("from " + original);
+          Console.WriteLine("to   " + line);
+        }
+        output.WriteLine(line);
       }
+      input.Close();
+      output.Close();
+      fileToEdit.Delete();
+      tmp.Value.MoveTo(fileToEdit.FullName);
     }
     /// <summary>
     /// Extracts the start year from a copyright string.  I.e.,
