@@ -103,7 +103,7 @@ namespace DataCapture.Workflow.Yeti.Db
         #region CRUD: Insert
         public static Rule Insert(IDbConnection dbConn
             , String variableName
-            , Rule.Compare compare
+            , Rule.Compare operation
             , String variableValue
             , int ruleOrder
             , Step step
@@ -113,13 +113,19 @@ namespace DataCapture.Workflow.Yeti.Db
         {
             try
             {
+                // arg checks here in try block, so the building of message can only be
+                // done 1x:
+                if (ruleOrder < 0) throw new ArgumentException("ruleOrder is unsigned.  Use >= 0");
+                if (step == null) throw new ArgumentNullException("step");
+                if (nextStep == null) throw new ArgumentNullException("nextStep");
+
                 IDbCommand command = dbConn.CreateCommand();
                 command.CommandText = INSERT + " ; " + DbUtil.GET_KEY;
 
                 DbUtil.AddParameter(command, "@rule_order", ruleOrder);
                 DbUtil.AddParameter(command, "@variable_name", variableName);
                 DbUtil.AddParameter(command, "@variable_value", variableValue);
-                DbUtil.AddParameter(command, "@comparison", (int)(compare));
+                DbUtil.AddParameter(command, "@comparison", (int)(operation));
                 DbUtil.AddParameter(command, "@step_id", step.Id);
                 DbUtil.AddParameter(command, "@next_step_id", nextStep.Id);
 
@@ -127,7 +133,7 @@ namespace DataCapture.Workflow.Yeti.Db
                 return new Rule(id
                     , step.Id
                     , variableName
-                    , compare
+                    , operation
                     , variableValue
                     , ruleOrder
                     , nextStep.Id
@@ -135,9 +141,22 @@ namespace DataCapture.Workflow.Yeti.Db
             }
             catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(INSERT);
-                throw;
+                var msg = new StringBuilder();
+                msg.Append("error adding rule [");
+                msg.Append(variableName);
+                msg.Append(Pretty(operation));
+                msg.Append(variableValue);
+                msg.Append("], order ");
+                msg.Append(ruleOrder);
+                msg.Append(" from step [");
+                msg.Append(step);
+                msg.Append("] to [");
+                msg.Append(nextStep);
+                msg.Append("]: ");
+                msg.Append(ex.Message);
+                //Console.WriteLine(msg);
+                //Console.WriteLine(INSERT);
+                throw new Exception(msg.ToString(), ex);
             }
         }
         #endregion
@@ -196,15 +215,10 @@ namespace DataCapture.Workflow.Yeti.Db
         #endregion
 
         #region ToString()
-        public override string ToString()
+        public static String Pretty(Db.Rule.Compare operation)
         {
             var sb = new StringBuilder();
-            sb.Append(this.GetType().FullName);
-            sb.Append(' ');
-            sb.Append(this.Id);
-            sb.Append(", ");
-            sb.Append(this.VariableName);
-            switch(this.Comparison)
+            switch (operation)
             {
                 case Rule.Compare.Equal:
                     sb.Append("==");
@@ -222,6 +236,17 @@ namespace DataCapture.Workflow.Yeti.Db
                     sb.Append("??");
                     break;
             }
+            return sb.ToString();
+        }
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.Append(this.GetType().FullName);
+            sb.Append(' ');
+            sb.Append(this.Id);
+            sb.Append(", ");
+            sb.Append(this.VariableName);
+            sb.Append(Pretty(this.Comparison));
             sb.Append(this.VariableValue);
             sb.Append(", next=");
             sb.Append(this.NextStepId);
