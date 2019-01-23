@@ -23,7 +23,7 @@
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
               failonerror="true"
-              input="Workflow/DataCapture.Workflow.Yeti/sql/WorkflowDDL.sql"
+              input="Workflow/DCwfl_Yeti/sql/WorkflowDDL.sql"
               >
             <arg value="-u" />
             <arg value="${db.mysql.user}" />
@@ -32,13 +32,13 @@
     </target>
     <!-- =============================================================== -->
     <target name="test">
-        <nunitconsole namespace="DataCapture.Example.Test" 
+        <nunitconsole namespace="DCcmn_ExampleTest"
 											category="Common"
 											/>
-        <nunitconsole namespace="DataCapture.IO.Test" 
+        <nunitconsole namespace="DCcmn_FileUtilTest"
 											category="Common"
 											/>
-        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test"
+        <nunitconsole namespace="DCwfl_YetiTest"
 											category="Workflow"
 											/>
     </target>
@@ -49,7 +49,7 @@
     </target>
     <!-- =============================================================== -->
     <target name="build">
-        <msbuild solution="Workflow/DataCapture.Workflow.Yeti.sln" 
+        <msbuild solution="Workflow/DCwfl_Yeti/DCwfl_Yeti.sln"
 								 />
     </target>
     <!-- =============================================================== -->
