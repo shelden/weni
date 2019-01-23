@@ -1,7 +1,8 @@
-<project name="DataCapture.Workflow"
+<?xml version="1.0" encoding="utf-8"?>
+<project name="DataCapture.Workflow.Yeti"
          default="all"
-         basedir="DataCapture"
+         basedir="Census_Practice"
          >
-    <!-- ================================================================== -->
-    <import file="DataCapture/build.xml" />
+    <!--  ================================================== -->
+    <import file="Census_Practice/build.xml" />
 </project>    
