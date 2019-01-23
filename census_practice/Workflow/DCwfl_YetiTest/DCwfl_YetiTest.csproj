@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B3B054B2-E7E8-490E-8DA6-E5E745C043F5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>LM.DataCapture.Workflow.Yeti.Test</RootNamespace>
+    <AssemblyName>DCwfl_YetiTest</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\Common\GACAssemblies\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestUtil.cs" />
+    <Compile Include="CrudUserTest.cs" />
+    <Compile Include="CrudSessionTest.cs" />
+    <Compile Include="CrudQueueTest.cs" />
+    <Compile Include="CrudMapTest.cs" />
+    <Compile Include="CrudStepTest.cs" />
+    <Compile Include="CrudRuleTest.cs" />
+    <Compile Include="CrudWorkItemTest.cs" />
+    <Compile Include="CrudWorkItemDataTest.cs" />
+    <Compile Include="CrudWorkItemAccessTest.cs" />
+    <Compile Include="ApiConnectionTest.cs" />
+    <Compile Include="XmlImportTest.cs" />
+    <Compile Include="ApiAddItemTest.cs" />
+    <Compile Include="ApiGetItemTest.cs" />
+    <Compile Include="ApiFinishItemTest.cs" />
+    <Compile Include="ApiRulesTest.cs" />
+    <Compile Include="MiscDateTimeTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DCwfl_Yeti\DCwfl_Yeti.csproj">
+      <Project>{DB68AA81-C4E9-4350-9153-9821DADA7420}</Project>
+      <Name>DCwfl_Yeti</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Common\DCcmn_FileUtil\DCcmn_FileUtil.csproj">
+      <Project>{C7508BD7-082D-49E1-9FA2-AF22231F82C8}</Project>
+      <Name>DCcmn_FileUtil</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
