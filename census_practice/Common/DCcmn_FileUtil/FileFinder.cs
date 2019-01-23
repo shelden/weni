@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
-namespace DataCapture.IO
+namespace LM.DataCapture.Common.FileUtil
 {
   /// <summary>
   /// This class will recursively find files -- as FileInfos -- starting

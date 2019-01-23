@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using DataCapture.IO;
+using LM.DataCapture.Common.FileUtil;
 
-namespace DataCapture.Build.VersionSetter
+namespace LM.DataCapture.Build.VersionSetter
 {
   public class VersionSetter
   {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace DataCapture.IO
+namespace LM.DataCapture.Common.FileUtil
 {
   /// <summary>
   /// Often programs need Temporary Files.  And naive programmers

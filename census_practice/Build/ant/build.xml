@@ -15,6 +15,7 @@
             <fileset dir="." includes="**/DataCapture*.dll" />
             <fileset dir="." includes="**/DataCapture*.exe" />
             <fileset dir="." includes="**/DC_*.dll" />
+            <fileset dir="." includes="**/DC_*.exe" />
             <fileset dir="." includes="**/TestResult*.xml" />
         </delete>
     </target>
@@ -62,11 +63,14 @@
         <property name="version.namespace"
                   value="DataCapture.Build.VersionSetter"
                   />
+        <property name="version.namespace.mangled"
+                  value="DCbld_VersionSetter"
+                  />
 				<!-- directories relative to census_practice: -->
         <property name="version.project"
-                  location="Build/${version.namespace}/${version.namespace}.sln" />
+                  location="Build/${version.namespace.mangled}/${version.namespace.mangled}.sln" />
         <property name="version.prog"
-                  location="Build/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
+                  location="Build/${version.namespace.mangled}/bin/${compile.config}/${version.namespace.mangled}.exe"
                   />
         <msbuild solution="${version.project}" 
 								 />

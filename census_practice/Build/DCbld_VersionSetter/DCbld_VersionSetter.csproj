@@ -5,8 +5,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5A93F5E9-6B69-8B1B-551B-4402169CA283}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>DataCapture.Build.VersionSetter</RootNamespace>
-    <AssemblyName>DataCapture.Build.VersionSetter</AssemblyName>
+    <RootNamespace>LM.DataCapture.Build.VersionSetter</RootNamespace>
+    <AssemblyName>DCbld_VersionSetter</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,9 +36,9 @@
     <Compile Include="VersionSetter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\DataCapture.IO\DataCapture.IO.csproj">
+    <ProjectReference Include="..\..\Common\DCcmn_FileUtil\DCcmn_FileUtil.csproj">
       <Project>{C7508BD7-082D-49E1-9FA2-AF22231F82C8}</Project>
-      <Name>DataCapture.IO</Name>
+      <Name>DCcmn_FileUtil</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

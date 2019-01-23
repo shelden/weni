@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using DataCapture.IO;
+using LM.DataCapture.Common.FileUtil;
 
-namespace DataCapture.Build.VersionSetter
+namespace LM.DataCapture.Build.VersionSetter
 {
   public class Program
   {

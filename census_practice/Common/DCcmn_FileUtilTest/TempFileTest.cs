@@ -1,8 +1,8 @@
 ﻿using System;
-using DataCapture.IO;
+using LM.DataCapture.Common.FileUtil;
 using NUnit.Framework;
 
-namespace DataCapture.IO.Test
+namespace LM.DataCapture.Common.FileUtil.Test
 {
   public class TempFileTest
   {
