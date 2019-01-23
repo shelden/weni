@@ -1,6 +1,7 @@
-<project name="DataCapture.Workflow.Yeti"
+<!-- basedir is census_practice -->
+<project name="DataCapture"
          default="all"
-         basedir="."
+         basedir="../.."
          >
     <!-- ============================================================== -->
     <property environment="env" />
@@ -13,6 +14,7 @@
         <delete>
             <fileset dir="." includes="**/DataCapture*.dll" />
             <fileset dir="." includes="**/DataCapture*.exe" />
+            <fileset dir="." includes="**/DC_*.dll" />
             <fileset dir="." includes="**/TestResult*.xml" />
         </delete>
     </target>
@@ -20,7 +22,7 @@
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
               failonerror="true"
-              input="DataCapture.Workflow.Yeti/sql/WorkflowDDL.sql"
+              input="Workflow/DataCapture.Workflow.Yeti/sql/WorkflowDDL.sql"
               >
             <arg value="-u" />
             <arg value="${db.mysql.user}" />
@@ -29,9 +31,15 @@
     </target>
     <!-- =============================================================== -->
     <target name="test">
-        <nunitconsole namespace="DataCapture.Example.Test" />
-        <nunitconsole namespace="DataCapture.IO.Test" />
-        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test" />
+        <nunitconsole namespace="DataCapture.Example.Test" 
+											category="Common"
+											/>
+        <nunitconsole namespace="DataCapture.IO.Test" 
+											category="Common"
+											/>
+        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test"
+											category="Workflow"
+											/>
     </target>
     <!-- =============================================================== -->
     <target name="echo">
@@ -40,28 +48,36 @@
     </target>
     <!-- =============================================================== -->
     <target name="build">
-        <msbuild solution="DataCapture.Workflow.sln" />
+        <msbuild solution="Workflow/DataCapture.Workflow.Yeti.sln" 
+								 />
     </target>
     <!-- =============================================================== -->
     <target name="version">
         <property name="version.number"
                   value="0.11.*"
                   />
+        <property name="version.company"
+                  value="Leidos Corporation"
+                  />
         <property name="version.namespace"
                   value="DataCapture.Build.VersionSetter"
                   />
+				<!-- directories relative to census_practice: -->
         <property name="version.project"
-                  location="../../Build/${version.namespace}/${version.namespace}.sln" />
+                  location="Build/${version.namespace}/${version.namespace}.sln" />
         <property name="version.prog"
-                  location="../Build/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
+                  location="Build/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
                   />
-        <msbuild solution="${version.project}" />
+        <msbuild solution="${version.project}" 
+								 />
         <exec    executable="${version.prog}"
                  osfamily="windows"
                  failonerror="true"
                  >
             <arg value="--version" />
             <arg value="${version.number}" />
+            <arg value="--company" />
+            <arg value="${version.company}" />
         </exec>
         <exec    executable="mono"
                  osfamily="unix"
@@ -70,6 +86,8 @@
             <arg value="${version.prog}" />
             <arg value="--version" />
             <arg value="${version.number}" />
+            <arg value="--company" />
+            <arg value="${version.company}" />
         </exec>
     </target>
     <!-- =============================================================== -->
@@ -97,12 +115,11 @@
               </exec>
         </sequential>
     </macrodef>
-
     <!-- =============================================================== -->
     <!-- nunit test runner section -->
     <!-- =============================================================== -->
     <property name="test.runner.prog"
-              location="3rdParty/NUnit.Console-3.9.0/nunit3-console.exe"
+              location="Common/GACAssemblies/NUnit.Console-3.9.0/nunit3-console.exe"
               />
     <!-- run nunit-console based on some standard naming conventions.    -->
     <!-- 1. we assume that the test dll foo lives in                     -->
@@ -117,9 +134,10 @@
     <!--    this macro.                                                  -->
     <macrodef name="nunitconsole">
         <attribute name="namespace" />
+        <attribute name="category" />
         <sequential>
             <exec executable="${test.runner.prog}"
-                  dir="@{namespace}"
+                  dir="@{category}/@{namespace}"
                   osfamily="windows"
                   >
                 <arg value="bin/${compile.config}/@{namespace}.dll" />
@@ -127,7 +145,7 @@
                 <arg value="--nocolor" />
             </exec>
             <exec executable="mono"
-                  dir="@{namespace}"
+                  dir="@{category}/@{namespace}"
                   osfamily="unix"
                   >
                 <arg value="${test.runner.prog}" />
