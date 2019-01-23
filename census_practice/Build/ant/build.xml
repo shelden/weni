@@ -1,6 +1,7 @@
-<project name="DataCapture.Workflow.Yeti"
+<!-- basedir is census_practice -->
+<project name="DataCapture"
          default="all"
-         basedir="."
+         basedir="../.."
          >
     <!-- ============================================================== -->
     <property environment="env" />
@@ -13,6 +14,7 @@
         <delete>
             <fileset dir="." includes="**/DataCapture*.dll" />
             <fileset dir="." includes="**/DataCapture*.exe" />
+            <fileset dir="." includes="**/DC_*.dll" />
             <fileset dir="." includes="**/TestResult*.xml" />
         </delete>
     </target>
@@ -29,14 +31,14 @@
     </target>
     <!-- =============================================================== -->
     <target name="test">
-        <nunitconsole category="Common"
-											namespace="DataCapture.Example.Test"
+        <nunitconsole namespace="DataCapture.Example.Test" 
+											category="Common"
 											/>
-        <nunitconsole category="Common"
-											namespace="DataCapture.IO.Test"
+        <nunitconsole namespace="DataCapture.IO.Test" 
+											category="Common"
 											/>
-        <nunitconsole category="Workflow"
-											namespace="DataCapture.Workflow.Yeti.Test"
+        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test"
+											category="Workflow"
 											/>
     </target>
     <!-- =============================================================== -->
@@ -46,42 +48,36 @@
     </target>
     <!-- =============================================================== -->
     <target name="build">
-        <msbuild solution="Workflow/DataCapture.Workflow.Yeti.sln" />
+        <msbuild solution="Workflow/DataCapture.Workflow.Yeti.sln" 
+								 />
     </target>
     <!-- =============================================================== -->
     <target name="version">
         <property name="version.number"
                   value="0.11.*"
                   />
-				<property name="version.company"
-									value="Leidos Corporation"
-									/>
+        <property name="version.company"
+                  value="Leidos Corporation"
+                  />
         <property name="version.namespace"
                   value="DataCapture.Build.VersionSetter"
                   />
-				<property name="version.namespace.mangled"
-									value="DCbld_VersionSetter"
-									/>
-				<property name="version.src.dir"
-									location="Build/${version.namespace}"
-									/>
-        <property name="version.solution"
-                  location="${version.src.dir}/${version.namespace}.sln" />
+				<!-- directories relative to census_practice: -->
+        <property name="version.project"
+                  location="Build/${version.namespace}/${version.namespace}.sln" />
         <property name="version.prog"
-                  location="${version.src.dir}/bin/${compile.config}/${version.namespace}.exe"
+                  location="Build/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
                   />
-				<echo message="${version.solution}" />
-				<msbuild solution="${version.solution}" />
+        <msbuild solution="${version.project}" 
+								 />
         <exec    executable="${version.prog}"
                  osfamily="windows"
                  failonerror="true"
                  >
             <arg value="--version" />
             <arg value="${version.number}" />
-						<arg value="--top" />
-						<arg value="." />
-						<arg value="--company" />
-						<arg value="${version.company}" />
+            <arg value="--company" />
+            <arg value="${version.company}" />
         </exec>
         <exec    executable="mono"
                  osfamily="unix"
@@ -90,10 +86,8 @@
             <arg value="${version.prog}" />
             <arg value="--version" />
             <arg value="${version.number}" />
-						<arg value="--top" />
-						<arg value="." />
-						<arg value="--company" />
-						<arg value="${version.company}" />
+            <arg value="--company" />
+            <arg value="${version.company}" />
         </exec>
     </target>
     <!-- =============================================================== -->
@@ -121,7 +115,6 @@
               </exec>
         </sequential>
     </macrodef>
-
     <!-- =============================================================== -->
     <!-- nunit test runner section -->
     <!-- =============================================================== -->
@@ -141,7 +134,7 @@
     <!--    this macro.                                                  -->
     <macrodef name="nunitconsole">
         <attribute name="namespace" />
- 				<attribute name="category" />
+        <attribute name="category" />
         <sequential>
             <exec executable="${test.runner.prog}"
                   dir="@{category}/@{namespace}"

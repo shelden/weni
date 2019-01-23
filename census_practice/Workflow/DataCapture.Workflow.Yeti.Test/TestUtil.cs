@@ -1,4 +1,4 @@
-﻿using System;
+ ﻿using System;
 using System.Text;
 using System.Data;
 using System.Collections.Generic;
@@ -365,28 +365,33 @@ namespace DataCapture.Workflow.Yeti.Test
     #region Useful DateTimes
     /// <summary>
     /// Returns the current time, in UTC, to the nearest previous
-	/// millisecond.  Doing so makes comparisons in unit
-	/// tests more reliable.
+    /// millisecond.  Doing so makes comparisons in unit
+    /// tests more reliable.
     /// </summary>
-	/// ...because depending on the precision of a) the clock
-	/// your machine, and b) the DDL you're using to declare
-	/// date times in the database, unpredictable things can
-	/// happen
+    /// ...because depending on the precision of a) the clock
+    /// your machine, and b) the DDL you're using to declare
+    /// date times in the database, unpredictable things can
+    /// happen.  
+    /// Worse, DateTime's implementation is in "ticks," so 
+    /// which change from OS to OS, if not machine to machine.
+    /// Meaning, rounding errors when converting from System.Sql.Timestamp,
+    /// making for difficult tests.
     public static DateTime FlooredNow()
     {
       var value = DateTime.UtcNow;
       var copy = new DateTime(value.Year
-							, value.Month
-							, value.Day
-							, value.Hour
-							, value.Minute
-							, value.Second
-							, value.Millisecond
-							, value.Kind
-							);
-       return copy;
+              , value.Month
+              , value.Day
+              , value.Hour
+              , value.Minute
+              , value.Second
+              , value.Millisecond
+              , value.Kind
+              );
+      System.Threading.Thread.Sleep(1);
+      return copy;
     }
-	#endregion
-			
+  #endregion
+      
   }
 }

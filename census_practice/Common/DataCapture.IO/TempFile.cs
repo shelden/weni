@@ -114,7 +114,14 @@ namespace DataCapture.IO
     {
       this.ReallyDelete();
     }
+    #endregion
 
+    #region ToString()
+    public override string ToString()
+    {
+      if (m_file == null) return "";
+      return m_file.FullName;
+    }
     #endregion
 
     #region private behavior

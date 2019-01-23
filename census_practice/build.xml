@@ -1,0 +1,7 @@
+<project name="DataCapture" 
+				 default="all" 
+				 basedir="."
+				 >
+<!-- ================================================== -->
+	<import file="Build/ant/build.xml" />
+</project>
