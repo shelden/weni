@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace DataCapture.Example.Test
+namespace LM.DataCapture.Common.ExampleTest
 {
   public class TrivialTest
   {

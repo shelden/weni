@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCcmn_FileUtil", "..\..\Com
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCcmn_FileUtilTest", "..\..\Common\DCcmn_FileUtilTest\DCcmn_FileUtilTest.csproj", "{5AFC4BB5-843C-C180-AE73-47F5A1978B22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DCcmn_ExampleTest", "..\..\Common\DCcmn_ExampleTest\DCcmn_ExampleTest.csproj", "{59D41ACA-2299-6E6E-40AE-A966531967E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5AFC4BB5-843C-C180-AE73-47F5A1978B22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D41ACA-2299-6E6E-40AE-A966531967E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
