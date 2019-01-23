@@ -15,6 +15,7 @@
             <fileset dir="." includes="**/DataCapture*.dll" />
             <fileset dir="." includes="**/DataCapture*.exe" />
             <fileset dir="." includes="**/DC_*.dll" />
+            <fileset dir="." includes="**/DC_*.exe" />
             <fileset dir="." includes="**/TestResult*.xml" />
         </delete>
     </target>
@@ -22,7 +23,7 @@
     <target name="db.init">
         <exec executable="${db.mysql.prog}"
               failonerror="true"
-              input="Workflow/DataCapture.Workflow.Yeti/sql/WorkflowDDL.sql"
+              input="Workflow/DCwfl_Yeti/sql/WorkflowDDL.sql"
               >
             <arg value="-u" />
             <arg value="${db.mysql.user}" />
@@ -31,13 +32,13 @@
     </target>
     <!-- =============================================================== -->
     <target name="test">
-        <nunitconsole namespace="DataCapture.Example.Test" 
+        <nunitconsole namespace="DCcmn_ExampleTest"
 											category="Common"
 											/>
-        <nunitconsole namespace="DataCapture.IO.Test" 
+        <nunitconsole namespace="DCcmn_FileUtilTest"
 											category="Common"
 											/>
-        <nunitconsole namespace="DataCapture.Workflow.Yeti.Test"
+        <nunitconsole namespace="DCwfl_YetiTest"
 											category="Workflow"
 											/>
     </target>
@@ -48,7 +49,7 @@
     </target>
     <!-- =============================================================== -->
     <target name="build">
-        <msbuild solution="Workflow/DataCapture.Workflow.Yeti.sln" 
+        <msbuild solution="Workflow/DCwfl_Yeti/DCwfl_Yeti.sln"
 								 />
     </target>
     <!-- =============================================================== -->
@@ -62,11 +63,14 @@
         <property name="version.namespace"
                   value="DataCapture.Build.VersionSetter"
                   />
+        <property name="version.namespace.mangled"
+                  value="DCbld_VersionSetter"
+                  />
 				<!-- directories relative to census_practice: -->
         <property name="version.project"
-                  location="Build/${version.namespace}/${version.namespace}.sln" />
+                  location="Build/${version.namespace.mangled}/${version.namespace.mangled}.sln" />
         <property name="version.prog"
-                  location="Build/${version.namespace}/bin/${compile.config}/${version.namespace}.exe"
+                  location="Build/${version.namespace.mangled}/bin/${compile.config}/${version.namespace.mangled}.exe"
                   />
         <msbuild solution="${version.project}" 
 								 />
