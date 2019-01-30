@@ -52,7 +52,6 @@
     <Compile Include="ApiGetItemTest.cs" />
     <Compile Include="ApiFinishItemTest.cs" />
     <Compile Include="ApiRulesTest.cs" />
-    <Compile Include="MiscDateTimeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DCwfl_Yeti\DCwfl_Yeti.csproj">
